@@ -13,6 +13,8 @@ multiple days.
 
 ## Example
 
+If you want a <q>real project</q> example, you can check [this one](https://github.com/Skyost/FlutterWeekView/tree/master/example) on Github.
+
 ### Day View
 
 Snippet :
