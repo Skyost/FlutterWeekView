@@ -128,11 +128,11 @@ Here are the options that are available for both `FlutterDayView` and `FlutterWe
 * `dateFormatter` The function that returns a formatted date as a String from a year, a month and a day.
 * `hourFormatter` The function that returns a formatted hour as a String from a hour and a minute.
 * `dayBarTextStyle` The day bar (top bar) text style.
-* `dayBarHeight` The day bar height (≤ 0 to disable).
+* `dayBarHeight` The day bar height (_≤ 0_ to disable).
 * `dayBarBackgroundColor` The day bar background color (`null` to remove).
 * `hoursColumnTextStyle` The hours column (left column) text style.
-* `hoursColumnWidth` The hours column width (≤ 0 to disable).
-* `hoursColumnBackgroundColor` The hours column background color.
+* `hoursColumnWidth` The hours column width (_≤ 0_ to disable).
+* `hoursColumnBackgroundColor` The hours column background color (`null` to remove).
 * `hourRowHeight` A hour row height (with a zoom factor of _1.0_).
 * `inScrollableWidget` Whether to put the widget in a scrollable widget (disable if you want to manage the scroll by yourself).
 * `scrollToCurrentTime` Whether the widget should automatically scroll to the current time (hour and minute with day if you are in a Week View).
