@@ -1,0 +1,20 @@
+name: flutter_week_view_example
+description: Demonstrates how to use the flutter_week_view plugin.
+publish_to: 'none'
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  url_launcher: ^5.4.1
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_week_view:
+    path: ../
+
+flutter:
+  uses-material-design: true

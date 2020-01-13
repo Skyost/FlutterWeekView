@@ -1,0 +1,179 @@
+import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart' as URLLauncher;
+import 'package:flutter_week_view/flutter_week_view.dart';
+
+/// First plugin test method.
+void main() => runApp(_FlutterWeekViewDemoApp());
+
+/// The demo material app.
+class _FlutterWeekViewDemoApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+        title: 'Flutter Week View Demo',
+        initialRoute: '/',
+        routes: {
+          '/': (context) => inScaffold(body: _FlutterWeekViewDemoAppBody()),
+          '/day-view': (context) => inScaffold(
+                title: 'Demo day view',
+                body: _DemoDayView(),
+              ),
+          '/week-view': (context) => inScaffold(
+                title: 'Demo week view',
+                body: _DemoWeekView(),
+              ),
+        },
+      );
+
+  static Widget inScaffold({
+    String title = 'Flutter Week View',
+    @required Widget body,
+  }) =>
+      Scaffold(
+        appBar: AppBar(
+          title: Text(title),
+        ),
+        body: body,
+      );
+}
+
+/// The demo app body widget.
+class _FlutterWeekViewDemoAppBody extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    String github = 'https://github.com/Skyost/FlutterWeekView';
+    return Padding(
+      padding: EdgeInsets.all(30),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(bottom: 40),
+              child: Text(
+                'Flutter Week View demo',
+                style: Theme.of(context).textTheme.display1,
+                textAlign: TextAlign.center,
+              ),
+            ),
+            RaisedButton(
+              child: Text('Demo day view'),
+              onPressed: () => Navigator.pushNamed(context, '/day-view'),
+            ),
+            RaisedButton(
+              child: Text('Demo week view'),
+              onPressed: () => Navigator.pushNamed(context, '/week-view'),
+            ),
+            Expanded(
+              child: SizedBox.expand(),
+            ),
+            GestureDetector(
+              onTap: () async {
+                if (await URLLauncher.canLaunch(github)) {
+                  await URLLauncher.launch(github);
+                }
+              },
+              child: Text(
+                github,
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  color: Colors.blue[800],
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The demo day view widget.
+class _DemoDayView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+    DateTime date = DateTime(now.year, now.month, now.day);
+    return DayView(
+      date: now,
+      events: [
+        FlutterWeekViewEvent(
+          title: 'An event 1',
+          description: 'A description 1',
+          start: date.subtract(Duration(hours: 1)),
+          end: date.add(Duration(hours: 18, minutes: 30)),
+        ),
+        FlutterWeekViewEvent(
+          title: 'An event 2',
+          description: 'A description 2',
+          start: date.add(Duration(hours: 19)),
+          end: date.add(Duration(hours: 22)),
+        ),
+        FlutterWeekViewEvent(
+          title: 'An event 3',
+          description: 'A description 3',
+          start: date.add(Duration(hours: 23, minutes: 30)),
+          end: date.add(Duration(hours: 25, minutes: 30)),
+        ),
+        FlutterWeekViewEvent(
+          title: 'An event 4',
+          description: 'A description 4',
+          start: date.add(Duration(hours: 20)),
+          end: date.add(Duration(hours: 21)),
+        ),
+        FlutterWeekViewEvent(
+          title: 'An event 5',
+          description: 'A description 5',
+          start: date.add(Duration(hours: 20)),
+          end: date.add(Duration(hours: 21)),
+        ),
+      ],
+      currentTimeCircleColor: Colors.pink,
+    );
+  }
+}
+
+/// The demo week view widget.
+class _DemoWeekView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+    DateTime date = DateTime(now.year, now.month, now.day);
+    return WeekView(
+      dates: [date.subtract(Duration(days: 1)), date, date.add(Duration(days: 1))],
+      events: [
+        FlutterWeekViewEvent(
+          title: 'An event 1',
+          description: 'A description 1',
+          start: date.subtract(Duration(hours: 1)),
+          end: date.add(Duration(hours: 18, minutes: 30)),
+        ),
+        FlutterWeekViewEvent(
+          title: 'An event 2',
+          description: 'A description 2',
+          start: date.add(Duration(hours: 19)),
+          end: date.add(Duration(hours: 22)),
+        ),
+        FlutterWeekViewEvent(
+          title: 'An event 3',
+          description: 'A description 3',
+          start: date.add(Duration(hours: 23, minutes: 30)),
+          end: date.add(Duration(hours: 25, minutes: 30)),
+        ),
+        FlutterWeekViewEvent(
+          title: 'An event 4',
+          description: 'A description 4',
+          start: date.add(Duration(hours: 20)),
+          end: date.add(Duration(hours: 21)),
+        ),
+        FlutterWeekViewEvent(
+          title: 'An event 5',
+          description: 'A description 5',
+          start: date.add(Duration(hours: 20)),
+          end: date.add(Duration(hours: 21)),
+        ),
+      ],
+    );
+  }
+}
