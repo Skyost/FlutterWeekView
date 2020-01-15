@@ -14,10 +14,10 @@ class Utils {
   /// Makes the specified number to have at least two digits by adding a leading zero if needed.
   static String addLeadingZero(int number) => (number < 10 ? '0' : '') + number.toString();
 
-  /// Checks whether the provided date is today.
-  static bool isToday(DateTime date) {
-    DateTime now = DateTime.now();
-    return DateTime(now.year, now.month, now.day).difference(DateTime(date.year, date.month, date.day)).inDays == 0;
+  /// Checks whether the provided date overlaps the target date.
+  static bool overlapsDate(DateTime date, [DateTime target]) {
+    target = target ?? DateTime.now();
+    return DateTime(target.year, target.month, target.day).difference(DateTime(date.year, date.month, date.day)).inDays == 0;
   }
 
   /// Removes the last word from a string.

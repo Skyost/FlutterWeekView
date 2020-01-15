@@ -118,7 +118,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
     events.sort((a, b) => a.start.compareTo(b.start));
     controller.listeners.add(this);
 
-    if (widget.scrollToCurrentTime && widget.inScrollableWidget && Utils.isToday(widget.date)) {
+    if (widget.scrollToCurrentTime && widget.inScrollableWidget && Utils.overlapsDate(widget.date)) {
       DateTime now = DateTime.now();
       double topOffset = calculateTopOffset(now.hour, now.minute);
 
@@ -206,7 +206,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
     }
 
     DateTime now = DateTime.now();
-    if (widget.currentTimeRuleColor != null && Utils.isToday(widget.date)) {
+    if (widget.currentTimeRuleColor != null && Utils.overlapsDate(widget.date)) {
       children.add(createPositionedHorizontalRule(calculateTopOffset(now.hour + 1, now.minute), widget.currentTimeRuleColor));
       if (widget.currentTimeCircleColor != null) {
         double radius = 15;
@@ -275,7 +275,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
   List<Widget> createBackground() => [
         Positioned.fill(
           child: Container(
-            color: widget.eventsColumnBackgroundColor ?? (Utils.isToday(widget.date) ? Color(0xFFe3f5ff) : Color(0xFFF2F2F2)),
+            color: widget.eventsColumnBackgroundColor ?? (Utils.overlapsDate(widget.date) ? Color(0xFFe3f5ff) : Color(0xFFF2F2F2)),
           ),
         ),
       ]..addAll(List.generate(23, (hour) => createPositionedHorizontalRule(calculateTopOffset(hour + 1), widget.eventsColumnBackgroundRulesColor)));
@@ -373,7 +373,7 @@ class _EventDrawProperties {
 
   /// Creates a new flutter week view event draw properties from the specified day view and the specified day view event.
   _EventDrawProperties(DayView dayView, FlutterWeekViewEvent event) {
-    if (shouldDraw || (!Utils.isToday(event.start) && !Utils.isToday(event.end))) {
+    if (shouldDraw || (!Utils.overlapsDate(event.start, dayView.date) && !Utils.overlapsDate(event.end, dayView.date))) {
       return;
     }
 

@@ -243,7 +243,7 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       int index = 0;
       for (; index < widget.dates.length; index++) {
-        if (Utils.isToday(widget.dates[index])) {
+        if (Utils.overlapsDate(widget.dates[index])) {
           break;
         }
       }
