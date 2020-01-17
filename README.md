@@ -143,8 +143,7 @@ Here are the options that are available for both `FlutterDayView` and `FlutterWe
 Here are the specific options of `FlutterDayView` :
 
 * `date` The widget date.
-* `eventsColumnBackgroundColor` The events column background color (`null` to remove).
-* `eventsColumnBackgroundRulesColor` The events column background rules color (`null` to remove).
+* `eventsColumnBackgroundPainter` The events column background painter.
 * `currentTimeRuleColor` The current time rule color (`null` to disable).
 * `currentTimeCircleColor` The current time circle color (`null` or blank to disable).
 

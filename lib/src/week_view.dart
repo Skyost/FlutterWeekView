@@ -116,7 +116,7 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
       return SizedBox.expand();
     }
 
-    return createMainWidget(context);
+    return createMainWidget();
   }
 
   @override
@@ -148,8 +148,8 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
   }
 
   /// Creates the main widget.
-  Widget createMainWidget(BuildContext context) {
-    Widget weekViewStack = createWeekViewStack(context);
+  Widget createMainWidget() {
+    Widget weekViewStack = createWeekViewStack();
     if (widget.inScrollableWidget) {
       weekViewStack = NoGlowBehavior.noGlow(
         child: SingleChildScrollView(
@@ -186,8 +186,8 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
   }
 
   /// Creates the week view stack.
-  Widget createWeekViewStack(BuildContext context) {
-    Widget dayViewsRow = createDayViewsRow(context);
+  Widget createWeekViewStack() {
+    Widget dayViewsRow = createDayViewsRow();
     if (widget.inScrollableWidget) {
       dayViewsRow = NoGlowBehavior.noGlow(
         child: SingleChildScrollView(
@@ -204,14 +204,14 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
         Positioned(
           top: 0,
           left: 0,
-          child: createDayBarsRow(context),
+          child: createDayBarsRow(),
         ),
       ],
     );
   }
 
   /// Creates the day bars row.
-  Widget createDayBarsRow(BuildContext context) => Row(
+  Widget createDayBarsRow() => Row(
         children: widget.dates
             .map((date) => SizedBox(
                   width: dayViewWidth,
@@ -224,7 +224,7 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
       );
 
   /// Creates the views rows.
-  Widget createDayViewsRow(BuildContext context) => Row(
+  Widget createDayViewsRow() => Row(
         children: [
           for (int i = 0; i < widget.dates.length; i++)
             SizedBox(

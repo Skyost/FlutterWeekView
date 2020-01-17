@@ -16,6 +16,9 @@ typedef String HourFormatter(int hour, int minute);
 /// Builds an event text widget.
 typedef Widget EventTextBuilder(BuildContext context, DayView dayView, double height, double width);
 
+/// Allows to calculate a top offset from a given hour.
+typedef double TopOffsetCalculator(int hour);
+
 /// A (scrollable) day view which is able to display events, zoom and un-zoom and more !
 class DayView extends HeadersWidget {
   /// The events.
@@ -24,11 +27,8 @@ class DayView extends HeadersWidget {
   /// The day view date.
   final DateTime date;
 
-  /// The events column background color.
-  final Color eventsColumnBackgroundColor;
-
-  /// The events column background rules color.
-  final Color eventsColumnBackgroundRulesColor;
+  /// The events column background painter.
+  final EventsColumnBackgroundPainter eventsColumnBackgroundPainter;
 
   /// The current time rule color.
   final Color currentTimeRuleColor;
@@ -52,8 +52,7 @@ class DayView extends HeadersWidget {
   DayView({
     List<FlutterWeekViewEvent> events,
     @required DateTime date,
-    this.eventsColumnBackgroundColor,
-    this.eventsColumnBackgroundRulesColor = const Color(0x1A000000),
+    EventsColumnBackgroundPainter eventsColumnBackgroundPainter,
     this.currentTimeRuleColor = Colors.pink,
     this.currentTimeCircleColor,
     this.inScrollableWidget = true,
@@ -74,6 +73,7 @@ class DayView extends HeadersWidget {
         assert(scrollToCurrentTime != null),
         assert(userZoomable != null),
         this.date = DateTime(date.year, date.month, date.day),
+        this.eventsColumnBackgroundPainter = eventsColumnBackgroundPainter ?? EventsColumnBackgroundPainter(backgroundColor: Utils.overlapsDate(date) ? Color(0xFFe3f5ff) : Color(0xFFF2F2F2)),
         this.events = events ?? [],
         this.controller = controller ?? DayViewController(),
         super(
@@ -100,6 +100,9 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
   /// The current day view controller.
   final DayViewController controller;
 
+  /// The events column background painter.
+  final EventsColumnBackgroundPainter eventsColumnBackgroundPainter;
+
   /// The flutter week view events.
   final List<FlutterWeekViewEvent> events;
 
@@ -109,6 +112,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
   /// Creates a new day view state.
   _DayViewState(DayView dayView)
       : hourRowHeight = dayView.hourRowHeight,
+        eventsColumnBackgroundPainter = dayView.eventsColumnBackgroundPainter,
         controller = dayView.controller,
         events = List.of(dayView.events);
 
@@ -117,6 +121,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
     super.initState();
     events.sort((a, b) => a.start.compareTo(b.start));
     controller.listeners.add(this);
+    eventsColumnBackgroundPainter.topOffsetCalculator = (hour) => calculateTopOffset(hour);
 
     if (widget.scrollToCurrentTime && widget.inScrollableWidget && Utils.overlapsDate(widget.date)) {
       DateTime now = DateTime.now();
@@ -128,7 +133,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() => createEventsDrawProperties(context));
+      setState(() => createEventsDrawProperties());
     });
   }
 
@@ -136,7 +141,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
   Widget build(BuildContext context) {
     Widget mainStack = Stack(
       children: [
-        createMainWidget(context),
+        createMainWidget(),
         Positioned(
           top: 0,
           left: 0,
@@ -187,13 +192,13 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
 
     setState(() {
       this.hourRowHeight = hourRowHeight;
-      createEventsDrawProperties(context);
+      createEventsDrawProperties();
     });
   }
 
   /// Creates the main widget, with a hours column and an events column.
-  Widget createMainWidget(BuildContext context) {
-    List<Widget> children = createBackground()..addAll(eventsDrawProperties.entries.map((entry) => entry.value.createWidget(context, widget, entry.key)));
+  Widget createMainWidget() {
+    List<Widget> children = eventsDrawProperties.entries.map((entry) => entry.value.createWidget(context, widget, entry.key)).toList();
     if (widget.hoursColumnWidth > 0) {
       children.add(Positioned(
         top: 0,
@@ -229,7 +234,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
 
     Widget mainWidget = SizedBox(
       height: calculateHeight(),
-      child: Stack(children: children),
+      child: Stack(children: children..insert(0, createBackground())),
     );
 
     if (widget.inScrollableWidget) {
@@ -248,7 +253,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
   }
 
   /// Creates the events draw properties and add them to the current list.
-  void createEventsDrawProperties(BuildContext context) {
+  void createEventsDrawProperties() {
     _EventsGrid eventsGrid = _EventsGrid();
     for (FlutterWeekViewEvent event in List.of(events)) {
       _EventDrawProperties drawProperties = eventsDrawProperties[event] ?? _EventDrawProperties(widget, event);
@@ -272,13 +277,11 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
   }
 
   /// Creates the background widgets that should be added to a stack.
-  List<Widget> createBackground() => [
-        Positioned.fill(
-          child: Container(
-            color: widget.eventsColumnBackgroundColor ?? (Utils.overlapsDate(widget.date) ? Color(0xFFe3f5ff) : Color(0xFFF2F2F2)),
-          ),
+  Widget createBackground() => Positioned.fill(
+        child: CustomPaint(
+          painter: eventsColumnBackgroundPainter,
         ),
-      ]..addAll(List.generate(23, (hour) => createPositionedHorizontalRule(calculateTopOffset(hour + 1), widget.eventsColumnBackgroundRulesColor)));
+      );
 
   /// Creates a positioned horizontal rule in the hours column.
   Widget createPositionedHorizontalRule(double top, Color color) => Positioned(
@@ -296,6 +299,47 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
 
   /// Calculates the widget height.
   double calculateHeight([double hourRowHeight]) => calculateTopOffset(24, 0, hourRowHeight);
+}
+
+/// The events column background painter.
+class EventsColumnBackgroundPainter extends CustomPainter {
+  /// The color.
+  final Color backgroundColor;
+
+  /// The rules color.
+  final Color rulesColor;
+
+  /// The top offset calculator.
+  /// The day view state will give it its real value.
+  TopOffsetCalculator topOffsetCalculator = defaultTopOffsetCalculator;
+
+  /// Creates a new events column background painter.
+  EventsColumnBackgroundPainter({
+    this.backgroundColor,
+    this.rulesColor = const Color(0x1A000000),
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (backgroundColor != null) {
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()..color = backgroundColor);
+    }
+
+    if (rulesColor != null) {
+      for (int hour = 1; hour < 24; hour++) {
+        double topOffset = topOffsetCalculator(hour);
+        canvas.drawLine(Offset(0, topOffset), Offset(size.width, topOffset), Paint()..color = rulesColor);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(EventsColumnBackgroundPainter oldDayViewBackgroundPainter) {
+    return backgroundColor != oldDayViewBackgroundPainter.backgroundColor || rulesColor != oldDayViewBackgroundPainter.rulesColor || topOffsetCalculator != oldDayViewBackgroundPainter.topOffsetCalculator;
+  }
+
+  /// The default top offset calculator.
+  static double defaultTopOffsetCalculator(int hour) => hour * 60.0;
 }
 
 /// An utility class that allows to position events in a grid.
