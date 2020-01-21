@@ -71,7 +71,9 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView, WeekViewContro
   double dayViewWidth;
 
   /// Creates a new week view state instance.
-  _WeekViewState(WeekView weekView) : super(weekView);
+  _WeekViewState(WeekView weekView)
+      : dayViewWidth = weekView.dayViewWidth,
+        super(weekView);
 
   @override
   void initState() {
