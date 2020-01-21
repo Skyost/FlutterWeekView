@@ -1,5 +1,4 @@
 import 'dart:math' as Math;
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_week_view/src/controller.dart';
 import 'package:flutter_week_view/src/day_view.dart';
 import 'package:flutter_week_view/src/event.dart';
@@ -11,7 +10,7 @@ import 'package:flutter/material.dart';
 typedef DayView DayViewBuilder(BuildContext context, WeekView weekView, DateTime date, DayViewController dayViewController);
 
 /// A (scrollable) week view which is able to display events, zoom and un-zoom and more !
-class WeekView extends HeadersWidget {
+class WeekView extends ZoomableHeadersWidget<WeekViewController> {
   /// The events.
   final List<FlutterWeekViewEvent> events;
 
@@ -24,27 +23,12 @@ class WeekView extends HeadersWidget {
   /// A day view width.
   final double dayViewWidth;
 
-  /// Whether the widget should automatically be placed in a scrollable widget.
-  final bool inScrollableWidget;
-
-  /// Whether the widget should automatically scroll to the current time (hour and minute).
-  final bool scrollToCurrentTime;
-
-  /// Whether the user is able to pinch-to-zoom the widget.
-  final bool userZoomable;
-
-  /// The current day view controller.
-  final WeekViewController controller;
-
   /// Creates a new week view instance.
   WeekView({
     List<FlutterWeekViewEvent> events,
     @required this.dates,
     this.dayViewBuilder = DefaultBuilders.defaultDayViewBuilder,
     this.dayViewWidth,
-    this.inScrollableWidget = true,
-    this.scrollToCurrentTime = true,
-    this.userZoomable = true,
     DateFormatter dateFormatter,
     HourFormatter hourFormatter,
     WeekViewController controller,
@@ -55,13 +39,14 @@ class WeekView extends HeadersWidget {
     double hoursColumnWidth,
     Color hoursColumnBackgroundColor,
     double hourRowHeight,
+    bool inScrollableWidget = true,
+    bool scrollToCurrentTime = true,
+    bool userZoomable = true,
   })  : assert(dates != null && dates.isNotEmpty),
         assert(dayViewBuilder != null),
-        assert(scrollToCurrentTime != null),
-        assert(userZoomable != null),
         this.events = events ?? [],
-        this.controller = controller ?? WeekViewController(dayViewsCount: dates.length),
         super(
+          controller: controller ?? WeekViewController(dayViewsCount: dates.length),
           dateFormatter: dateFormatter ?? DefaultBuilders.defaultDateFormatter,
           hourFormatter: hourFormatter ?? DefaultBuilders.defaultHourFormatter,
           dayBarTextStyle: dayBarTextStyle,
@@ -71,6 +56,9 @@ class WeekView extends HeadersWidget {
           hoursColumnWidth: hoursColumnWidth,
           hoursColumnBackgroundColor: hoursColumnBackgroundColor,
           hourRowHeight: hourRowHeight,
+          inScrollableWidget: inScrollableWidget,
+          scrollToCurrentTime: scrollToCurrentTime,
+          userZoomable: userZoomable,
         );
 
   @override
@@ -78,36 +66,28 @@ class WeekView extends HeadersWidget {
 }
 
 /// The week view state.
-class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
-  /// The current controller.
-  final WeekViewController controller;
-
+class _WeekViewState extends ZoomableHeadersWidgetState<WeekView, WeekViewController> {
   /// A day view width.
   double dayViewWidth;
 
-  /// The hour row height.
-  double hourRowHeight;
-
   /// Creates a new week view state instance.
-  _WeekViewState(WeekView weekView)
-      : controller = weekView.controller,
-        dayViewWidth = weekView.dayViewWidth,
-        hourRowHeight = weekView.hourRowHeight;
+  _WeekViewState(WeekView weekView) : super(weekView);
 
   @override
   void initState() {
     super.initState();
-    controller.listeners.add(this);
 
-    if (dayViewWidth == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        double widgetWidth = (context.findRenderObject() as RenderBox).size.width;
-        setState(() => dayViewWidth = widgetWidth - widget.hoursColumnWidth);
+    if (dayViewWidth != null) {
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      double widgetWidth = (context.findRenderObject() as RenderBox).size.width;
+      setState(() {
+        dayViewWidth = widgetWidth - widget.hoursColumnWidth;
         scheduleScrollToCurrentTimeIfNeeded();
       });
-    } else {
-      scheduleScrollToCurrentTimeIfNeeded();
-    }
+    });
   }
 
   @override
@@ -117,36 +97,6 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
     }
 
     return createMainWidget();
-  }
-
-  @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  void onZoomFactorChanged(WeekViewController controller, ScaleUpdateDetails details) {
-    if (!mounted) {
-      return;
-    }
-
-    double hourRowHeight = widget.hourRowHeight * controller.zoomFactor;
-
-    if (widget.inScrollableWidget) {
-      double widgetHeight = (context.findRenderObject() as RenderBox).size.height;
-      double maxPixels = calculateHeight(hourRowHeight) - widgetHeight + widget.dayBarHeight;
-
-      if (hourRowHeight < this.hourRowHeight && controller.verticalScrollController.position.pixels > maxPixels) {
-        controller.verticalScrollController.jumpTo(maxPixels);
-      } else {
-        controller.verticalScrollController.jumpTo(Math.min(maxPixels, details.localFocalPoint.dy));
-      }
-    }
-
-    setState(() {
-      this.hourRowHeight = hourRowHeight;
-    });
   }
 
   /// Creates the main widget.
@@ -162,7 +112,7 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
       );
     }
 
-    if (widget.userZoomable && controller.dayViewControllers.first.zoomCoefficient > 0) {
+    if (isZoomable) {
       weekViewStack = GestureDetector(
         onScaleStart: (_) => controller.scaleStart(),
         onScaleUpdate: (details) => controller.scaleUpdate(details),
@@ -210,10 +160,7 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
     return Stack(
       children: [
         dayViewsList,
-        HoursColumn.fromHeadersWidget(
-          parent: widget,
-          zoomFactor: controller.zoomFactor,
-        ),
+        HoursColumn.fromHeadersWidget(parent: widget),
       ],
     );
   }
@@ -224,38 +171,26 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
         child: widget.dayViewBuilder(context, widget, widget.dates[index], controller.dayViewControllers[index]),
       );
 
-  /// Schedules a post frame action that is going to scroll to the current day, hour and minute.
-  void scheduleScrollToCurrentTimeIfNeeded() {
-    if (!widget.scrollToCurrentTime) {
-      return;
-    }
-
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      int index = 0;
-      for (; index < widget.dates.length; index++) {
-        if (Utils.overlapsDate(widget.dates[index])) {
-          break;
-        }
-      }
-
-      if (index == widget.dates.length) {
-        return;
-      }
-
-      DateTime now = DateTime.now();
-      double topOffset = calculateTopOffset(now.hour, now.minute);
-      double leftOffset = dayViewWidth * index;
-
-      controller.verticalScrollController.jumpTo(Math.min(topOffset, controller.verticalScrollController.position.maxScrollExtent));
-      controller.horizontalScrollController.jumpTo(Math.min(leftOffset, controller.horizontalScrollController.position.maxScrollExtent));
-    });
+  @override
+  bool get shouldScrollToCurrentTime {
+    DateTime now = DateTime.now();
+    return dayViewWidth != null && super.shouldScrollToCurrentTime && widget.dates.contains(DateTime(now.year, now.month, now.day));
   }
 
-  /// Calculates the top offset of a given hour and a given minute.
-  double calculateTopOffset(int hour, [int minute = 0, double hourRowHeight]) => (hour + (minute / 60)) * (hourRowHeight ?? this.hourRowHeight);
+  @override
+  void scrollToCurrentTime() {
+    super.scrollToCurrentTime();
 
-  /// Calculates the widget height.
-  double calculateHeight([double hourRowHeight]) => calculateTopOffset(24, 0, hourRowHeight);
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    int index = widget.dates.indexOf(today);
+
+    double topOffset = calculateTopOffset(now.hour, now.minute);
+    double leftOffset = dayViewWidth * index;
+
+    controller.verticalScrollController.jumpTo(Math.min(topOffset, controller.verticalScrollController.position.maxScrollExtent));
+    controller.horizontalScrollController.jumpTo(Math.min(leftOffset, controller.horizontalScrollController.position.maxScrollExtent));
+  }
 }
 
 /// A day bar that positions itself in a stack according to the current scroll position.

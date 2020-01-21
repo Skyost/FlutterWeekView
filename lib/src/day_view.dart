@@ -20,7 +20,7 @@ typedef Widget EventTextBuilder(BuildContext context, DayView dayView, double he
 typedef double TopOffsetCalculator(int hour);
 
 /// A (scrollable) day view which is able to display events, zoom and un-zoom and more !
-class DayView extends HeadersWidget {
+class DayView extends ZoomableHeadersWidget<DayViewController> {
   /// The events.
   final List<FlutterWeekViewEvent> events;
 
@@ -36,18 +36,6 @@ class DayView extends HeadersWidget {
   /// The current time circle color.
   final Color currentTimeCircleColor;
 
-  /// Whether the widget should automatically be placed in a scrollable widget.
-  final bool inScrollableWidget;
-
-  /// Whether the widget should automatically scroll to the current time (hour and minute).
-  final bool scrollToCurrentTime;
-
-  /// Whether the user is able to pinch-to-zoom the widget.
-  final bool userZoomable;
-
-  /// The current day view controller.
-  final DayViewController controller;
-
   /// Creates a new day view instance.
   DayView({
     List<FlutterWeekViewEvent> events,
@@ -55,9 +43,6 @@ class DayView extends HeadersWidget {
     EventsColumnBackgroundPainter eventsColumnBackgroundPainter,
     this.currentTimeRuleColor = Colors.pink,
     this.currentTimeCircleColor,
-    this.inScrollableWidget = true,
-    this.scrollToCurrentTime = true,
-    this.userZoomable = true,
     DayViewController controller,
     DateFormatter dateFormatter,
     HourFormatter hourFormatter,
@@ -68,15 +53,15 @@ class DayView extends HeadersWidget {
     double hoursColumnWidth,
     Color hoursColumnBackgroundColor,
     double hourRowHeight,
+    bool inScrollableWidget = true,
+    bool scrollToCurrentTime = true,
+    bool userZoomable = true,
   })  : assert(date != null),
-        assert(inScrollableWidget != null),
-        assert(scrollToCurrentTime != null),
-        assert(userZoomable != null),
         this.date = DateTime(date.year, date.month, date.day),
         this.eventsColumnBackgroundPainter = eventsColumnBackgroundPainter ?? EventsColumnBackgroundPainter(backgroundColor: Utils.overlapsDate(date) ? Color(0xFFe3f5ff) : Color(0xFFF2F2F2)),
         this.events = events ?? [],
-        this.controller = controller ?? DayViewController(),
         super(
+          controller: controller ?? DayViewController(),
           dateFormatter: dateFormatter ?? DefaultBuilders.defaultDateFormatter,
           hourFormatter: hourFormatter ?? DefaultBuilders.defaultHourFormatter,
           dayBarTextStyle: dayBarTextStyle,
@@ -86,6 +71,9 @@ class DayView extends HeadersWidget {
           hoursColumnWidth: hoursColumnWidth,
           hoursColumnBackgroundColor: hoursColumnBackgroundColor,
           hourRowHeight: hourRowHeight,
+          inScrollableWidget: inScrollableWidget,
+          scrollToCurrentTime: scrollToCurrentTime,
+          userZoomable: userZoomable,
         );
 
   @override
@@ -93,12 +81,9 @@ class DayView extends HeadersWidget {
 }
 
 /// The day view state.
-class _DayViewState extends State<DayView> with DayViewControllerListener {
+class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewController> {
   /// Contains all events draw properties.
   final Map<FlutterWeekViewEvent, _EventDrawProperties> eventsDrawProperties = HashMap();
-
-  /// The current day view controller.
-  final DayViewController controller;
 
   /// The events column background painter.
   final EventsColumnBackgroundPainter eventsColumnBackgroundPainter;
@@ -106,31 +91,17 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
   /// The flutter week view events.
   final List<FlutterWeekViewEvent> events;
 
-  /// The current hour row height.
-  double hourRowHeight;
-
   /// Creates a new day view state.
   _DayViewState(DayView dayView)
-      : hourRowHeight = dayView.hourRowHeight,
-        eventsColumnBackgroundPainter = dayView.eventsColumnBackgroundPainter,
-        controller = dayView.controller,
-        events = List.of(dayView.events);
+      : eventsColumnBackgroundPainter = dayView.eventsColumnBackgroundPainter,
+        events = List.of(dayView.events),
+        super(dayView);
 
   @override
   void initState() {
     super.initState();
     events.sort((a, b) => a.start.compareTo(b.start));
-    controller.listeners.add(this);
     eventsColumnBackgroundPainter.topOffsetCalculator = (hour) => calculateTopOffset(hour);
-
-    if (widget.scrollToCurrentTime && widget.inScrollableWidget && Utils.overlapsDate(widget.date)) {
-      DateTime now = DateTime.now();
-      double topOffset = calculateTopOffset(now.hour, now.minute);
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        controller.scrollController.jumpTo(Math.min(topOffset, controller.scrollController.position.maxScrollExtent));
-      });
-    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() => createEventsDrawProperties());
@@ -154,7 +125,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
       ],
     );
 
-    if (!widget.userZoomable || controller.zoomCoefficient <= 0) {
+    if (!isZoomable) {
       return mainStack;
     }
 
@@ -166,34 +137,12 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
   }
 
   @override
-  void dispose() {
-    controller.dispose();
-    super.dispose();
-  }
+  void onZoomFactorChanged(ZoomController controller, ScaleUpdateDetails details) {
+    super.onZoomFactorChanged(controller, details);
 
-  @override
-  void onZoomFactorChanged(DayViewController controller, ScaleUpdateDetails details) {
-    if (!mounted) {
-      return;
+    if (mounted) {
+      setState(() => createEventsDrawProperties());
     }
-
-    double hourRowHeight = widget.hourRowHeight * controller.zoomFactor;
-
-    if (widget.inScrollableWidget) {
-      double widgetHeight = (context.findRenderObject() as RenderBox).size.height;
-      double maxPixels = calculateHeight(hourRowHeight) - widgetHeight + widget.dayBarHeight;
-
-      if (hourRowHeight < this.hourRowHeight && controller.scrollController.position.pixels > maxPixels) {
-        controller.scrollController.jumpTo(maxPixels);
-      } else {
-        controller.scrollController.jumpTo(Math.min(maxPixels, details.localFocalPoint.dy));
-      }
-    }
-
-    setState(() {
-      this.hourRowHeight = hourRowHeight;
-      createEventsDrawProperties();
-    });
   }
 
   /// Creates the main widget, with a hours column and an events column.
@@ -203,10 +152,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
       children.add(Positioned(
         top: 0,
         left: 0,
-        child: HoursColumn.fromHeadersWidget(
-          parent: widget,
-          zoomFactor: controller.zoomFactor,
-        ),
+        child: HoursColumn.fromHeadersWidget(parent: widget),
       ));
     }
 
@@ -240,7 +186,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
     if (widget.inScrollableWidget) {
       mainWidget = NoGlowBehavior.noGlow(
         child: SingleChildScrollView(
-          controller: controller.scrollController,
+          controller: controller.verticalScrollController,
           child: mainWidget,
         ),
       );
@@ -278,9 +224,7 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
 
   /// Creates the background widgets that should be added to a stack.
   Widget createBackground() => Positioned.fill(
-        child: CustomPaint(
-          painter: eventsColumnBackgroundPainter,
-        ),
+        child: CustomPaint(painter: eventsColumnBackgroundPainter),
       );
 
   /// Creates a positioned horizontal rule in the hours column.
@@ -294,11 +238,8 @@ class _DayViewState extends State<DayView> with DayViewControllerListener {
         ),
       );
 
-  /// Calculates the top offset of a given hour and a given minute.
-  double calculateTopOffset(int hour, [int minute = 0, double hourRowHeight]) => (hour + (minute / 60)) * (hourRowHeight ?? this.hourRowHeight);
-
-  /// Calculates the widget height.
-  double calculateHeight([double hourRowHeight]) => calculateTopOffset(24, 0, hourRowHeight);
+  @override
+  bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && Utils.overlapsDate(widget.date);
 }
 
 /// The events column background painter.

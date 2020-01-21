@@ -1,10 +1,11 @@
 import 'dart:math' as Math;
 import 'package:flutter/material.dart';
+import 'package:flutter_week_view/src/controller.dart';
 import 'package:flutter_week_view/src/day_view.dart';
 import 'package:flutter_week_view/src/utils.dart';
 
-/// A widget which is showing both headers.
-abstract class HeadersWidget extends StatefulWidget {
+/// A widget which is showing both headers and can be zoomed.
+abstract class ZoomableHeadersWidget<C extends ZoomController> extends StatefulWidget {
   /// The day formatter.
   final DateFormatter dateFormatter;
 
@@ -32,8 +33,21 @@ abstract class HeadersWidget extends StatefulWidget {
   /// An hour row height (with a zoom factor set to 1).
   final double hourRowHeight;
 
-  /// Creates a new header widget instance.
-  HeadersWidget({
+  /// Whether the widget should automatically be placed in a scrollable widget.
+  final bool inScrollableWidget;
+
+  /// Whether the widget should automatically scroll to the current time (hour and minute).
+  final bool scrollToCurrentTime;
+
+  /// Whether the user is able to pinch-to-zoom the widget.
+  final bool userZoomable;
+
+  /// The current day view controller.
+  final C controller;
+
+  /// Creates a new zoomable headers widget instance.
+  ZoomableHeadersWidget({
+    @required this.controller,
     this.dateFormatter = DefaultBuilders.defaultDateFormatter,
     this.hourFormatter = DefaultBuilders.defaultHourFormatter,
     this.dayBarTextStyle,
@@ -43,11 +57,102 @@ abstract class HeadersWidget extends StatefulWidget {
     double hoursColumnWidth = 60,
     this.hoursColumnBackgroundColor,
     double hourRowHeight = 60,
+    @required this.inScrollableWidget,
+    @required this.scrollToCurrentTime,
+    @required this.userZoomable,
   })  : assert(dateFormatter != null),
         assert(hourFormatter != null),
         this.dayBarHeight = Math.max(0, dayBarHeight ?? 40),
         this.hoursColumnWidth = Math.max(0, hoursColumnWidth ?? 60),
-        this.hourRowHeight = Math.max(0, hourRowHeight ?? 60);
+        this.hourRowHeight = Math.max(0, hourRowHeight ?? 60),
+        assert(inScrollableWidget != null),
+        assert(scrollToCurrentTime != null),
+        assert(userZoomable != null);
+}
+
+/// An abstract widget state that shows both headers and can be zoomed.
+abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C extends ZoomController> extends State<W> with ZoomControllerListener {
+  /// The zoom controller.
+  final C controller;
+
+  /// The current hour row height.
+  double hourRowHeight;
+
+  /// Creates a new zoomable headers widget state instance.
+  ZoomableHeadersWidgetState(ZoomableHeadersWidget<C> parent) : controller = parent.controller;
+
+  @override
+  void initState() {
+    super.initState();
+    hourRowHeight = widget.hourRowHeight * controller.zoomFactor;
+    controller.addListener(this);
+
+    if (shouldScrollToCurrentTime) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        scrollToCurrentTime();
+      });
+    }
+  }
+
+  @override
+  void onZoomFactorChanged(ZoomController controller, ScaleUpdateDetails details) {
+    if (!mounted) {
+      return;
+    }
+
+    double hourRowHeight = widget.hourRowHeight * controller.zoomFactor;
+
+    if (widget.inScrollableWidget) {
+      double widgetHeight = (context.findRenderObject() as RenderBox).size.height;
+      double maxPixels = calculateHeight(hourRowHeight) - widgetHeight + widget.dayBarHeight;
+
+      if (hourRowHeight < this.hourRowHeight && controller.verticalScrollController.position.pixels > maxPixels) {
+        controller.verticalScrollController.jumpTo(maxPixels);
+      } else {
+        controller.verticalScrollController.jumpTo(Math.min(maxPixels, details.localFocalPoint.dy));
+      }
+    }
+
+    setState(() {
+      this.hourRowHeight = hourRowHeight;
+    });
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  /// Schedules a scroll to the current time if needed.
+  void scheduleScrollToCurrentTimeIfNeeded() {
+    if (shouldScrollToCurrentTime) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToCurrentTime());
+    }
+  }
+
+  /// Checks whether the widget should scroll to current time.
+  bool get shouldScrollToCurrentTime => widget.scrollToCurrentTime && widget.inScrollableWidget;
+
+  /// Scrolls to current time.
+  void scrollToCurrentTime() {
+    if (!mounted) {
+      return;
+    }
+
+    DateTime now = DateTime.now();
+    double topOffset = calculateTopOffset(now.hour, now.minute);
+    controller.verticalScrollController.jumpTo(Math.min(topOffset, controller.verticalScrollController.position.maxScrollExtent));
+  }
+
+  /// Returns whether this widget should be zoomable.
+  bool get isZoomable => widget.userZoomable && controller.zoomCoefficient > 0;
+
+  /// Calculates the top offset of a given hour and a given minute.
+  double calculateTopOffset(int hour, [int minute = 0, double hourRowHeight]) => (hour + (minute / 60)) * (hourRowHeight ?? this.hourRowHeight);
+
+  /// Calculates the widget height.
+  double calculateHeight([double hourRowHeight]) => calculateTopOffset(24, 0, hourRowHeight);
 }
 
 /// A bar which is showing a day.
@@ -82,7 +187,7 @@ class DayBar extends StatelessWidget {
 
   /// Creates a new day bar instance from a headers widget instance.
   DayBar.fromHeadersWidget({
-    @required HeadersWidget parent,
+    @required ZoomableHeadersWidget parent,
     DateTime date,
   }) : this(
           date: date ?? DateTime.now(),
@@ -139,10 +244,9 @@ class HoursColumn extends StatelessWidget {
 
   /// Creates a new hours column instance from a headers widget instance.
   HoursColumn.fromHeadersWidget({
-    @required HeadersWidget parent,
-    @required double zoomFactor,
+    @required ZoomableHeadersWidget parent,
   }) : this(
-          hourRowHeight: parent.hourRowHeight * zoomFactor,
+          hourRowHeight: parent.hourRowHeight * parent.controller.zoomFactor,
           width: parent.hoursColumnWidth,
           backgroundColor: parent.hoursColumnBackgroundColor ?? Colors.white,
           textStyle: parent.hoursColumnTextStyle ?? const TextStyle(color: Colors.black54),
