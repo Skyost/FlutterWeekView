@@ -80,12 +80,12 @@ class DayView extends HeadersWidget {
           dateFormatter: dateFormatter ?? DefaultBuilders.defaultDateFormatter,
           hourFormatter: hourFormatter ?? DefaultBuilders.defaultHourFormatter,
           dayBarTextStyle: dayBarTextStyle,
-          dayBarHeight: dayBarHeight ?? 40,
+          dayBarHeight: dayBarHeight,
           dayBarBackgroundColor: dayBarBackgroundColor,
           hoursColumnTextStyle: hoursColumnTextStyle,
-          hoursColumnWidth: hoursColumnWidth ?? 60,
+          hoursColumnWidth: hoursColumnWidth,
           hoursColumnBackgroundColor: hoursColumnBackgroundColor,
-          hourRowHeight: hourRowHeight ?? 60,
+          hourRowHeight: hourRowHeight,
         );
 
   @override

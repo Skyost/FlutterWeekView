@@ -45,9 +45,9 @@ abstract class HeadersWidget extends StatefulWidget {
     double hourRowHeight = 60,
   })  : assert(dateFormatter != null),
         assert(hourFormatter != null),
-        this.dayBarHeight = Math.max(0, dayBarHeight ?? 0),
-        this.hoursColumnWidth = Math.max(0, hoursColumnWidth ?? 0),
-        this.hourRowHeight = Math.max(0, hourRowHeight ?? 0);
+        this.dayBarHeight = Math.max(0, dayBarHeight ?? 40),
+        this.hoursColumnWidth = Math.max(0, hoursColumnWidth ?? 60),
+        this.hourRowHeight = Math.max(0, hourRowHeight ?? 60);
 }
 
 /// A bar which is showing a day.

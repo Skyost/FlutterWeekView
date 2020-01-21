@@ -1,7 +1,7 @@
 import 'dart:math' as Math;
 import 'dart:collection';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 /// Allows to control some parameters of a day view.
 class DayViewController {
@@ -16,6 +16,9 @@ class DayViewController {
 
   /// The maximum zoom factor.
   final double maxZoom;
+
+  /// Whether this controller is disposable.
+  final bool disposable;
 
   /// The previous zoom factor.
   double _previousZoomFactor = 1;
@@ -32,12 +35,14 @@ class DayViewController {
     double zoomCoefficient = 0.8,
     this.minZoom = 0.4,
     this.maxZoom = 1.6,
+    this.disposable = true,
   })  : this.scrollController = scrollController ?? ScrollController(),
         this.zoomCoefficient = Math.max(0, zoomCoefficient ?? 0),
         assert(zoomCoefficient != null),
         assert(minZoom != null),
         assert(maxZoom != null),
-        assert(minZoom <= maxZoom);
+        assert(minZoom <= maxZoom),
+        assert(disposable != null);
 
   /// Calculates a zoom factor according to the specified scale.
   double calculateZoomFactor(double scale) {
@@ -75,8 +80,10 @@ class DayViewController {
   /// Disposes this controller.
   /// You should not use it anymore after having called this method.
   void dispose() {
-    listeners.clear();
-    scrollController.dispose();
+    if (disposable) {
+      listeners.clear();
+      scrollController.dispose();
+    }
   }
 }
 
@@ -117,6 +124,7 @@ class WeekViewController {
             zoomCoefficient: zoomCoefficient,
             minZoom: minZoom,
             maxZoom: maxZoom,
+            disposable: false,
           ),
         );
 
@@ -144,11 +152,9 @@ class WeekViewController {
 
   /// Disposes this controller.
   /// You should not use it anymore after having called this method.
-  void dispose([bool disposeDayViewControllers = true]) {
+  void dispose() {
     listeners.clear();
-    if (disposeDayViewControllers) {
-      dayViewControllers.forEach((controller) => controller.dispose());
-    }
+    dayViewControllers.forEach((controller) => controller.dispose());
     horizontalScrollController.dispose();
     verticalScrollController.dispose();
   }
