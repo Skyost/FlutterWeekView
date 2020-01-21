@@ -1,4 +1,4 @@
-## [0.2.0] - 2020-01-??
+## [0.2.0] - 2020-01-21
 
 * Added the ability to completely change the background.
 * Performances improvement (see [#7](https://github.com/Skyost/FlutterWeekView/issues/7)).
