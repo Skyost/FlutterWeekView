@@ -135,7 +135,7 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
 
     if (widget.inScrollableWidget) {
       double widgetHeight = (context.findRenderObject() as RenderBox).size.height;
-      double maxPixels = (hourRowHeight * 24) - widgetHeight + widget.dayBarHeight;
+      double maxPixels = calculateHeight(hourRowHeight) - widgetHeight + widget.dayBarHeight;
 
       if (hourRowHeight < this.hourRowHeight && controller.verticalScrollController.position.pixels > maxPixels) {
         controller.verticalScrollController.jumpTo(maxPixels);
@@ -144,7 +144,9 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
       }
     }
 
-    this.hourRowHeight = hourRowHeight;
+    setState(() {
+      this.hourRowHeight = hourRowHeight;
+    });
   }
 
   /// Creates the main widget.
@@ -188,7 +190,7 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
     Widget dayViewsList;
     if (widget.inScrollableWidget) {
       dayViewsList = SizedBox(
-        height: 24 * hourRowHeight,
+        height: calculateHeight(),
         child: ListView.builder(
           padding: EdgeInsets.only(left: widget.hoursColumnWidth),
           controller: controller.horizontalScrollController,
@@ -208,7 +210,10 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
     return Stack(
       children: [
         dayViewsList,
-        _AutoResizeHoursColumn(state: this),
+        HoursColumn.fromHeadersWidget(
+          parent: widget,
+          zoomFactor: controller.zoomFactor,
+        ),
       ],
     );
   }
@@ -238,13 +243,19 @@ class _WeekViewState extends State<WeekView> with WeekViewControllerListener {
       }
 
       DateTime now = DateTime.now();
-      double topOffset = (now.hour + (now.minute / 60)) * hourRowHeight;
+      double topOffset = calculateTopOffset(now.hour, now.minute);
       double leftOffset = dayViewWidth * index;
 
       controller.verticalScrollController.jumpTo(Math.min(topOffset, controller.verticalScrollController.position.maxScrollExtent));
       controller.horizontalScrollController.jumpTo(Math.min(leftOffset, controller.horizontalScrollController.position.maxScrollExtent));
     });
   }
+
+  /// Calculates the top offset of a given hour and a given minute.
+  double calculateTopOffset(int hour, [int minute = 0, double hourRowHeight]) => (hour + (minute / 60)) * (hourRowHeight ?? this.hourRowHeight);
+
+  /// Calculates the widget height.
+  double calculateHeight([double hourRowHeight]) => calculateTopOffset(24, 0, hourRowHeight);
 }
 
 /// A day bar that positions itself in a stack according to the current scroll position.
@@ -315,60 +326,6 @@ class _PositionedDayBarState extends State<_PositionedDayBar> {
 
     setState(() {
       this.left = widget.weekView.hoursColumnWidth - widget.weekView.controller.horizontalScrollController.position.pixels;
-    });
-  }
-}
-
-/// A hours column that resizes itself according to the week view zoom state.
-class _AutoResizeHoursColumn extends StatefulWidget {
-  /// The week view.
-  final WeekView weekView;
-
-  /// The week view controller.
-  final WeekViewController weekViewController;
-
-  /// Creates a new positioned hours column instance.
-  _AutoResizeHoursColumn({
-    @required _WeekViewState state,
-  })  : weekView = state.widget,
-        weekViewController = state.controller;
-
-  @override
-  State<StatefulWidget> createState() => _AutoResizeHoursColumnState();
-}
-
-/// The auto resize hours column state.
-class _AutoResizeHoursColumnState extends State<_AutoResizeHoursColumn> with WeekViewControllerListener {
-  /// The current zoom factor.
-  double zoomFactor = 1;
-
-  @override
-  void initState() {
-    super.initState();
-    zoomFactor = widget.weekViewController.zoomFactor;
-    widget.weekViewController.listeners.add(this);
-  }
-
-  @override
-  Widget build(BuildContext context) => HoursColumn.fromHeadersWidget(
-        parent: widget.weekView,
-        zoomFactor: zoomFactor,
-      );
-
-  @override
-  void dispose() {
-    widget.weekViewController.listeners.remove(this);
-    super.dispose();
-  }
-
-  @override
-  void onZoomFactorChanged(WeekViewController controller, ScaleUpdateDetails details) {
-    if (!mounted) {
-      return;
-    }
-
-    setState(() {
-      this.zoomFactor = controller.zoomFactor;
     });
   }
 }

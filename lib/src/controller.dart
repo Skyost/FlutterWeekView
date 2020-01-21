@@ -104,6 +104,9 @@ class WeekViewController {
   /// The vertical scroll controller.
   final ScrollController verticalScrollController;
 
+  /// Whether this controller is disposable.
+  final bool disposable;
+
   /// All controller listeners.
   Set<WeekViewControllerListener> listeners = HashSet();
 
@@ -115,9 +118,11 @@ class WeekViewController {
     double zoomCoefficient = 0.8,
     double minZoom = 0.4,
     double maxZoom = 1.6,
+    this.disposable = true,
   })  : this.horizontalScrollController = horizontalScrollController ?? ScrollController(),
         this.verticalScrollController = verticalScrollController ?? ScrollController(),
         assert(dayViewsCount != null && dayViewsCount > 0),
+        assert(disposable != null),
         this.dayViewControllers = List.generate(
           dayViewsCount,
           (_) => DayViewController(
@@ -153,10 +158,12 @@ class WeekViewController {
   /// Disposes this controller.
   /// You should not use it anymore after having called this method.
   void dispose() {
-    listeners.clear();
-    dayViewControllers.forEach((controller) => controller.dispose());
-    horizontalScrollController.dispose();
-    verticalScrollController.dispose();
+    if (disposable) {
+      listeners.clear();
+      dayViewControllers.forEach((controller) => controller.dispose());
+      horizontalScrollController.dispose();
+      verticalScrollController.dispose();
+    }
   }
 }
 
