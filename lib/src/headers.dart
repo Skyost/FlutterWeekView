@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/controller.dart';
 import 'package:flutter_week_view/src/day_view.dart';
@@ -62,9 +62,9 @@ abstract class ZoomableHeadersWidget<C extends ZoomController> extends StatefulW
     @required this.userZoomable,
   })  : assert(dateFormatter != null),
         assert(hourFormatter != null),
-        this.dayBarHeight = Math.max(0, dayBarHeight ?? 40),
-        this.hoursColumnWidth = Math.max(0, hoursColumnWidth ?? 60),
-        this.hourRowHeight = Math.max(0, hourRowHeight ?? 60),
+        dayBarHeight = math.max(0, dayBarHeight ?? 40),
+        hoursColumnWidth = math.max(0, hoursColumnWidth ?? 60),
+        hourRowHeight = math.max(0, hourRowHeight ?? 60),
         assert(inScrollableWidget != null),
         assert(scrollToCurrentTime != null),
         assert(userZoomable != null);
@@ -109,7 +109,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
       if (hourRowHeight < this.hourRowHeight && controller.verticalScrollController.position.pixels > maxPixels) {
         controller.verticalScrollController.jumpTo(maxPixels);
       } else {
-        controller.verticalScrollController.jumpTo(Math.min(maxPixels, details.localFocalPoint.dy));
+        controller.verticalScrollController.jumpTo(math.min(maxPixels, details.localFocalPoint.dy));
       }
     }
 
@@ -142,7 +142,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
 
     DateTime now = DateTime.now();
     double topOffset = calculateTopOffset(now.hour, now.minute);
-    controller.verticalScrollController.jumpTo(Math.min(topOffset, controller.verticalScrollController.position.maxScrollExtent));
+    controller.verticalScrollController.jumpTo(math.min(topOffset, controller.verticalScrollController.position.maxScrollExtent));
   }
 
   /// Returns whether this widget should be zoomable.
@@ -183,7 +183,7 @@ class DayBar extends StatelessWidget {
         assert(backgroundColor != null),
         assert(dateFormatter != null),
         date = DateTime(date.year, date.month, date.day),
-        height = Math.max(0, height ?? 0);
+        height = math.max(0, height ?? 0);
 
   /// Creates a new day bar instance from a headers widget instance.
   DayBar.fromHeadersWidget({
@@ -239,8 +239,8 @@ class HoursColumn extends StatelessWidget {
     this.textStyle = const TextStyle(color: Colors.black54),
     this.hourFormatter = DefaultBuilders.defaultHourFormatter,
   })  : assert(hourFormatter != null),
-        this.hourRowHeight = Math.max(0, hourRowHeight ?? 0),
-        this.width = Math.max(0, width ?? 0);
+        hourRowHeight = math.max(0, hourRowHeight ?? 0),
+        width = math.max(0, width ?? 0);
 
   /// Creates a new hours column instance from a headers widget instance.
   HoursColumn.fromHeadersWidget({

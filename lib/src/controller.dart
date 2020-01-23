@@ -192,8 +192,7 @@ class WeekViewController extends ZoomController {
   @override
   double get zoomFactor => dayViewControllers.first.zoomFactor;
 
-  /// Disposes this controller.
-  /// You should not use it anymore after having called this method.
+  @override
   void dispose() {
     super.dispose();
     if (disposable) {

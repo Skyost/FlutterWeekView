@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
 import 'package:flutter_week_view/src/controller.dart';
@@ -98,7 +98,7 @@ class DefaultBuilders {
 
   /// Builds a hours column widget in order to put it in a week view.
   static HoursColumn defaultHoursColumnBuilder(BuildContext context, WeekView weekView, double hourRowHeight) => weekView.hoursColumnWidth <= 0
-      ? SizedBox.shrink()
+      ? const SizedBox.shrink()
       : HoursColumn(
           hourRowHeight: hourRowHeight,
           width: weekView.hoursColumnWidth,
@@ -146,7 +146,7 @@ class DefaultBuilders {
       truncatedText = text.substring(0, text.length - 1) + ellipse;
     } else {
       truncatedText = Utils.removeLastWord(text);
-      truncatedText = truncatedText.substring(0, Math.max(0, truncatedText.length - 2)) + ellipse;
+      truncatedText = truncatedText.substring(0, math.max(0, truncatedText.length - 2)) + ellipse;
     }
 
     input[input.length - 1] = TextSpan(
@@ -275,5 +275,5 @@ class MagnetScrollPhysics extends ScrollPhysics {
     double minScrollExtent,
     double maxScrollExtent,
   ) =>
-      Math.min(Math.max(offset, minScrollExtent), maxScrollExtent);
+      math.min(math.max(offset, minScrollExtent), maxScrollExtent);
 }

@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/day_view.dart';
 import 'package:flutter_week_view/src/utils.dart';
@@ -51,8 +51,8 @@ class FlutterWeekViewEvent {
     this.onTap,
     this.onLongPress,
     this.eventTextBuilder,
-  })  : this.start = DateTime(start.year, start.month, start.day, start.hour, start.minute),
-        this.end = DateTime(end.year, end.month, end.day, end.hour, end.minute),
+  })  : start = DateTime(start.year, start.month, start.day, start.hour, start.minute),
+        end = DateTime(end.year, end.month, end.day, end.hour, end.minute),
         assert(title != null),
         assert(description != null),
         assert(start != null),
@@ -74,8 +74,8 @@ class FlutterWeekViewEvent {
           this,
           context,
           dayView,
-          Math.max(0.0, height),
-          Math.max(0.0, width),
+          math.max(0.0, height),
+          math.max(0.0, width),
         ),
       ),
     );

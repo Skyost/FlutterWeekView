@@ -1,4 +1,4 @@
-import 'dart:math' as Math;
+import 'dart:math' as math;
 import 'package:flutter_week_view/src/controller.dart';
 import 'package:flutter_week_view/src/day_view.dart';
 import 'package:flutter_week_view/src/event.dart';
@@ -7,7 +7,7 @@ import 'package:flutter_week_view/src/utils.dart';
 import 'package:flutter/material.dart';
 
 /// Builds a day view.
-typedef DayView DayViewBuilder(BuildContext context, WeekView weekView, DateTime date, DayViewController dayViewController);
+typedef DayViewBuilder = DayView Function(BuildContext context, WeekView weekView, DateTime date, DayViewController dayViewController);
 
 /// A (scrollable) week view which is able to display events, zoom and un-zoom and more !
 class WeekView extends ZoomableHeadersWidget<WeekViewController> {
@@ -44,7 +44,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewController> {
     bool userZoomable = true,
   })  : assert(dates != null && dates.isNotEmpty),
         assert(dayViewBuilder != null),
-        this.events = events ?? [],
+        events = events ?? [],
         super(
           controller: controller ?? WeekViewController(dayViewsCount: dates.length),
           dateFormatter: dateFormatter ?? DefaultBuilders.defaultDateFormatter,
@@ -95,7 +95,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView, WeekViewContro
   @override
   Widget build(BuildContext context) {
     if (dayViewWidth == null) {
-      return SizedBox.expand();
+      return const SizedBox.expand();
     }
 
     return createMainWidget();
@@ -131,7 +131,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView, WeekViewContro
         Container(
           height: widget.dayBarHeight,
           width: widget.hoursColumnWidth,
-          color: widget.dayBarBackgroundColor ?? Color(0xFFEBEBEB),
+          color: widget.dayBarBackgroundColor ?? const Color(0xFFEBEBEB),
         ),
       ],
     );
@@ -148,7 +148,6 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView, WeekViewContro
           controller: controller.horizontalScrollController,
           scrollDirection: Axis.horizontal,
           physics: MagnetScrollPhysics(itemSize: dayViewWidth),
-          shrinkWrap: true,
           itemCount: widget.dates.length,
           itemBuilder: (context, index) => createDayView(index),
         ),
@@ -190,8 +189,8 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView, WeekViewContro
     double topOffset = calculateTopOffset(now.hour, now.minute);
     double leftOffset = dayViewWidth * index;
 
-    controller.verticalScrollController.jumpTo(Math.min(topOffset, controller.verticalScrollController.position.maxScrollExtent));
-    controller.horizontalScrollController.jumpTo(Math.min(leftOffset, controller.horizontalScrollController.position.maxScrollExtent));
+    controller.verticalScrollController.jumpTo(math.min(topOffset, controller.verticalScrollController.position.maxScrollExtent));
+    controller.horizontalScrollController.jumpTo(math.min(leftOffset, controller.horizontalScrollController.position.maxScrollExtent));
   }
 }
 
@@ -262,7 +261,7 @@ class _PositionedDayBarState extends State<_PositionedDayBar> {
     }
 
     setState(() {
-      this.left = widget.weekView.hoursColumnWidth - widget.weekView.controller.horizontalScrollController.position.pixels;
+      left = widget.weekView.hoursColumnWidth - widget.weekView.controller.horizontalScrollController.position.pixels;
     });
   }
 }

@@ -1,5 +1,5 @@
 import 'dart:collection';
-import 'dart:math' as Math;
+import 'dart:math' as math;
 
 import 'package:flutter_week_view/src/controller.dart';
 import 'package:flutter_week_view/src/event.dart';
@@ -8,16 +8,16 @@ import 'package:flutter_week_view/src/utils.dart';
 import 'package:flutter/material.dart';
 
 /// Returns a string from a specified date.
-typedef String DateFormatter(int year, int month, int day);
+typedef DateFormatter = String Function(int year, int month, int day);
 
 /// Returns a string from a specified hour.
-typedef String HourFormatter(int hour, int minute);
+typedef HourFormatter = String Function(int hour, int minute);
 
 /// Builds an event text widget.
-typedef Widget EventTextBuilder(BuildContext context, DayView dayView, double height, double width);
+typedef EventTextBuilder = Widget Function(BuildContext context, DayView dayView, double height, double width);
 
 /// Allows to calculate a top offset from a given hour.
-typedef double TopOffsetCalculator(int hour);
+typedef TopOffsetCalculator = double Function(int hour);
 
 /// A (scrollable) day view which is able to display events, zoom and un-zoom and more !
 class DayView extends ZoomableHeadersWidget<DayViewController> {
@@ -57,9 +57,9 @@ class DayView extends ZoomableHeadersWidget<DayViewController> {
     bool scrollToCurrentTime = true,
     bool userZoomable = true,
   })  : assert(date != null),
-        this.date = DateTime(date.year, date.month, date.day),
-        this.eventsColumnBackgroundPainter = eventsColumnBackgroundPainter ?? EventsColumnBackgroundPainter(backgroundColor: Utils.overlapsDate(date) ? Color(0xFFe3f5ff) : Color(0xFFF2F2F2)),
-        this.events = events ?? [],
+        date = DateTime(date.year, date.month, date.day),
+        eventsColumnBackgroundPainter = eventsColumnBackgroundPainter ?? EventsColumnBackgroundPainter(backgroundColor: Utils.overlapsDate(date) ? const Color(0xFFe3f5ff) : const Color(0xFFF2F2F2)),
+        events = events ?? [],
         super(
           controller: controller ?? DayViewController(),
           dateFormatter: dateFormatter ?? DefaultBuilders.defaultDateFormatter,
@@ -300,7 +300,7 @@ class _EventsGrid {
     for (int hour in drawProperties.hours) {
       List<_EventDrawProperties> events = (hourDrawProperties[hour] ?? [])..add(drawProperties);
       hourDrawProperties[hour] = events;
-      columnsCount = Math.max(columnsCount, events.length);
+      columnsCount = math.max(columnsCount, events.length);
     }
   }
 
@@ -365,7 +365,7 @@ class _EventDrawProperties {
     start = event.start;
     end = event.end;
 
-    DateTime tomorrow = dayView.date.add(Duration(days: 1));
+    DateTime tomorrow = dayView.date.add(const Duration(days: 1));
 
     if (start.isBefore(dayView.date)) {
       start = dayView.date;
@@ -380,7 +380,7 @@ class _EventDrawProperties {
     hours = [];
     while (hour.isBefore(max)) {
       hours.add(hour.hour);
-      hour = hour.add(Duration(hours: 1));
+      hour = hour.add(const Duration(hours: 1));
     }
   }
 
