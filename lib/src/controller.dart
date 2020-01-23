@@ -1,7 +1,8 @@
-import 'dart:math' as Math;
+import 'dart:math' as math;
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_week_view/src/utils.dart';
 
 /// An abstract zoom controller.
 abstract class ZoomController {
@@ -30,10 +31,10 @@ abstract class ZoomController {
     double minZoom,
     double maxZoom,
     this.disposable = true,
-  })  : this.verticalScrollController = verticalScrollController ?? ScrollController(),
-        this.zoomCoefficient = Math.max(0, zoomCoefficient ?? 0),
-        this.minZoom = Math.max(0, minZoom ?? 0.4),
-        this.maxZoom = Math.max(0, minZoom ?? 1.6),
+  })  : verticalScrollController = verticalScrollController ?? SilentScrollController(),
+        zoomCoefficient = math.max(0, zoomCoefficient ?? 0),
+        minZoom = math.max(0, minZoom ?? 0.4),
+        maxZoom = math.max(0, minZoom ?? 1.6),
         assert(disposable != null) {
     assert(this.minZoom <= this.maxZoom);
   }
@@ -150,10 +151,10 @@ class WeekViewController extends ZoomController {
     double minZoom,
     double maxZoom,
     bool disposable = true,
-  })  : this.horizontalScrollController = horizontalScrollController ?? ScrollController(),
+  })  : horizontalScrollController = horizontalScrollController ?? SilentScrollController(),
         assert(dayViewsCount != null && dayViewsCount > 0),
         assert(disposable != null),
-        this.dayViewControllers = List.generate(
+        dayViewControllers = List.generate(
           dayViewsCount,
           (_) => DayViewController(
             zoomCoefficient: zoomCoefficient,

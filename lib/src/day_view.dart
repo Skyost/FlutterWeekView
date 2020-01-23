@@ -156,25 +156,10 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
       ));
     }
 
-    DateTime now = DateTime.now();
     if (widget.currentTimeRuleColor != null && Utils.overlapsDate(widget.date)) {
-      children.add(createPositionedHorizontalRule(calculateTopOffset(now.hour + 1, now.minute), widget.currentTimeRuleColor));
+      children.add(createCurrentTimeRule());
       if (widget.currentTimeCircleColor != null) {
-        double radius = 15;
-        children.add(
-          Positioned(
-            top: calculateTopOffset(now.hour + 1, now.minute) - (radius / 2),
-            right: 0,
-            child: Container(
-              height: radius,
-              width: radius,
-              decoration: BoxDecoration(
-                color: widget.currentTimeCircleColor,
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-        );
+        children.add(createCurrentTimeCircle());
       }
     }
 
@@ -228,15 +213,35 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
       );
 
   /// Creates a positioned horizontal rule in the hours column.
-  Widget createPositionedHorizontalRule(double top, Color color) => Positioned(
-        top: top,
-        left: widget.hoursColumnWidth,
-        right: 0,
-        child: Container(
-          height: 1,
-          color: color,
+  Widget createCurrentTimeRule() {
+    DateTime now = DateTime.now();
+    return Positioned(
+      top: calculateTopOffset(now.hour + 1, now.minute),
+      left: widget.hoursColumnWidth,
+      right: 0,
+      child: Container(
+        height: 1,
+        color: widget.currentTimeRuleColor,
+      ),
+    );
+  }
+
+  /// Creates a positioned horizontal rule in the hours column.
+  Widget createCurrentTimeCircle([double radius = 15]) {
+    DateTime now = DateTime.now();
+    return Positioned(
+      top: calculateTopOffset(now.hour + 1, now.minute) - (radius / 2),
+      right: 0,
+      child: Container(
+        height: radius,
+        width: radius,
+        decoration: BoxDecoration(
+          color: widget.currentTimeCircleColor,
+          shape: BoxShape.circle,
         ),
-      );
+      ),
+    );
+  }
 
   @override
   bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && Utils.overlapsDate(widget.date);

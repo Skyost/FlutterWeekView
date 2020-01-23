@@ -181,7 +181,7 @@ class MagnetScrollPhysics extends ScrollPhysics {
   final double itemSize;
 
   /// Creates a new magnet scroll physics instance.
-  MagnetScrollPhysics({
+  const MagnetScrollPhysics({
     ScrollPhysics parent,
     @required this.itemSize,
   }) : super(parent: parent);
@@ -276,4 +276,67 @@ class MagnetScrollPhysics extends ScrollPhysics {
     double maxScrollExtent,
   ) =>
       math.min(math.max(offset, minScrollExtent), maxScrollExtent);
+}
+
+/// A scroll controller that allows to use the [silentJumpTo] method.
+class SilentScrollController extends ScrollController {
+  /// Creates a new silent scroll controller instance.
+  SilentScrollController({
+    double initialScrollOffset = 0.0,
+    bool keepScrollOffset = true,
+    String debugLabel,
+  }) : super(
+          initialScrollOffset: initialScrollOffset,
+          keepScrollOffset: keepScrollOffset,
+          debugLabel: debugLabel,
+        );
+
+  @override
+  _SilentScrollPosition createScrollPosition(
+    ScrollPhysics physics,
+    ScrollContext context,
+    ScrollPosition oldPosition,
+  ) {
+    return _SilentScrollPosition(
+      physics: physics,
+      context: context,
+      initialPixels: initialScrollOffset,
+      keepScrollOffset: keepScrollOffset,
+      oldPosition: oldPosition,
+      debugLabel: debugLabel,
+    );
+  }
+
+  /// Silently jumps to the specified position.
+  void silentJumpTo(double pixels) {
+    assert(positions.isNotEmpty, 'ScrollController not attached to any scroll views.');
+    List.from(positions).forEach((position) => position.silentJumpTo(pixels));
+  }
+}
+
+/// A scroll position that allows to use [silentJumpTo].
+class _SilentScrollPosition extends ScrollPositionWithSingleContext {
+  /// Creates a new scroll position instance.
+  _SilentScrollPosition({
+    @required ScrollPhysics physics,
+    @required ScrollContext context,
+    double initialPixels = 0.0,
+    bool keepScrollOffset = true,
+    ScrollPosition oldPosition,
+    String debugLabel,
+  }) : super(
+          physics: physics,
+          context: context,
+          initialPixels: initialPixels,
+          keepScrollOffset: keepScrollOffset,
+          oldPosition: oldPosition,
+          debugLabel: debugLabel,
+        );
+
+  /// Silently jumps to the specified position.
+  void silentJumpTo(double value) {
+    if (pixels != value) {
+      forcePixels(value);
+    }
+  }
 }
