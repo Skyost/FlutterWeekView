@@ -58,7 +58,7 @@ class DayView extends ZoomableHeadersWidget<DayViewController> {
     bool userZoomable = true,
   })  : assert(date != null),
         date = DateTime(date.year, date.month, date.day),
-        eventsColumnBackgroundPainter = eventsColumnBackgroundPainter ?? EventsColumnBackgroundPainter(backgroundColor: Utils.overlapsDate(date) ? const Color(0xFFe3f5ff) : const Color(0xFFF2F2F2)),
+        eventsColumnBackgroundPainter = eventsColumnBackgroundPainter ?? EventsColumnBackgroundPainter(backgroundColor: Utils.sameDay(date) ? const Color(0xFFe3f5ff) : const Color(0xFFF2F2F2)),
         events = events ?? [],
         super(
           controller: controller ?? DayViewController(),
@@ -156,7 +156,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
       ));
     }
 
-    if (widget.currentTimeRuleColor != null && Utils.overlapsDate(widget.date)) {
+    if (widget.currentTimeRuleColor != null && Utils.sameDay(widget.date)) {
       children.add(createCurrentTimeRule());
       if (widget.currentTimeCircleColor != null) {
         children.add(createCurrentTimeCircle());
@@ -244,7 +244,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
   }
 
   @override
-  bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && Utils.overlapsDate(widget.date);
+  bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && Utils.sameDay(widget.date);
 }
 
 /// The events column background painter.
@@ -363,7 +363,7 @@ class _EventDrawProperties {
 
   /// Creates a new flutter week view event draw properties from the specified day view and the specified day view event.
   _EventDrawProperties(DayView dayView, FlutterWeekViewEvent event) {
-    if (shouldDraw || (!Utils.overlapsDate(event.start, dayView.date) && !Utils.overlapsDate(event.end, dayView.date))) {
+    if (shouldDraw || (!Utils.sameDay(event.start, dayView.date) && !Utils.sameDay(event.end, dayView.date))) {
       return;
     }
 

@@ -1,3 +1,7 @@
+## [0.2.0+2] - 2020-01-27
+
+* A little bug fixed.
+
 ## [0.2.0+1] - 2020-01-23
 
 * Performance improvement (see [#8](https://github.com/Skyost/FlutterWeekView/issues/8)).

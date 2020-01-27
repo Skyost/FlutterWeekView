@@ -206,7 +206,7 @@ class DayBar extends StatelessWidget {
             dateFormatter(date.year, date.month, date.day),
             style: textStyle ??
                 TextStyle(
-                  color: Utils.overlapsDate(date) ? Colors.blue[800] : Colors.black54,
+                  color: Utils.sameDay(date) ? Colors.blue[800] : Colors.black54,
                   fontWeight: FontWeight.bold,
                 ),
           ),
