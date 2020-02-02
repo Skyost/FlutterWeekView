@@ -9,13 +9,19 @@ import 'package:flutter/material.dart';
 /// Builds a day view.
 typedef DayViewBuilder = DayView Function(BuildContext context, WeekView weekView, DateTime date, DayViewController dayViewController);
 
+/// Creates a date according to the specified index.
+typedef DateCreator = DateTime Function(int index);
+
 /// A (scrollable) week view which is able to display events, zoom and un-zoom and more !
 class WeekView extends ZoomableHeadersWidget<WeekViewController> {
+  /// The number of events.
+  final int dateCount;
+
+  /// The date creator.
+  final DateCreator dateCreator;
+
   /// The events.
   final List<FlutterWeekViewEvent> events;
-
-  /// The dates.
-  final List<DateTime> dates;
 
   /// The day view builder.
   final DayViewBuilder dayViewBuilder;
@@ -26,7 +32,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewController> {
   /// Creates a new week view instance.
   WeekView({
     List<FlutterWeekViewEvent> events,
-    @required this.dates,
+    @required List<DateTime> dates,
     this.dayViewBuilder = DefaultBuilders.defaultDayViewBuilder,
     this.dayViewWidth,
     DateFormatter dateFormatter,
@@ -44,9 +50,51 @@ class WeekView extends ZoomableHeadersWidget<WeekViewController> {
     bool userZoomable = true,
   })  : assert(dates != null && dates.isNotEmpty),
         assert(dayViewBuilder != null),
+        dateCount = dates?.length ?? 0,
+        dateCreator = ((index) => DefaultBuilders.defaultDateCreator(dates, index)),
         events = events ?? [],
         super(
           controller: controller ?? WeekViewController(dayViewsCount: dates.length),
+          dateFormatter: dateFormatter ?? DefaultBuilders.defaultDateFormatter,
+          hourFormatter: hourFormatter ?? DefaultBuilders.defaultHourFormatter,
+          dayBarTextStyle: dayBarTextStyle,
+          dayBarHeight: dayBarHeight,
+          dayBarBackgroundColor: dayBarBackgroundColor,
+          hoursColumnTextStyle: hoursColumnTextStyle,
+          hoursColumnWidth: hoursColumnWidth,
+          hoursColumnBackgroundColor: hoursColumnBackgroundColor,
+          hourRowHeight: hourRowHeight,
+          inScrollableWidget: inScrollableWidget,
+          scrollToCurrentTime: scrollToCurrentTime,
+          userZoomable: userZoomable,
+        );
+
+  /// Creates a new week view instance.
+  WeekView.builder({
+    List<FlutterWeekViewEvent> events,
+    this.dateCount,
+    @required this.dateCreator,
+    this.dayViewBuilder = DefaultBuilders.defaultDayViewBuilder,
+    this.dayViewWidth,
+    DateFormatter dateFormatter,
+    HourFormatter hourFormatter,
+    WeekViewController controller,
+    TextStyle dayBarTextStyle,
+    double dayBarHeight,
+    Color dayBarBackgroundColor,
+    TextStyle hoursColumnTextStyle,
+    double hoursColumnWidth,
+    Color hoursColumnBackgroundColor,
+    double hourRowHeight,
+    bool inScrollableWidget = true,
+    bool scrollToCurrentTime = true,
+    bool userZoomable = true,
+  })  : assert(dateCount == null || dateCount >= 0),
+        assert(dateCreator != null),
+        assert(dayViewBuilder != null),
+        events = events ?? [],
+        super(
+          controller: controller ?? WeekViewController(dayViewsCount: dateCount),
           dateFormatter: dateFormatter ?? DefaultBuilders.defaultDateFormatter,
           hourFormatter: hourFormatter ?? DefaultBuilders.defaultHourFormatter,
           dayBarTextStyle: dayBarTextStyle,
@@ -138,45 +186,49 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView, WeekViewContro
   }
 
   /// Creates the week view stack.
-  Widget createWeekViewStack() {
-    Widget dayViewsList;
-    if (widget.inScrollableWidget) {
-      dayViewsList = SizedBox(
-        height: calculateHeight(),
-        child: ListView.builder(
-          padding: EdgeInsets.only(left: widget.hoursColumnWidth),
-          controller: controller.horizontalScrollController,
-          scrollDirection: Axis.horizontal,
-          physics: MagnetScrollPhysics(itemSize: dayViewWidth),
-          itemCount: widget.dates.length,
-          itemBuilder: (context, index) => createDayView(index),
-        ),
+  Widget createWeekViewStack() => Stack(
+        children: [
+          SizedBox(
+            height: calculateHeight(),
+            child: ListView.builder(
+              padding: EdgeInsets.only(left: widget.hoursColumnWidth),
+              controller: controller.horizontalScrollController,
+              scrollDirection: Axis.horizontal,
+              physics: widget.inScrollableWidget ? MagnetScrollPhysics(itemSize: dayViewWidth) : const NeverScrollableScrollPhysics(),
+              itemCount: widget.dateCount,
+              itemBuilder: (context, index) => createDayView(index),
+            ),
+          ),
+          HoursColumn.fromHeadersWidget(parent: widget),
+        ],
       );
-    } else {
-      dayViewsList = Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [for (int i = 0; i < widget.dates.length; i++) createDayView(i)],
-      );
-    }
-
-    return Stack(
-      children: [
-        dayViewsList,
-        HoursColumn.fromHeadersWidget(parent: widget),
-      ],
-    );
-  }
 
   /// Creates the day view at the specified index.
   Widget createDayView(int index) => SizedBox(
         width: dayViewWidth,
-        child: widget.dayViewBuilder(context, widget, widget.dates[index], controller.dayViewControllers[index]),
+        child: widget.dayViewBuilder(context, widget, widget.dateCreator(index), controller.dayViewControllers[index]),
       );
 
   @override
   bool get shouldScrollToCurrentTime {
+    if (widget.dateCount == null) {
+      return false;
+    }
+
     DateTime now = DateTime.now();
-    return dayViewWidth != null && super.shouldScrollToCurrentTime && widget.dates.contains(DateTime(now.year, now.month, now.day));
+    DateTime today = DateTime(now.year, now.month, now.day);
+
+    bool hasCurrentDay = false;
+    if (widget.dateCount != null) {
+      for (int i = 0; i < widget.dateCount; i++) {
+        if (widget.dateCreator(i) == today) {
+          hasCurrentDay = true;
+          break;
+        }
+      }
+    }
+
+    return dayViewWidth != null && super.shouldScrollToCurrentTime && hasCurrentDay;
   }
 
   @override
@@ -185,7 +237,15 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView, WeekViewContro
 
     DateTime now = DateTime.now();
     DateTime today = DateTime(now.year, now.month, now.day);
-    int index = widget.dates.indexOf(today);
+
+    int index = 0;
+    if (widget.dateCount != null) {
+      for (; index < widget.dateCount; index++) {
+        if (widget.dateCreator(index) == today) {
+          break;
+        }
+      }
+    }
 
     double topOffset = calculateTopOffset(now.hour, now.minute);
     double leftOffset = dayViewWidth * index;
@@ -237,12 +297,12 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
   Widget build(BuildContext context) => SizedBox(
         height: widget.weekView.dayBarHeight,
         child: ListView.builder(
-          itemCount: widget.weekView.dates.length,
+          itemCount: widget.weekView.dateCount,
           itemBuilder: (context, position) => SizedBox(
             width: widget.dayViewWidth,
             child: DayBar.fromHeadersWidget(
               parent: widget.weekView,
-              date: widget.weekView.dates[position],
+              date: widget.weekView.dateCreator(position),
             ),
           ),
           physics: MagnetScrollPhysics(itemSize: widget.dayViewWidth),

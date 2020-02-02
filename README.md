@@ -155,6 +155,10 @@ Here are the specific options of `FlutterWeekView` :
 * `dayViewBuilder` The function that allows to build a Day View widget.
 * `dayViewWidth` A Day View width.
 
+Please note that you can create a `FlutterWeekView` instance using a builder.
+All previous options are still available but you don't need to provide the `dates` list.
+However, you need to provide a `DateCreator` (and a date count if you can, if it's impossible for you to do it then `scrollToCurrentTime` will have no effect).
+
 ## Contributions
 
 You have a lot of options to contribute to this project ! You can :

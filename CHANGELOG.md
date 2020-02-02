@@ -1,3 +1,8 @@
+## [0.2.1] - 2020-02-02
+
+* Added the ability to create a `WeekView` widget with a builder.
+* Fixed a problem with controllers that were not usable.
+
 ## [0.2.0+2] - 2020-01-27
 
 * A little bug fixed.

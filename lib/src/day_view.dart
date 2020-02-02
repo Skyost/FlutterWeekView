@@ -58,7 +58,7 @@ class DayView extends ZoomableHeadersWidget<DayViewController> {
     bool userZoomable = true,
   })  : assert(date != null),
         date = DateTime(date.year, date.month, date.day),
-        eventsColumnBackgroundPainter = eventsColumnBackgroundPainter ?? EventsColumnBackgroundPainter(backgroundColor: Utils.sameDay(date) ? const Color(0xFFe3f5ff) : const Color(0xFFF2F2F2)),
+        eventsColumnBackgroundPainter = eventsColumnBackgroundPainter ?? EventsColumnBackgroundPainter(backgroundColor: Utils.sameDay(date) ? const Color(0xFFE3F5FF) : const Color(0xFFF2F2F2)),
         events = events ?? [],
         super(
           controller: controller ?? DayViewController(),
