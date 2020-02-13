@@ -1,3 +1,7 @@
+## [0.2.1+1] - 2020-02-13
+
+* Fixed a problem with the current time rule.
+
 ## [0.2.1] - 2020-02-02
 
 * Added the ability to create a `WeekView` widget with a builder.

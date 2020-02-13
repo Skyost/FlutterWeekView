@@ -216,7 +216,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
   Widget createCurrentTimeRule() {
     DateTime now = DateTime.now();
     return Positioned(
-      top: calculateTopOffset(now.hour + 1, now.minute),
+      top: calculateTopOffset(now.hour, now.minute),
       left: widget.hoursColumnWidth,
       right: 0,
       child: Container(
