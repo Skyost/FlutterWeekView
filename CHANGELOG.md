@@ -1,3 +1,7 @@
+## [0.2.1+2] - 2020-02-17
+
+* Fixed a problem with the current time rule circle.
+
 ## [0.2.1+1] - 2020-02-13
 
 * Fixed a problem with the current time rule.
