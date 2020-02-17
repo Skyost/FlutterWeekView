@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/day_view.dart';
 import 'package:flutter_week_view/src/utils.dart';
@@ -19,6 +20,9 @@ class FlutterWeekViewEvent {
 
   /// The event widget background color.
   final Color backgroundColor;
+
+  /// The event widget decoration.
+  final BoxDecoration decoration;
 
   /// The event text widget text style.
   final TextStyle textStyle;
@@ -45,6 +49,7 @@ class FlutterWeekViewEvent {
     @required DateTime start,
     @required DateTime end,
     this.backgroundColor = const Color(0xCC2196F3),
+    this.decoration,
     this.textStyle = const TextStyle(color: Colors.white),
     this.padding = const EdgeInsets.all(10),
     this.margin,
@@ -68,6 +73,7 @@ class FlutterWeekViewEvent {
       onLongPress: onLongPress,
       child: Container(
         color: backgroundColor,
+        decoration: decoration,
         margin: margin,
         padding: padding,
         child: (eventTextBuilder ?? DefaultBuilders.defaultEventTextBuilder)(
