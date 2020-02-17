@@ -230,7 +230,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
   Widget createCurrentTimeCircle([double radius = 15]) {
     DateTime now = DateTime.now();
     return Positioned(
-      top: calculateTopOffset(now.hour + 1, now.minute) - (radius / 2),
+      top: calculateTopOffset(now.hour, now.minute) - (radius / 2),
       right: 0,
       child: Container(
         height: radius,
