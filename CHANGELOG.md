@@ -1,3 +1,7 @@
+## [0.2.1+3] - 2020-02-17
+
+* Fixed a bug that disallowed to put the widget in a stateful context.
+
 ## [0.2.1+2] - 2020-02-17
 
 * Fixed a problem with the current time rule circle.
