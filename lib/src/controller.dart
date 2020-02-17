@@ -60,6 +60,9 @@ abstract class ZoomController {
   /// Returns the current zoom factor.
   double get zoomFactor;
 
+  /// Changes the current zoom factor (but doesn't trigger any listener).
+  set zoomFactor(double zoomFactor);
+
   /// Disposes this controller if enabled.
   /// You should not use it anymore after having called this method.
   @mustCallSuper
@@ -83,7 +86,8 @@ class DayViewController extends ZoomController {
   double _previousZoomFactor = 1;
 
   /// The current zoom factor.
-  double _zoomFactor = 1;
+  @override
+  double zoomFactor = 1;
 
   /// Creates a new day view controller instance.
   DayViewController({
@@ -93,12 +97,12 @@ class DayViewController extends ZoomController {
     double maxZoom,
     bool disposable = true,
   }) : super(
-          verticalScrollController: verticalScrollController,
-          zoomCoefficient: zoomCoefficient,
-          minZoom: minZoom,
-          maxZoom: maxZoom,
-          disposable: disposable,
-        );
+    verticalScrollController: verticalScrollController,
+    zoomCoefficient: zoomCoefficient,
+    minZoom: minZoom,
+    maxZoom: maxZoom,
+    disposable: disposable,
+  );
 
   @override
   double calculateZoomFactor(double scale) {
@@ -115,23 +119,20 @@ class DayViewController extends ZoomController {
   }
 
   @override
-  void scaleStart() => _previousZoomFactor = _zoomFactor;
+  void scaleStart() => _previousZoomFactor = zoomFactor;
 
   @override
   void scaleUpdate(ScaleUpdateDetails details) {
     double zoomFactor = calculateZoomFactor(details.scale);
-    bool hasChanged = _zoomFactor != zoomFactor;
+    bool hasChanged = this.zoomFactor != zoomFactor;
     if (hasChanged) {
-      _zoomFactor = zoomFactor;
+      this.zoomFactor = zoomFactor;
       _listeners.forEach((listener) => listener.onZoomFactorChanged(this, details));
     }
   }
 
   @override
-  double get scale => _zoomFactor / (_previousZoomFactor * zoomCoefficient);
-
-  @override
-  double get zoomFactor => _zoomFactor;
+  double get scale => zoomFactor / (_previousZoomFactor * zoomCoefficient);
 }
 
 /// Allows to control some parameters of a week view.
@@ -156,7 +157,7 @@ class WeekViewController extends ZoomController {
         assert(disposable != null),
         dayViewControllers = List.generate(
           dayViewsCount,
-          (_) => DayViewController(
+              (_) => DayViewController(
             zoomCoefficient: zoomCoefficient,
             minZoom: minZoom,
             maxZoom: maxZoom,
@@ -164,12 +165,12 @@ class WeekViewController extends ZoomController {
           ),
         ),
         super(
-          verticalScrollController: verticalScrollController,
-          zoomCoefficient: zoomCoefficient,
-          minZoom: minZoom,
-          maxZoom: maxZoom,
-          disposable: disposable,
-        );
+        verticalScrollController: verticalScrollController,
+        zoomCoefficient: zoomCoefficient,
+        minZoom: minZoom,
+        maxZoom: maxZoom,
+        disposable: disposable,
+      );
 
   @override
   double calculateZoomFactor(double scale) => dayViewControllers.first.calculateZoomFactor(scale);
@@ -192,6 +193,11 @@ class WeekViewController extends ZoomController {
 
   @override
   double get zoomFactor => dayViewControllers.first.zoomFactor;
+
+  @override
+  set zoomFactor(double zoomFactor) {
+    dayViewControllers.forEach((controller) => controller.zoomFactor = zoomFactor);
+  }
 
   @override
   void dispose() {

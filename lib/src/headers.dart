@@ -68,24 +68,21 @@ abstract class ZoomableHeadersWidget<C extends ZoomController> extends StatefulW
         assert(inScrollableWidget != null),
         assert(scrollToCurrentTime != null),
         assert(userZoomable != null);
+
+  /// Calculates the hour row height.
+  double _calculateHourRowHeight([C controller]) => hourRowHeight * (controller ?? this.controller).zoomFactor;
 }
 
 /// An abstract widget state that shows both headers and can be zoomed.
 abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C extends ZoomController> extends State<W> with ZoomControllerListener {
-  /// The zoom controller.
-  final C controller;
-
   /// The current hour row height.
   double hourRowHeight;
-
-  /// Creates a new zoomable headers widget state instance.
-  ZoomableHeadersWidgetState(ZoomableHeadersWidget<C> parent) : controller = parent.controller;
 
   @override
   void initState() {
     super.initState();
-    hourRowHeight = widget.hourRowHeight * controller.zoomFactor;
-    controller.addListener(this);
+    hourRowHeight = widget._calculateHourRowHeight();
+    widget.controller.addListener(this);
 
     if (shouldScrollToCurrentTime) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -95,12 +92,25 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
   }
 
   @override
+  void didUpdateWidget(W oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.controller.zoomFactor != oldWidget.controller.zoomFactor) {
+      widget.controller.zoomFactor = oldWidget.controller.zoomFactor;
+    }
+
+    hourRowHeight = widget._calculateHourRowHeight();
+    oldWidget.controller.dispose();
+    widget.controller.addListener(this);
+  }
+
+  @override
   void onZoomFactorChanged(ZoomController controller, ScaleUpdateDetails details) {
     if (!mounted) {
       return;
     }
 
-    double hourRowHeight = widget.hourRowHeight * controller.zoomFactor;
+    double hourRowHeight = widget._calculateHourRowHeight(controller);
 
     if (widget.inScrollableWidget) {
       double widgetHeight = (context.findRenderObject() as RenderBox).size.height;
@@ -120,7 +130,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
 
   @override
   void dispose() {
-    controller.dispose();
+    widget.controller.dispose();
     super.dispose();
   }
 
@@ -142,11 +152,11 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
 
     DateTime now = DateTime.now();
     double topOffset = calculateTopOffset(now.hour, now.minute);
-    controller.verticalScrollController.jumpTo(math.min(topOffset, controller.verticalScrollController.position.maxScrollExtent));
+    widget.controller.verticalScrollController.jumpTo(math.min(topOffset, widget.controller.verticalScrollController.position.maxScrollExtent));
   }
 
   /// Returns whether this widget should be zoomable.
-  bool get isZoomable => widget.userZoomable && controller.zoomCoefficient > 0;
+  bool get isZoomable => widget.userZoomable && widget.controller.zoomCoefficient > 0;
 
   /// Calculates the top offset of a given hour and a given minute.
   double calculateTopOffset(int hour, [int minute = 0, double hourRowHeight]) => (hour + (minute / 60)) * (hourRowHeight ?? this.hourRowHeight);
@@ -246,7 +256,7 @@ class HoursColumn extends StatelessWidget {
   HoursColumn.fromHeadersWidget({
     @required ZoomableHeadersWidget parent,
   }) : this(
-          hourRowHeight: parent.hourRowHeight * parent.controller.zoomFactor,
+          hourRowHeight: parent._calculateHourRowHeight(),
           width: parent.hoursColumnWidth,
           backgroundColor: parent.hoursColumnBackgroundColor ?? Colors.white,
           textStyle: parent.hoursColumnTextStyle ?? const TextStyle(color: Colors.black54),

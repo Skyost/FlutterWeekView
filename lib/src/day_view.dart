@@ -85,27 +85,33 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
   /// Contains all events draw properties.
   final Map<FlutterWeekViewEvent, _EventDrawProperties> eventsDrawProperties = HashMap();
 
-  /// The events column background painter.
-  final EventsColumnBackgroundPainter eventsColumnBackgroundPainter;
-
   /// The flutter week view events.
-  final List<FlutterWeekViewEvent> events;
+  List<FlutterWeekViewEvent> events;
 
   /// Creates a new day view state.
   _DayViewState(DayView dayView)
-      : eventsColumnBackgroundPainter = dayView.eventsColumnBackgroundPainter,
-        events = List.of(dayView.events),
-        super(dayView);
+      : events = List.of(dayView.events);
 
   @override
   void initState() {
     super.initState();
-    events.sort((a, b) => a.start.compareTo(b.start));
-    eventsColumnBackgroundPainter.topOffsetCalculator = (hour) => calculateTopOffset(hour);
+    sortEvents();
+    widget.eventsColumnBackgroundPainter.topOffsetCalculator = calculateTopOffset;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() => createEventsDrawProperties());
     });
+  }
+
+  @override
+  void didUpdateWidget(DayView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    eventsDrawProperties.clear();
+    events = List.of(widget.events);
+    sortEvents();
+    widget.eventsColumnBackgroundPainter.topOffsetCalculator = calculateTopOffset;
+    createEventsDrawProperties();
   }
 
   @override
@@ -130,8 +136,8 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
     }
 
     return GestureDetector(
-      onScaleStart: (_) => controller.scaleStart(),
-      onScaleUpdate: (details) => controller.scaleUpdate(details),
+      onScaleStart: (_) => widget.controller.scaleStart(),
+      onScaleUpdate: (details) => widget.controller.scaleUpdate(details),
       child: mainStack,
     );
   }
@@ -171,7 +177,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
     if (widget.inScrollableWidget) {
       mainWidget = NoGlowBehavior.noGlow(
         child: SingleChildScrollView(
-          controller: controller.verticalScrollController,
+          controller: widget.controller.verticalScrollController,
           child: mainWidget,
         ),
       );
@@ -209,7 +215,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
 
   /// Creates the background widgets that should be added to a stack.
   Widget createBackground() => Positioned.fill(
-        child: CustomPaint(painter: eventsColumnBackgroundPainter),
+        child: CustomPaint(painter: widget.eventsColumnBackgroundPainter),
       );
 
   /// Creates a positioned horizontal rule in the hours column.
@@ -245,6 +251,9 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
 
   @override
   bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && Utils.sameDay(widget.date);
+
+  /// Sorts the events.
+  void sortEvents() => events.sort((a, b) => a.start.compareTo(b.start));
 }
 
 /// The events column background painter.
