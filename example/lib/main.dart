@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart' as launcher;
 import 'package:flutter_week_view/flutter_week_view.dart';
@@ -21,6 +23,7 @@ class _FlutterWeekViewDemoApp extends StatelessWidget {
                 title: 'Demo week view',
                 body: _DemoWeekView(),
               ),
+          '/dynamic-day-view': (context) => _DynamicDayView(),
         },
       );
 
@@ -58,11 +61,15 @@ class _FlutterWeekViewDemoAppBody extends StatelessWidget {
             ),
             RaisedButton(
               child: const Text('Demo day view'),
-              onPressed: () => Navigator.pushNamed(context, '/day-view'),
+              onPressed: () => Navigator.pushNamed(context, '/dyna'),
             ),
             RaisedButton(
               child: const Text('Demo week view'),
               onPressed: () => Navigator.pushNamed(context, '/week-view'),
+            ),
+            RaisedButton(
+              child: const Text('Demo dynamic day view'),
+              onPressed: () => Navigator.pushNamed(context, '/dynamic-day-view'),
             ),
             const Expanded(
               child: SizedBox.expand(),
@@ -174,6 +181,53 @@ class _DemoWeekView extends StatelessWidget {
           end: date.add(const Duration(hours: 21)),
         ),
       ],
+    );
+  }
+}
+
+/// A day view that displays dynamically added events.
+class _DynamicDayView extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _DynamicDayViewState();
+}
+
+/// The dynamic day view state.
+class _DynamicDayViewState extends State<_DynamicDayView> {
+  /// The added events.
+  List<FlutterWeekViewEvent> events = [];
+
+  @override
+  Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Demo dynamic day view'),
+        actions: [
+          FlatButton.icon(
+            onPressed: () {
+              setState(() {
+                DateTime start = DateTime(now.year, now.month, now.day, Random().nextInt(24), Random().nextInt(60));
+                events.add(FlutterWeekViewEvent(
+                  title: 'Event ' + (events.length + 1).toString(),
+                  start: start,
+                  end: start.add(const Duration(hours: 1)),
+                  description: 'A description.',
+                ));
+              });
+            },
+            icon: Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+            label: const SizedBox.shrink(),
+          ),
+        ],
+      ),
+      body: DayView(
+        date: now,
+        events: events,
+      ),
     );
   }
 }
