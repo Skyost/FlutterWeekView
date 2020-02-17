@@ -72,8 +72,7 @@ class FlutterWeekViewEvent {
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
-        color: backgroundColor,
-        decoration: decoration,
+        decoration: decoration ?? (backgroundColor != null ? BoxDecoration(color: backgroundColor) : null),
         margin: margin,
         padding: padding,
         child: (eventTextBuilder ?? DefaultBuilders.defaultEventTextBuilder)(
