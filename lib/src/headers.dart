@@ -100,7 +100,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
     }
 
     hourRowHeight = widget._calculateHourRowHeight();
-    oldWidget.controller.dispose();
+    oldWidget.controller.removeListener(this);
     widget.controller.addListener(this);
   }
 
