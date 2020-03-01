@@ -143,7 +143,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
   }
 
   @override
-  void onZoomFactorChanged(ZoomController controller, ScaleUpdateDetails details) {
+  void onZoomFactorChanged(DayViewController controller, ScaleUpdateDetails details) {
     super.onZoomFactorChanged(controller, details);
 
     if (mounted) {
