@@ -53,6 +53,8 @@ class DayView extends ZoomableHeadersWidget<DayViewController> {
     Color hoursColumnBackgroundColor,
     double hourRowHeight,
     bool inScrollableWidget = true,
+    int initialHour,
+    int initialMinute,
     bool scrollToCurrentTime = true,
     bool userZoomable = true,
   })  : assert(date != null),
@@ -71,6 +73,8 @@ class DayView extends ZoomableHeadersWidget<DayViewController> {
           hoursColumnBackgroundColor: hoursColumnBackgroundColor,
           hourRowHeight: hourRowHeight,
           inScrollableWidget: inScrollableWidget,
+          initialHour: initialHour,
+          initialMinute: initialMinute,
           scrollToCurrentTime: scrollToCurrentTime,
           userZoomable: userZoomable,
         );
@@ -90,6 +94,9 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
   @override
   void initState() {
     super.initState();
+    if (!scheduleScrollToCurrentTimeIfNeeded()) {
+      scheduleScrollToInitialHour();
+    }
 
     reset();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -112,12 +119,17 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
         createMainWidget(),
         Positioned(
           top: 0,
-          left: 0,
+          left: widget.hoursColumnWidth,
           right: 0,
           child: DayBar.fromHeadersWidget(
             parent: widget,
             date: widget.date,
           ),
+        ),
+        Container(
+          height: widget.dayBarHeight,
+          width: widget.hoursColumnWidth,
+          color: widget.dayBarBackgroundColor ?? const Color(0xFFEBEBEB),
         ),
       ],
     );

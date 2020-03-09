@@ -1,6 +1,8 @@
-## [0.2.1+5] - 2020-03-09
+## [0.2.1+5] - 2020-03-10
 
 * Fixed a bug with events positioning.
+* Added the ability to change the initial hour / minute.
+* Fixed day bar positioning in `DayView`.
 
 ## [0.2.1+4] - 2020-02-18
 
