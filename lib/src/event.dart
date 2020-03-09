@@ -5,7 +5,7 @@ import 'package:flutter_week_view/src/day_view.dart';
 import 'package:flutter_week_view/src/utils.dart';
 
 /// Represents a flutter week view event.
-class FlutterWeekViewEvent {
+class FlutterWeekViewEvent extends Comparable<FlutterWeekViewEvent> {
   /// The event title.
   final String title;
 
@@ -84,5 +84,14 @@ class FlutterWeekViewEvent {
         ),
       ),
     );
+  }
+
+  @override
+  int compareTo(FlutterWeekViewEvent other) {
+    int result = start.compareTo(other.start);
+    if (result != 0) {
+      return result;
+    }
+    return end.compareTo(other.end);
   }
 }

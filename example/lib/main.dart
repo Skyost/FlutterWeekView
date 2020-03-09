@@ -61,7 +61,7 @@ class _FlutterWeekViewDemoAppBody extends StatelessWidget {
             ),
             RaisedButton(
               child: const Text('Demo day view'),
-              onPressed: () => Navigator.pushNamed(context, '/dyna'),
+              onPressed: () => Navigator.pushNamed(context, '/day-view'),
             ),
             RaisedButton(
               child: const Text('Demo week view'),
@@ -204,7 +204,7 @@ class _DynamicDayViewState extends State<_DynamicDayView> {
       appBar: AppBar(
         title: const Text('Demo dynamic day view'),
         actions: [
-          FlatButton.icon(
+          IconButton(
             onPressed: () {
               setState(() {
                 DateTime start = DateTime(now.year, now.month, now.day, Random().nextInt(24), Random().nextInt(60));
@@ -220,7 +220,6 @@ class _DynamicDayViewState extends State<_DynamicDayView> {
               Icons.add,
               color: Colors.white,
             ),
-            label: const SizedBox.shrink(),
           ),
         ],
       ),
