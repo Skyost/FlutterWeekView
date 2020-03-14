@@ -1,3 +1,7 @@
+## [0.2.1+6] - 2020-03-12
+
+* Fixed a bug with initial scrolling.
+
 ## [0.2.1+5] - 2020-03-10
 
 * Fixed a bug with events positioning.
