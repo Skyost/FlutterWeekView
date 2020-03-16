@@ -51,6 +51,9 @@ abstract class ZoomableHeadersWidget<C extends ZoomController> extends StatefulW
   /// The current day view controller.
   final C controller;
 
+  /// The decoration of hours
+  final Decoration hoursDecoration;
+
   /// Creates a new zoomable headers widget instance.
   ZoomableHeadersWidget({
     @required this.controller,
@@ -62,6 +65,7 @@ abstract class ZoomableHeadersWidget<C extends ZoomController> extends StatefulW
     this.hoursColumnTextStyle,
     double hoursColumnWidth = 60,
     this.hoursColumnBackgroundColor,
+    this.hoursDecoration,
     double hourRowHeight = 60,
     @required this.inScrollableWidget,
     int initialHour,
@@ -259,10 +263,14 @@ class HoursColumn extends StatelessWidget {
   /// The hour formatter.
   final HourFormatter hourFormatter;
 
+  /// The column decoration
+  final Decoration decoration;
+
   /// Creates a new hours column instance.
   HoursColumn({
     double hourRowHeight = 60,
     double width = 60,
+    this.decoration,
     this.backgroundColor = Colors.white,
     this.textStyle = const TextStyle(color: Colors.black54),
     this.hourFormatter = DefaultBuilders.defaultHourFormatter,
@@ -279,13 +287,15 @@ class HoursColumn extends StatelessWidget {
           backgroundColor: parent.hoursColumnBackgroundColor ?? Colors.white,
           textStyle: parent.hoursColumnTextStyle ?? const TextStyle(color: Colors.black54),
           hourFormatter: parent.hourFormatter,
+          decoration: parent.hoursDecoration
         );
 
   @override
   Widget build(BuildContext context) => Container(
+        decoration: decoration,
         height: 24 * hourRowHeight,
         width: width,
-        color: backgroundColor,
+        color: decoration == null ? backgroundColor : null,
         child: Stack(
           children: List.generate(
             23,

@@ -13,7 +13,7 @@ typedef DateFormatter = String Function(int year, int month, int day);
 typedef HourFormatter = String Function(int hour, int minute);
 
 /// Builds an event text widget.
-typedef EventTextBuilder = Widget Function(BuildContext context, DayView dayView, double height, double width);
+typedef EventTextBuilder = Widget Function(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width);
 
 /// Allows to calculate a top offset from a given hour.
 typedef TopOffsetCalculator = double Function(int hour);
@@ -52,6 +52,7 @@ class DayView extends ZoomableHeadersWidget<DayViewController> {
     double hoursColumnWidth,
     Color hoursColumnBackgroundColor,
     double hourRowHeight,
+    Decoration hoursDecoration,
     bool inScrollableWidget = true,
     int initialHour,
     int initialMinute,
@@ -62,6 +63,7 @@ class DayView extends ZoomableHeadersWidget<DayViewController> {
         eventsColumnBackgroundPainter = eventsColumnBackgroundPainter ?? EventsColumnBackgroundPainter(backgroundColor: Utils.sameDay(date) ? const Color(0xFFE3F5FF) : const Color(0xFFF2F2F2)),
         events = events ?? [],
         super(
+          hoursDecoration: hoursDecoration,
           controller: controller ?? DayViewController(),
           dateFormatter: dateFormatter ?? DefaultBuilders.defaultDateFormatter,
           hourFormatter: hourFormatter ?? DefaultBuilders.defaultHourFormatter,
