@@ -132,6 +132,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView, WeekViewContro
 
     dayViewWidth = widget.dayViewWidth;
     if (dayViewWidth != null) {
+      scheduleScrolls();
       return;
     }
 
@@ -139,9 +140,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView, WeekViewContro
       double widgetWidth = (context.findRenderObject() as RenderBox).size.width;
       setState(() {
         dayViewWidth = widgetWidth - widget.hoursColumnWidth;
-        if (!scheduleScrollToCurrentTimeIfNeeded()) {
-          scheduleScrollToInitialHour();
-        }
+        scheduleScrolls();
       });
     });
   }

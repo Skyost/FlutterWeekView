@@ -142,10 +142,10 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
     super.dispose();
   }
 
-  /// Schedules a scroll to the default hour.
-  void scheduleScrollToInitialHour() {
-    if (mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToTime(widget.initialHour, widget.initialMinute));
+  /// Schedules both scroll if needed.
+  void scheduleScrolls() {
+    if (!scheduleScrollToCurrentTimeIfNeeded()) {
+      scheduleScrollToInitialHour();
     }
   }
 
@@ -156,6 +156,13 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
       return true;
     }
     return false;
+  }
+
+  /// Schedules a scroll to the default hour.
+  void scheduleScrollToInitialHour() {
+    if (mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToTime(widget.initialHour, widget.initialMinute));
+    }
   }
 
   /// Checks whether the widget should scroll to current time.

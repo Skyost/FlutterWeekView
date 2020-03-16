@@ -96,10 +96,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
   @override
   void initState() {
     super.initState();
-    if (!scheduleScrollToCurrentTimeIfNeeded()) {
-      scheduleScrollToInitialHour();
-    }
-
+    scheduleScrolls();
     reset();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() => createEventsDrawProperties());
