@@ -270,16 +270,12 @@ class EventsColumnBackgroundPainter extends CustomPainter {
   /// The rules color.
   final Color rulesColor;
 
-  /// Left position
-  final double left;
-
   /// The top offset calculator.
   /// The day view state will give it its real value.
   TopOffsetCalculator topOffsetCalculator = defaultTopOffsetCalculator;
 
   /// Creates a new events column background painter.
   EventsColumnBackgroundPainter({
-    this.left = 0,
     this.backgroundColor,
     this.rulesColor = const Color(0x1A000000),
   });
@@ -293,10 +289,7 @@ class EventsColumnBackgroundPainter extends CustomPainter {
     if (rulesColor != null) {
       for (int hour = 1; hour < 24; hour++) {
         double topOffset = topOffsetCalculator(hour);
-        Paint paint = Paint();
-        paint.color = rulesColor;
-        paint.strokeWidth = 1;
-        canvas.drawLine(Offset(left, topOffset), Offset(size.width, topOffset), paint);
+        canvas.drawLine(Offset(0, topOffset), Offset(size.width, topOffset), Paint()..color = rulesColor);
       }
     }
   }
