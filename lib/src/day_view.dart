@@ -13,7 +13,7 @@ typedef DateFormatter = String Function(int year, int month, int day);
 typedef HourFormatter = String Function(int hour, int minute);
 
 /// Builds an event text widget.
-typedef EventTextBuilder = Widget Function(BuildContext context, DayView dayView, double height, double width);
+typedef EventTextBuilder = Widget Function(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width);
 
 /// Allows to calculate a top offset from a given hour.
 typedef TopOffsetCalculator = double Function(int hour);

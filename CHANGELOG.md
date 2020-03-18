@@ -1,3 +1,7 @@
+## [0.2.1+7] - 2020-03-18
+
+* Fixed a bug with custom event text builders.
+
 ## [0.2.1+6] - 2020-03-12
 
 * Fixed a bug with initial scrolling.
