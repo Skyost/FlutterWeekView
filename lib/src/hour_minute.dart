@@ -41,6 +41,19 @@ class HourMinute {
     @required DateTime dateTime,
   }) : this._internal(hour: dateTime.hour, minute: dateTime.minute);
 
+  /// Creates a new hour minute time instance from a given date time object.
+  factory HourMinute.fromDuration({
+    @required Duration duration,
+  }) {
+    int hour = 0;
+    int minute = duration.inMinutes;
+    while (minute >= 60) {
+      hour += 1;
+      minute -= 60;
+    }
+    return HourMinute._internal(hour: hour, minute: minute);
+  }
+
   /// Creates a new hour minute time instance.
   HourMinute.now() : this.fromDateTime(dateTime: DateTime.now());
 
@@ -60,7 +73,7 @@ class HourMinute {
     int hour = math.max(this.hour - other.hour, 0);
     int minute = this.minute - other.minute;
     while (minute < 0) {
-      if(hour == 0) {
+      if (hour == 0) {
         return HourMinute.ZERO;
       }
       hour--;
@@ -84,6 +97,7 @@ class HourMinute {
     if (other is! HourMinute) {
       return false;
     }
+
     return _calculateDifference(other) < 0;
   }
 
@@ -112,5 +126,5 @@ class HourMinute {
   int get hashCode => hour.hashCode + minute.hashCode;
 
   /// Returns the difference in minutes between this and another hour minute time instance.
-  int _calculateDifference(HourMinute other) => hour * 60 - other.hour * 60 + (minute * 60 - other.minute * 60);
+  int _calculateDifference(HourMinute other) => (hour * 60 - other.hour * 60) + (minute - other.minute);
 }

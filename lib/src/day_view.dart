@@ -31,6 +31,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
     HourMinute initialTime = HourMinute.MIN,
     bool scrollToCurrentTime = true,
     bool userZoomable = true,
+    HoursColumnTappedDownCallback onHoursColumnTappedDown,
   })  : assert(date != null),
         date = DateTime(date.year, date.month, date.day),
         events = events ?? [],
@@ -43,6 +44,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
           initialTime: initialTime,
           scrollToCurrentTime: scrollToCurrentTime,
           userZoomable: userZoomable,
+          onHoursColumnTappedDown: onHoursColumnTappedDown,
         );
 
   @override
@@ -369,13 +371,14 @@ class _EventDrawProperties {
     start = event.start;
     end = event.end;
 
-    if (start.isBefore(dayView.date)) {
-      start = dayView.date;
+    DateTime dayViewMin = dayView.date.add(Duration(hours: dayView.minimumTime.hour, minutes: dayView.minimumTime.minute));
+    if (start.isBefore(dayViewMin)) {
+      start = dayViewMin;
     }
 
-    DateTime tomorrow = dayView.date.add(const Duration(days: 1));
-    if (end.isAfter(tomorrow)) {
-      end = tomorrow;
+    DateTime dayViewMax = dayView.date.add(Duration(hours: dayView.maximumTime.hour, minutes: dayView.maximumTime.minute));
+    if (end.isAfter(dayViewMax)) {
+      end = dayViewMax;
     }
   }
 
@@ -385,7 +388,7 @@ class _EventDrawProperties {
   /// Calculates the top and the height of the event rectangle.
   void calculateTopAndHeight(_DayViewState state) {
     top = state.calculateTopOffset(HourMinute.fromDateTime(dateTime: start));
-    height = state.calculateTopOffset(HourMinute(minute: end.difference(start).inMinutes)) + 1;
+    height = state.calculateTopOffset(HourMinute.fromDuration(duration: end.difference(start)), minimumTime: HourMinute.MIN) + 1;
   }
 
   /// Returns whether this draw properties overlaps another.

@@ -5,10 +5,8 @@ import 'package:flutter/physics.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_week_view/src/day_view.dart';
 import 'package:flutter_week_view/src/event.dart';
-import 'package:flutter_week_view/src/headers.dart';
 import 'package:flutter_week_view/src/hour_minute.dart';
 import 'package:flutter_week_view/src/style.dart';
-import 'package:flutter_week_view/src/week_view.dart';
 
 /// Contains some useful methods.
 class Utils {
@@ -41,7 +39,10 @@ class DefaultBuilders {
   static String defaultTimeFormatter(HourMinute time) => Utils.addLeadingZero(time.hour) + ':' + Utils.addLeadingZero(time.minute);
 
   /// Allows to calculate a top offset according to the specified hour row height.
-  static double defaultTopOffsetCalculator(HourMinute time, [double hourRowHeight = 60]) => (time.hour + (time.minute / 60)) * hourRowHeight;
+  static double defaultTopOffsetCalculator(HourMinute time, {HourMinute minimumTime = HourMinute.MIN, double hourRowHeight = 60}) {
+    HourMinute relative = time.subtract(minimumTime);
+    return (relative.hour + (relative.minute / 60)) * hourRowHeight;
+  }
 
   /// Builds an event text widget in order to put it in a week view.
   static Widget defaultEventTextBuilder(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width) {
@@ -86,21 +87,6 @@ class DefaultBuilders {
 
   /// The default day view style builder.
   static DayViewStyle defaultDayViewStyleBuilder(DateTime date) => DayViewStyle.fromDate(date: date);
-
-  /// Builds a day bar in order to put it in a week view.
-  static DayBar defaultDayBarBuilder(BuildContext context, WeekView weekView, DateTime date) => DayBar(
-        date: date,
-        height: weekView.style.dayBarHeight,
-        backgroundColor: weekView.style.dayBarBackgroundColor,
-      );
-
-  /// Builds a hours column widget in order to put it in a week view.
-  static HoursColumn defaultHoursColumnBuilder(BuildContext context, WeekView weekView, double hourRowHeight) => weekView.style.hoursColumnWidth <= 0
-      ? const SizedBox.shrink()
-      : HoursColumn(
-          topOffsetCalculator: (time) => defaultTopOffsetCalculator(time, hourRowHeight),
-          width: weekView.style.hoursColumnWidth,
-        );
 
   /// Returns whether this input exceeds the specified height.
   static bool _exceedHeight(List<TextSpan> input, TextStyle textStyle, double height, double width) {

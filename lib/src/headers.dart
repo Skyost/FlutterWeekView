@@ -9,6 +9,9 @@ import 'package:flutter_week_view/src/utils.dart';
 /// Allows to calculate a top offset from a given hour.
 typedef TopOffsetCalculator = double Function(HourMinute time);
 
+/// Triggered when the hours column has been tapped down.
+typedef HoursColumnTappedDownCallback = Function(HourMinute time);
+
 /// A widget which is showing both headers and can be zoomed.
 abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C extends ZoomController> extends StatefulWidget {
   /// The widget style.
@@ -32,6 +35,9 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
   /// Whether the user is able to pinch-to-zoom the widget.
   final bool userZoomable;
 
+  /// Triggered when the hours column has been tapped down.
+  final HoursColumnTappedDownCallback onHoursColumnTappedDown;
+
   /// The current day view controller.
   final C controller;
 
@@ -44,6 +50,7 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
     this.initialTime = HourMinute.MIN,
     @required this.scrollToCurrentTime,
     @required this.userZoomable,
+    this.onHoursColumnTappedDown,
     @required this.controller,
   })  : assert(minimumTime != null),
         assert(maximumTime != null),
@@ -157,10 +164,10 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
   bool get isZoomable => widget.userZoomable && widget.controller.zoomCoefficient > 0;
 
   /// Calculates the top offset of a given time.
-  double calculateTopOffset(HourMinute time, [double hourRowHeight]) => DefaultBuilders.defaultTopOffsetCalculator(time, hourRowHeight ?? this.hourRowHeight);
+  double calculateTopOffset(HourMinute time, {HourMinute minimumTime, double hourRowHeight}) => DefaultBuilders.defaultTopOffsetCalculator(time, minimumTime: minimumTime ?? widget.minimumTime, hourRowHeight: hourRowHeight ?? this.hourRowHeight);
 
   /// Calculates the widget height.
-  double calculateHeight([double hourRowHeight]) => calculateTopOffset(widget.maximumTime.subtract(widget.minimumTime), hourRowHeight);
+  double calculateHeight([double hourRowHeight]) => calculateTopOffset(widget.maximumTime, hourRowHeight: hourRowHeight);
 }
 
 /// A bar which is showing a day.
@@ -245,6 +252,9 @@ class HoursColumn extends StatelessWidget {
   /// The hour formatter.
   final TimeFormatter timeFormatter;
 
+  /// Triggered when the hours column has been tapped down.
+  final HoursColumnTappedDownCallback onHoursColumnTappedDown;
+
   /// The times to display on the side border.
   final List<HourMinute> _sideTimes;
 
@@ -257,6 +267,7 @@ class HoursColumn extends StatelessWidget {
     this.backgroundColor = Colors.white,
     this.textStyle = const TextStyle(color: Colors.black54),
     this.timeFormatter = DefaultBuilders.defaultTimeFormatter,
+    this.onHoursColumnTappedDown,
   })  : assert(minimumTime != null),
         assert(maximumTime != null),
         assert(minimumTime < maximumTime),
@@ -276,48 +287,58 @@ class HoursColumn extends StatelessWidget {
           backgroundColor: parent.widget.style.hoursColumnBackgroundColor ?? Colors.white,
           textStyle: parent.widget.style.hoursColumnTextStyle ?? const TextStyle(color: Colors.black54),
           timeFormatter: parent.widget.style.timeFormatter,
+          onHoursColumnTappedDown: parent.widget.onHoursColumnTappedDown,
         );
 
   @override
-  Widget build(BuildContext context) => Container(
-        height: topOffsetCalculator(maximumTime.subtract(minimumTime)),
-        width: width,
-        color: backgroundColor,
-        child: Stack(
-          children: _sideTimes
-              .map(
-                (time) => Positioned(
-                  top: topOffsetCalculator(time) - ((textStyle?.fontSize ?? 14) / 2),
-                  left: 0,
-                  right: 0,
-                  child: Text(
-                    timeFormatter(time),
-                    style: textStyle,
-                    textAlign: TextAlign.center,
-                  ),
+  Widget build(BuildContext context) {
+    Widget child = Container(
+      height: topOffsetCalculator(maximumTime),
+      width: width,
+      color: backgroundColor,
+      child: Stack(
+        children: _sideTimes
+            .map(
+              (time) => Positioned(
+                top: topOffsetCalculator(time) - ((textStyle?.fontSize ?? 14) / 2),
+                left: 0,
+                right: 0,
+                child: Text(
+                  timeFormatter(time),
+                  style: textStyle,
+                  textAlign: TextAlign.center,
                 ),
-              )
-              .toList(),
-        ),
-      );
+              ),
+            )
+            .toList(),
+      ),
+    );
+
+    if (onHoursColumnTappedDown == null) {
+      return child;
+    }
+
+    return GestureDetector(
+      onTapDown: (details) {
+        var hourRowHeight = topOffsetCalculator(minimumTime.add(const HourMinute(hour: 1)));
+        double hourMinutesInHour = details.localPosition.dy / hourRowHeight;
+
+        int hour = hourMinutesInHour.floor();
+        int minute = ((hourMinutesInHour - hour) * 60).round();
+        onHoursColumnTappedDown(minimumTime.add(HourMinute(hour: hour, minute: minute)));
+      },
+      child: child,
+    );
+  }
 
   /// Creates the side times.
   static List<HourMinute> getSideTimes(HourMinute minimumTime, HourMinute maximumTime) {
     List<HourMinute> sideTimes = [];
     HourMinute currentHour = HourMinute(hour: minimumTime.hour + 1);
-    if (minimumTime.minute != 0) {
-      sideTimes.add(minimumTime);
-    }
-
     while (currentHour < maximumTime) {
       sideTimes.add(currentHour);
       currentHour = currentHour.add(const HourMinute(hour: 1));
     }
-
-    if (maximumTime.minute != 0) {
-      sideTimes.add(maximumTime);
-    }
-
     return sideTimes;
   }
 }
