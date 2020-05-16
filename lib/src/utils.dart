@@ -1,13 +1,14 @@
 import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_week_view/src/controller.dart';
 import 'package:flutter_week_view/src/day_view.dart';
 import 'package:flutter_week_view/src/event.dart';
 import 'package:flutter_week_view/src/headers.dart';
+import 'package:flutter_week_view/src/hour_minute.dart';
+import 'package:flutter_week_view/src/style.dart';
 import 'package:flutter_week_view/src/week_view.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/physics.dart';
 
 /// Contains some useful methods.
 class Utils {
@@ -37,7 +38,10 @@ class DefaultBuilders {
   static String defaultDateFormatter(int year, int month, int day) => year.toString() + '-' + Utils.addLeadingZero(month) + '-' + Utils.addLeadingZero(day);
 
   /// Formats a hour.
-  static String defaultHourFormatter(int hour, int minute) => Utils.addLeadingZero(hour) + ':' + Utils.addLeadingZero(minute);
+  static String defaultTimeFormatter(HourMinute time) => Utils.addLeadingZero(time.hour) + ':' + Utils.addLeadingZero(time.minute);
+
+  /// Allows to calculate a top offset according to the specified hour row height.
+  static double defaultTopOffsetCalculator(HourMinute time, [double hourRowHeight = 60]) => (time.hour + (time.minute / 60)) * hourRowHeight;
 
   /// Builds an event text widget in order to put it in a week view.
   static Widget defaultEventTextBuilder(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width) {
@@ -47,7 +51,7 @@ class DefaultBuilders {
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       TextSpan(
-        text: ' ' + dayView.hourFormatter(event.start.hour, event.start.minute) + ' - ' + dayView.hourFormatter(event.end.hour, event.end.minute) + '\n\n',
+        text: ' ' + dayView.style.timeFormatter(HourMinute.fromDateTime(dateTime: event.start)) + ' - ' + dayView.style.timeFormatter(HourMinute.fromDateTime(dateTime: event.end)) + '\n\n',
       ),
       TextSpan(
         text: event.description,
@@ -80,31 +84,22 @@ class DefaultBuilders {
   /// Builds a date according to a list.
   static DateTime defaultDateCreator(List<DateTime> dates, int index) => dates[index];
 
-  /// Builds a day view in order to put it in a week view.
-  static DayView defaultDayViewBuilder(BuildContext context, WeekView weekView, DateTime date, DayViewController controller) => DayView(
-        date: date,
-        events: weekView.events,
-        hoursColumnWidth: 0,
-        controller: controller,
-        inScrollableWidget: false,
-        dayBarHeight: 0,
-        userZoomable: false,
-        scrollToCurrentTime: false,
-      );
+  /// The default day view style builder.
+  static DayViewStyle defaultDayViewStyleBuilder(DateTime date) => DayViewStyle.fromDate(date: date);
 
   /// Builds a day bar in order to put it in a week view.
   static DayBar defaultDayBarBuilder(BuildContext context, WeekView weekView, DateTime date) => DayBar(
         date: date,
-        height: weekView.dayBarHeight,
-        backgroundColor: weekView.dayBarBackgroundColor,
+        height: weekView.style.dayBarHeight,
+        backgroundColor: weekView.style.dayBarBackgroundColor,
       );
 
   /// Builds a hours column widget in order to put it in a week view.
-  static HoursColumn defaultHoursColumnBuilder(BuildContext context, WeekView weekView, double hourRowHeight) => weekView.hoursColumnWidth <= 0
+  static HoursColumn defaultHoursColumnBuilder(BuildContext context, WeekView weekView, double hourRowHeight) => weekView.style.hoursColumnWidth <= 0
       ? const SizedBox.shrink()
       : HoursColumn(
-          hourRowHeight: hourRowHeight,
-          width: weekView.hoursColumnWidth,
+          topOffsetCalculator: (time) => defaultTopOffsetCalculator(time, hourRowHeight),
+          width: weekView.style.hoursColumnWidth,
         );
 
   /// Returns whether this input exceeds the specified height.

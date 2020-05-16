@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart' as launcher;
 import 'package:flutter_week_view/flutter_week_view.dart';
+import 'package:url_launcher/url_launcher.dart' as launcher;
 
 /// First plugin test method.
 void main() => runApp(_FlutterWeekViewDemoApp());
@@ -55,7 +55,7 @@ class _FlutterWeekViewDemoAppBody extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 40),
               child: Text(
                 'Flutter Week View demo',
-                style: Theme.of(context).textTheme.display1,
+                style: Theme.of(context).textTheme.headline4,
                 textAlign: TextAlign.center,
               ),
             ),
@@ -103,7 +103,7 @@ class _DemoDayView extends StatelessWidget {
     DateTime now = DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day);
     return DayView(
-      initialHour: 7,
+      initialTime: const HourMinute(hour: 7),
       date: now,
       events: [
         FlutterWeekViewEvent(
@@ -137,7 +137,7 @@ class _DemoDayView extends StatelessWidget {
           end: date.add(const Duration(hours: 21)),
         ),
       ],
-      currentTimeCircleColor: Colors.pink,
+      style: const DayViewStyle(currentTimeCircleColor: Colors.pink),
     );
   }
 }
@@ -149,7 +149,7 @@ class _DemoWeekView extends StatelessWidget {
     DateTime now = DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day);
     return WeekView(
-      initialHour: 7,
+      initialTime: const HourMinute(hour: 7),
       dates: [date.subtract(const Duration(days: 1)), date, date.add(const Duration(days: 1))],
       events: [
         FlutterWeekViewEvent(

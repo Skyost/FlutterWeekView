@@ -1,46 +1,30 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/controller.dart';
-import 'package:flutter_week_view/src/day_view.dart';
+import 'package:flutter_week_view/src/hour_minute.dart';
+import 'package:flutter_week_view/src/style.dart';
 import 'package:flutter_week_view/src/utils.dart';
 
+/// Allows to calculate a top offset from a given hour.
+typedef TopOffsetCalculator = double Function(HourMinute time);
+
 /// A widget which is showing both headers and can be zoomed.
-abstract class ZoomableHeadersWidget<C extends ZoomController> extends StatefulWidget {
-  /// The day formatter.
-  final DateFormatter dateFormatter;
-
-  /// The hour formatter.
-  final HourFormatter hourFormatter;
-
-  /// The day bar text style.
-  final TextStyle dayBarTextStyle;
-
-  /// The day bar height.
-  final double dayBarHeight;
-
-  /// The day bar background color.
-  final Color dayBarBackgroundColor;
-
-  /// The hours column text style.
-  final TextStyle hoursColumnTextStyle;
-
-  /// The hours column width.
-  final double hoursColumnWidth;
-
-  /// The hours column background color.
-  final Color hoursColumnBackgroundColor;
-
-  /// An hour row height (with a zoom factor set to 1).
-  final double hourRowHeight;
+abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C extends ZoomController> extends StatefulWidget {
+  /// The widget style.
+  final S style;
 
   /// Whether the widget should automatically be placed in a scrollable widget.
   final bool inScrollableWidget;
 
-  /// The initial visible hour.
-  final int initialHour;
+  /// The minimum time to display.
+  final HourMinute minimumTime;
 
-  /// The initial visible minute.
-  final int initialMinute;
+  /// The maximum time to display.
+  final HourMinute maximumTime;
+
+  /// The initial visible time.
+  final HourMinute initialTime;
 
   /// Whether the widget should automatically scroll to the current time (hour and minute).
   final bool scrollToCurrentTime;
@@ -52,39 +36,29 @@ abstract class ZoomableHeadersWidget<C extends ZoomController> extends StatefulW
   final C controller;
 
   /// Creates a new zoomable headers widget instance.
-  ZoomableHeadersWidget({
-    @required this.controller,
-    this.dateFormatter = DefaultBuilders.defaultDateFormatter,
-    this.hourFormatter = DefaultBuilders.defaultHourFormatter,
-    this.dayBarTextStyle,
-    double dayBarHeight = 40,
-    this.dayBarBackgroundColor,
-    this.hoursColumnTextStyle,
-    double hoursColumnWidth = 60,
-    this.hoursColumnBackgroundColor,
-    double hourRowHeight = 60,
+  const ZoomableHeadersWidget({
+    @required this.style,
     @required this.inScrollableWidget,
-    int initialHour,
-    int initialMinute,
+    this.minimumTime = HourMinute.MIN,
+    this.maximumTime = HourMinute.MAX,
+    this.initialTime = HourMinute.MIN,
     @required this.scrollToCurrentTime,
     @required this.userZoomable,
-  })  : assert(dateFormatter != null),
-        assert(hourFormatter != null),
-        dayBarHeight = math.max(0, dayBarHeight ?? 40),
-        hoursColumnWidth = math.max(0, hoursColumnWidth ?? 60),
-        hourRowHeight = math.max(0, hourRowHeight ?? 60),
-        initialHour = math.min(23, math.max(0, initialHour ?? 0)),
-        initialMinute = math.min(59, math.max(0, initialMinute ?? 0)),
+    @required this.controller,
+  })  : assert(minimumTime != null),
+        assert(maximumTime != null),
+        assert(minimumTime < maximumTime),
+        assert(initialTime != null),
         assert(inScrollableWidget != null),
         assert(scrollToCurrentTime != null),
         assert(userZoomable != null);
 
   /// Calculates the hour row height.
-  double _calculateHourRowHeight([C controller]) => hourRowHeight * (controller ?? this.controller).zoomFactor;
+  double _calculateHourRowHeight([C controller]) => style.hourRowHeight * (controller ?? this.controller).zoomFactor;
 }
 
 /// An abstract widget state that shows both headers and can be zoomed.
-abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C extends ZoomController> extends State<W> with ZoomControllerListener {
+abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> extends State<W> with ZoomControllerListener {
   /// The current hour row height.
   double hourRowHeight;
 
@@ -118,7 +92,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
 
     if (widget.inScrollableWidget) {
       double widgetHeight = (context.findRenderObject() as RenderBox).size.height;
-      double maxPixels = calculateHeight(hourRowHeight) - widgetHeight + widget.dayBarHeight;
+      double maxPixels = calculateHeight(hourRowHeight) - widgetHeight + widget.style.dayBarHeight;
 
       if (hourRowHeight < this.hourRowHeight && controller.verticalScrollController.position.pixels > maxPixels) {
         controller.verticalScrollController.jumpTo(maxPixels);
@@ -157,7 +131,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
   /// Schedules a scroll to the default hour.
   void scheduleScrollToInitialHour() {
     if (mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToTime(widget.initialHour, widget.initialMinute));
+      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToTime(widget.initialTime));
     }
   }
 
@@ -167,15 +141,14 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
   /// Scrolls to current time.
   void scrollToCurrentTime() {
     if (mounted) {
-      DateTime now = DateTime.now();
-      scrollToTime(now.hour, now.minute);
+      scrollToTime(HourMinute.now());
     }
   }
 
   /// Scrolls to a given time if possible.
-  void scrollToTime(int hour, int minute) {
+  void scrollToTime(HourMinute time) {
     if (widget.inScrollableWidget) {
-      double topOffset = calculateTopOffset(hour, minute);
+      double topOffset = calculateTopOffset(time);
       widget.controller.verticalScrollController.jumpTo(math.min(topOffset, widget.controller.verticalScrollController.position.maxScrollExtent));
     }
   }
@@ -183,11 +156,11 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget<C>, C 
   /// Returns whether this widget should be zoomable.
   bool get isZoomable => widget.userZoomable && widget.controller.zoomCoefficient > 0;
 
-  /// Calculates the top offset of a given hour and a given minute.
-  double calculateTopOffset(int hour, [int minute = 0, double hourRowHeight]) => (hour + (minute / 60)) * (hourRowHeight ?? this.hourRowHeight);
+  /// Calculates the top offset of a given time.
+  double calculateTopOffset(HourMinute time, [double hourRowHeight]) => DefaultBuilders.defaultTopOffsetCalculator(time, hourRowHeight ?? this.hourRowHeight);
 
   /// Calculates the widget height.
-  double calculateHeight([double hourRowHeight]) => calculateTopOffset(24, 0, hourRowHeight);
+  double calculateHeight([double hourRowHeight]) => calculateTopOffset(widget.maximumTime.subtract(widget.minimumTime), hourRowHeight);
 }
 
 /// A bar which is showing a day.
@@ -226,10 +199,10 @@ class DayBar extends StatelessWidget {
     DateTime date,
   }) : this(
           date: date ?? DateTime.now(),
-          height: parent.dayBarHeight,
-          backgroundColor: parent.dayBarBackgroundColor ?? const Color(0xFFEBEBEB),
-          textStyle: parent.dayBarTextStyle,
-          dateFormatter: parent.dateFormatter,
+          height: parent.style.dayBarHeight,
+          backgroundColor: parent.style.dayBarBackgroundColor ?? const Color(0xFFEBEBEB),
+          textStyle: parent.style.dayBarTextStyle,
+          dateFormatter: parent.style.dateFormatter,
         );
 
   @override
@@ -251,8 +224,14 @@ class DayBar extends StatelessWidget {
 
 /// A column which is showing a day hours.
 class HoursColumn extends StatelessWidget {
-  /// The hour row height.
-  final double hourRowHeight;
+  /// The minimum time to display.
+  final HourMinute minimumTime;
+
+  /// The maximum time to display.
+  final HourMinute maximumTime;
+
+  /// The top offset calculator.
+  final TopOffsetCalculator topOffsetCalculator;
 
   /// The width.
   final double width;
@@ -264,49 +243,81 @@ class HoursColumn extends StatelessWidget {
   final TextStyle textStyle;
 
   /// The hour formatter.
-  final HourFormatter hourFormatter;
+  final TimeFormatter timeFormatter;
+
+  /// The times to display on the side border.
+  final List<HourMinute> _sideTimes;
 
   /// Creates a new hours column instance.
   HoursColumn({
-    double hourRowHeight = 60,
+    this.minimumTime = HourMinute.MIN,
+    this.maximumTime = HourMinute.MAX,
+    TopOffsetCalculator topOffsetCalculator,
     double width = 60,
     this.backgroundColor = Colors.white,
     this.textStyle = const TextStyle(color: Colors.black54),
-    this.hourFormatter = DefaultBuilders.defaultHourFormatter,
-  })  : assert(hourFormatter != null),
-        hourRowHeight = math.max(0, hourRowHeight ?? 0),
-        width = math.max(0, width ?? 0);
+    this.timeFormatter = DefaultBuilders.defaultTimeFormatter,
+  })  : assert(minimumTime != null),
+        assert(maximumTime != null),
+        assert(minimumTime < maximumTime),
+        topOffsetCalculator = topOffsetCalculator ?? DefaultBuilders.defaultTopOffsetCalculator,
+        width = math.max(0, width ?? 0),
+        assert(timeFormatter != null),
+        _sideTimes = getSideTimes(minimumTime, maximumTime);
 
   /// Creates a new hours column instance from a headers widget instance.
-  HoursColumn.fromHeadersWidget({
-    @required ZoomableHeadersWidget parent,
+  HoursColumn.fromHeadersWidgetState({
+    @required ZoomableHeadersWidgetState parent,
   }) : this(
-          hourRowHeight: parent._calculateHourRowHeight(),
-          width: parent.hoursColumnWidth,
-          backgroundColor: parent.hoursColumnBackgroundColor ?? Colors.white,
-          textStyle: parent.hoursColumnTextStyle ?? const TextStyle(color: Colors.black54),
-          hourFormatter: parent.hourFormatter,
+          minimumTime: parent.widget.minimumTime,
+          maximumTime: parent.widget.maximumTime,
+          topOffsetCalculator: parent.calculateTopOffset,
+          width: parent.widget.style.hoursColumnWidth,
+          backgroundColor: parent.widget.style.hoursColumnBackgroundColor ?? Colors.white,
+          textStyle: parent.widget.style.hoursColumnTextStyle ?? const TextStyle(color: Colors.black54),
+          timeFormatter: parent.widget.style.timeFormatter,
         );
 
   @override
   Widget build(BuildContext context) => Container(
-        height: 24 * hourRowHeight,
+        height: topOffsetCalculator(maximumTime.subtract(minimumTime)),
         width: width,
         color: backgroundColor,
         child: Stack(
-          children: List.generate(
-            23,
-            (hour) => Positioned(
-              top: (hour + 1) * hourRowHeight - ((textStyle?.fontSize ?? 14) / 2),
-              left: 0,
-              right: 0,
-              child: Text(
-                hourFormatter(hour + 1, 0),
-                style: textStyle,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
+          children: _sideTimes
+              .map(
+                (time) => Positioned(
+                  top: topOffsetCalculator(time) - ((textStyle?.fontSize ?? 14) / 2),
+                  left: 0,
+                  right: 0,
+                  child: Text(
+                    timeFormatter(time),
+                    style: textStyle,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+              .toList(),
         ),
       );
+
+  /// Creates the side times.
+  static List<HourMinute> getSideTimes(HourMinute minimumTime, HourMinute maximumTime) {
+    List<HourMinute> sideTimes = [];
+    HourMinute currentHour = HourMinute(hour: minimumTime.hour + 1);
+    if (minimumTime.minute != 0) {
+      sideTimes.add(minimumTime);
+    }
+
+    while (currentHour < maximumTime) {
+      sideTimes.add(currentHour);
+      currentHour = currentHour.add(const HourMinute(hour: 1));
+    }
+
+    if (maximumTime.minute != 0) {
+      sideTimes.add(maximumTime);
+    }
+
+    return sideTimes;
+  }
 }

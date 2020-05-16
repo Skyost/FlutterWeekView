@@ -1,80 +1,46 @@
 import 'dart:collection';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/controller.dart';
 import 'package:flutter_week_view/src/event.dart';
 import 'package:flutter_week_view/src/headers.dart';
+import 'package:flutter_week_view/src/hour_minute.dart';
+import 'package:flutter_week_view/src/style.dart';
 import 'package:flutter_week_view/src/utils.dart';
-import 'package:flutter/material.dart';
-
-/// Returns a string from a specified date.
-typedef DateFormatter = String Function(int year, int month, int day);
-
-/// Returns a string from a specified hour.
-typedef HourFormatter = String Function(int hour, int minute);
 
 /// Builds an event text widget.
 typedef EventTextBuilder = Widget Function(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width);
 
-/// Allows to calculate a top offset from a given hour.
-typedef TopOffsetCalculator = double Function(int hour);
-
 /// A (scrollable) day view which is able to display events, zoom and un-zoom and more !
-class DayView extends ZoomableHeadersWidget<DayViewController> {
+class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
   /// The events.
   final List<FlutterWeekViewEvent> events;
 
   /// The day view date.
   final DateTime date;
 
-  /// The events column background painter.
-  final EventsColumnBackgroundPainter eventsColumnBackgroundPainter;
-
-  /// The current time rule color.
-  final Color currentTimeRuleColor;
-
-  /// The current time circle color.
-  final Color currentTimeCircleColor;
-
   /// Creates a new day view instance.
   DayView({
     List<FlutterWeekViewEvent> events,
     @required DateTime date,
-    EventsColumnBackgroundPainter eventsColumnBackgroundPainter,
-    this.currentTimeRuleColor = Colors.pink,
-    this.currentTimeCircleColor,
+    DayViewStyle style,
     DayViewController controller,
-    DateFormatter dateFormatter,
-    HourFormatter hourFormatter,
-    TextStyle dayBarTextStyle,
-    double dayBarHeight,
-    Color dayBarBackgroundColor,
-    TextStyle hoursColumnTextStyle,
-    double hoursColumnWidth,
-    Color hoursColumnBackgroundColor,
-    double hourRowHeight,
     bool inScrollableWidget = true,
-    int initialHour,
-    int initialMinute,
+    HourMinute minimumTime = HourMinute.MIN,
+    HourMinute maximumTime = HourMinute.MAX,
+    HourMinute initialTime = HourMinute.MIN,
     bool scrollToCurrentTime = true,
     bool userZoomable = true,
   })  : assert(date != null),
         date = DateTime(date.year, date.month, date.day),
-        eventsColumnBackgroundPainter = eventsColumnBackgroundPainter ?? EventsColumnBackgroundPainter(backgroundColor: Utils.sameDay(date) ? const Color(0xFFE3F5FF) : const Color(0xFFF2F2F2)),
         events = events ?? [],
         super(
+          style: style ?? DayViewStyle.fromDate(date: date),
           controller: controller ?? DayViewController(),
-          dateFormatter: dateFormatter ?? DefaultBuilders.defaultDateFormatter,
-          hourFormatter: hourFormatter ?? DefaultBuilders.defaultHourFormatter,
-          dayBarTextStyle: dayBarTextStyle,
-          dayBarHeight: dayBarHeight,
-          dayBarBackgroundColor: dayBarBackgroundColor,
-          hoursColumnTextStyle: hoursColumnTextStyle,
-          hoursColumnWidth: hoursColumnWidth,
-          hoursColumnBackgroundColor: hoursColumnBackgroundColor,
-          hourRowHeight: hourRowHeight,
           inScrollableWidget: inScrollableWidget,
-          initialHour: initialHour,
-          initialMinute: initialMinute,
+          minimumTime: minimumTime,
+          maximumTime: maximumTime,
+          initialTime: initialTime,
           scrollToCurrentTime: scrollToCurrentTime,
           userZoomable: userZoomable,
         );
@@ -84,7 +50,7 @@ class DayView extends ZoomableHeadersWidget<DayViewController> {
 }
 
 /// The day view state.
-class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewController> {
+class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   /// Contains all events draw properties.
   final Map<FlutterWeekViewEvent, _EventDrawProperties> eventsDrawProperties = HashMap();
 
@@ -116,7 +82,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
         createMainWidget(),
         Positioned(
           top: 0,
-          left: widget.hoursColumnWidth,
+          left: widget.style.hoursColumnWidth,
           right: 0,
           child: DayBar.fromHeadersWidget(
             parent: widget,
@@ -124,9 +90,9 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
           ),
         ),
         Container(
-          height: widget.dayBarHeight,
-          width: widget.hoursColumnWidth,
-          color: widget.dayBarBackgroundColor ?? const Color(0xFFEBEBEB),
+          height: widget.style.dayBarHeight,
+          width: widget.style.hoursColumnWidth,
+          color: widget.style.dayBarBackgroundColor ?? const Color(0xFFEBEBEB),
         ),
       ],
     );
@@ -154,17 +120,17 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
   /// Creates the main widget, with a hours column and an events column.
   Widget createMainWidget() {
     List<Widget> children = eventsDrawProperties.entries.map((entry) => entry.value.createWidget(context, widget, entry.key)).toList();
-    if (widget.hoursColumnWidth > 0) {
+    if (widget.style.hoursColumnWidth > 0) {
       children.add(Positioned(
         top: 0,
         left: 0,
-        child: HoursColumn.fromHeadersWidget(parent: widget),
+        child: HoursColumn.fromHeadersWidgetState(parent: this),
       ));
     }
 
-    if (widget.currentTimeRuleColor != null && Utils.sameDay(widget.date)) {
+    if (widget.style.currentTimeRuleColor != null && Utils.sameDay(widget.date)) {
       children.add(createCurrentTimeRule());
-      if (widget.currentTimeCircleColor != null) {
+      if (widget.style.currentTimeCircleColor != null) {
         children.add(createCurrentTimeCircle());
       }
     }
@@ -184,46 +150,42 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
     }
 
     return Padding(
-      padding: EdgeInsets.only(top: widget.dayBarHeight),
+      padding: EdgeInsets.only(top: widget.style.dayBarHeight),
       child: mainWidget,
     );
   }
 
   /// Creates the background widgets that should be added to a stack.
   Widget createBackground() => Positioned.fill(
-        child: CustomPaint(painter: widget.eventsColumnBackgroundPainter),
+        child: CustomPaint(
+          painter: _EventsColumnBackgroundPainter.fromDayViewState(parent: this),
+        ),
       );
 
   /// Creates a positioned horizontal rule in the hours column.
-  Widget createCurrentTimeRule() {
-    DateTime now = DateTime.now();
-    return Positioned(
-      top: calculateTopOffset(now.hour, now.minute),
-      left: widget.hoursColumnWidth,
-      right: 0,
-      child: Container(
-        height: 1,
-        color: widget.currentTimeRuleColor,
-      ),
-    );
-  }
+  Widget createCurrentTimeRule() => Positioned(
+        top: calculateTopOffset(HourMinute.now()),
+        left: widget.style.hoursColumnWidth,
+        right: 0,
+        child: Container(
+          height: 1,
+          color: widget.style.currentTimeRuleColor,
+        ),
+      );
 
   /// Creates a positioned horizontal rule in the hours column.
-  Widget createCurrentTimeCircle([double radius = 15]) {
-    DateTime now = DateTime.now();
-    return Positioned(
-      top: calculateTopOffset(now.hour, now.minute) - (radius / 2),
-      right: 0,
-      child: Container(
-        height: radius,
-        width: radius,
-        decoration: BoxDecoration(
-          color: widget.currentTimeCircleColor,
-          shape: BoxShape.circle,
+  Widget createCurrentTimeCircle([double radius = 15]) => Positioned(
+        top: calculateTopOffset(HourMinute.now()) - (radius / 2),
+        right: 0,
+        child: Container(
+          height: radius,
+          width: radius,
+          decoration: BoxDecoration(
+            color: widget.style.currentTimeCircleColor,
+            shape: BoxShape.circle,
+          ),
         ),
-      ),
-    );
-  }
+      );
 
   @override
   bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && Utils.sameDay(widget.date);
@@ -232,7 +194,6 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
   void reset() {
     eventsDrawProperties.clear();
     events = List.of(widget.events)..sort();
-    widget.eventsColumnBackgroundPainter.topOffsetCalculator = calculateTopOffset;
   }
 
   /// Creates the events draw properties and add them to the current list.
@@ -254,14 +215,20 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView, DayViewControlle
     }
 
     if (eventsGrid.drawPropertiesList.isNotEmpty) {
-      double eventsColumnWidth = (context.findRenderObject() as RenderBox).size.width - widget.hoursColumnWidth;
-      eventsGrid.processEvents(widget.hoursColumnWidth, eventsColumnWidth);
+      double eventsColumnWidth = (context.findRenderObject() as RenderBox).size.width - widget.style.hoursColumnWidth;
+      eventsGrid.processEvents(widget.style.hoursColumnWidth, eventsColumnWidth);
     }
   }
 }
 
 /// The events column background painter.
-class EventsColumnBackgroundPainter extends CustomPainter {
+class _EventsColumnBackgroundPainter extends CustomPainter {
+  /// The minimum time to display.
+  final HourMinute minimumTime;
+
+  /// The maximum time to display.
+  final HourMinute maximumTime;
+
   /// The color.
   final Color backgroundColor;
 
@@ -269,14 +236,16 @@ class EventsColumnBackgroundPainter extends CustomPainter {
   final Color rulesColor;
 
   /// The top offset calculator.
-  /// The day view state will give it its real value.
-  TopOffsetCalculator topOffsetCalculator = defaultTopOffsetCalculator;
+  final TopOffsetCalculator topOffsetCalculator;
 
   /// Creates a new events column background painter.
-  EventsColumnBackgroundPainter({
-    this.backgroundColor,
-    this.rulesColor = const Color(0x1A000000),
-  });
+  _EventsColumnBackgroundPainter.fromDayViewState({
+    @required _DayViewState parent,
+  })  : minimumTime = parent.widget.minimumTime,
+        maximumTime = parent.widget.maximumTime,
+        backgroundColor = parent.widget.style.backgroundColor,
+        rulesColor = parent.widget.style.backgroundRulesColor,
+        topOffsetCalculator = parent.calculateTopOffset;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -285,20 +254,18 @@ class EventsColumnBackgroundPainter extends CustomPainter {
     }
 
     if (rulesColor != null) {
-      for (int hour = 1; hour < 24; hour++) {
-        double topOffset = topOffsetCalculator(hour);
+      final List<HourMinute> sideTimes = HoursColumn.getSideTimes(minimumTime, maximumTime);
+      for (HourMinute time in sideTimes) {
+        double topOffset = topOffsetCalculator(time);
         canvas.drawLine(Offset(0, topOffset), Offset(size.width, topOffset), Paint()..color = rulesColor);
       }
     }
   }
 
   @override
-  bool shouldRepaint(EventsColumnBackgroundPainter oldDayViewBackgroundPainter) {
+  bool shouldRepaint(_EventsColumnBackgroundPainter oldDayViewBackgroundPainter) {
     return backgroundColor != oldDayViewBackgroundPainter.backgroundColor || rulesColor != oldDayViewBackgroundPainter.rulesColor || topOffsetCalculator != oldDayViewBackgroundPainter.topOffsetCalculator;
   }
-
-  /// The default top offset calculator.
-  static double defaultTopOffsetCalculator(int hour) => hour * 60.0;
 }
 
 /// An utility class that allows to position events in a grid.
@@ -417,8 +384,8 @@ class _EventDrawProperties {
 
   /// Calculates the top and the height of the event rectangle.
   void calculateTopAndHeight(_DayViewState state) {
-    top = state.calculateTopOffset(start.hour, start.minute);
-    height = state.calculateTopOffset(0, end.difference(start).inMinutes) + 1;
+    top = state.calculateTopOffset(HourMinute.fromDateTime(dateTime: start));
+    height = state.calculateTopOffset(HourMinute(minute: end.difference(start).inMinutes)) + 1;
   }
 
   /// Returns whether this draw properties overlaps another.

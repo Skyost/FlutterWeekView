@@ -135,9 +135,8 @@ Here are the options that are available for both `FlutterDayView` and `FlutterWe
 * `hoursColumnBackgroundColor` The hours column background color (`null` to remove).
 * `hourRowHeight` A hour row height (with a zoom factor of _1.0_).
 * `inScrollableWidget` Whether to put the widget in a scrollable widget (disable if you want to manage the scroll by yourself).
-* `initialHour` The initial hour to put the widget on.
-* `initialMinute` The initial minute to put the widget on.
-* `scrollToCurrentTime` Whether the widget should automatically scroll to the current time (hour and minute with day if you are in a Week View).
+* `initialTime` The initial time to put the widget on.
+* `scrollToCurrentTime` Whether the widget should automatically scroll to the current time (hour and minute with day if you are in a Week View). This one takes priority over
 * `userZoomable` Whether the user is able to (un)zoom the widget.
 
 ### Flutter day view
