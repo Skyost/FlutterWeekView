@@ -1,3 +1,12 @@
+## [0.3.0] - 2020-05-17
+
+* Added a `Style` class for `DayView` and `WeekView`.
+* Replaced the `dayViewBuilder` by a `dayViewStyleBuilder` in `WeekView`.
+* Added a tap down list for hours column.
+* Added the ability to restrict the current visible time.
+* Removed the background canvas painter. It was maybe a bit too complicated to use.
+* Various fixes and improvements.
+
 ## [0.2.1+7] - 2020-03-18
 
 * Fixed a bug with custom event text builders.

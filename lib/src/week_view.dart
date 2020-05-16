@@ -17,7 +17,7 @@ typedef DateCreator = DateTime Function(int index);
 
 /// A (scrollable) week view which is able to display events, zoom and un-zoom and more !
 class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> {
-  /// The number of events.
+  /// The number of dates.
   final int dateCount;
 
   /// The date creator.
@@ -69,9 +69,12 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
     WeekViewStyle style,
     WeekViewController controller,
     bool inScrollableWidget = true,
-    HourMinute initialTime,
+    HourMinute minimumTime = HourMinute.MIN,
+    HourMinute maximumTime = HourMinute.MAX,
+    HourMinute initialTime = HourMinute.MIN,
     bool scrollToCurrentTime = true,
     bool userZoomable = true,
+    HoursColumnTappedDownCallback onHoursColumnTappedDown,
   })  : assert(dateCount == null || dateCount >= 0),
         assert(dateCreator != null),
         assert(dayViewStyleBuilder != null),
@@ -80,9 +83,12 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
           style: style ?? const WeekViewStyle(),
           controller: controller ?? WeekViewController(dayViewsCount: dateCount),
           inScrollableWidget: inScrollableWidget,
+          minimumTime: minimumTime,
+          maximumTime: maximumTime,
           initialTime: initialTime,
           scrollToCurrentTime: scrollToCurrentTime,
           userZoomable: userZoomable,
+          onHoursColumnTappedDown: onHoursColumnTappedDown,
         );
 
   @override

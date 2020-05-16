@@ -59,7 +59,7 @@ return DayView(
       end: date.add(Duration(hours: 21)),
     ),
   ],
-  currentTimeCircleColor: Colors.pink,
+  // style: const DayViewStyle(currentTimeCircleColor: Colors.pink), // This one is just an example. Try it !
 );
 ```
 
@@ -125,36 +125,27 @@ Result :
 Here are the options that are available for both `FlutterDayView` and `FlutterWeekView` :
 
 * `events` Events to display.
-* `dateFormatter` The function that returns a formatted date as a String from a year, a month and a day.
-* `hourFormatter` The function that returns a formatted hour as a String from a hour and a minute.
-* `dayBarTextStyle` The day bar (top bar) text style.
-* `dayBarHeight` The day bar height (_≤ 0_ to disable).
-* `dayBarBackgroundColor` The day bar background color (`null` to remove).
-* `hoursColumnTextStyle` The hours column (left column) text style.
-* `hoursColumnWidth` The hours column width (_≤ 0_ to disable).
-* `hoursColumnBackgroundColor` The hours column background color (`null` to remove).
-* `hourRowHeight` A hour row height (with a zoom factor of _1.0_).
+* `style` Allows you to style your widget. A lot of different styles are available so don't hesitate to try them out !
 * `inScrollableWidget` Whether to put the widget in a scrollable widget (disable if you want to manage the scroll by yourself).
-* `initialTime` The initial time to put the widget on.
-* `scrollToCurrentTime` Whether the widget should automatically scroll to the current time (hour and minute with day if you are in a Week View). This one takes priority over
+* `minimumTime` The minimum hour and minute to display in a day.
+* `maximumTime` The maximum hour and minute to display in a day.
+* `initialTime` The initial hour and minute to put the widget on.
+* `scrollToCurrentTime` Whether the widget should automatically scroll to the current time (hour and minute with day if you are in a Week View). This one takes priority over `initialTime`.
 * `userZoomable` Whether the user is able to (un)zoom the widget.
+* `onHoursColumnTappedDown` Provides a tapped down callback for the hours column. Pretty useful if you want your users to add their own events.
 
 ### Flutter day view
 
 Here are the specific options of `FlutterDayView` :
 
 * `date` The widget date.
-* `eventsColumnBackgroundPainter` The events column background painter.
-* `currentTimeRuleColor` The current time rule color (`null` to disable).
-* `currentTimeCircleColor` The current time circle color (`null` or blank to disable).
 
 ### Flutter week view
 
 Here are the specific options of `FlutterWeekView` :
 
 * `dates` The widget dates.
-* `dayViewBuilder` The function that allows to build a Day View widget.
-* `dayViewWidth` A Day View width.
+* `dayViewStyleBuilder` The function that allows to build a Day View style according to the provided date.
 
 Please note that you can create a `FlutterWeekView` instance using a builder.
 All previous options are still available but you don't need to provide the `dates` list.
