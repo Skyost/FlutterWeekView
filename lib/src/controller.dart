@@ -52,7 +52,7 @@ abstract class ZoomController {
   void scaleStart();
 
   /// Should be called when the scale operation has an update.
-  void scaleUpdate(ScaleUpdateDetails details);
+  void scaleUpdate(ScaleUpdateDetails details) => changeZoomFactor(calculateZoomFactor(details.scale), details: details);
 
   /// Returns the current scale.
   double get scale;
@@ -60,8 +60,8 @@ abstract class ZoomController {
   /// Returns the current zoom factor.
   double get zoomFactor;
 
-  /// Changes the current zoom factor (but doesn't trigger any listener).
-  set zoomFactor(double zoomFactor);
+  /// Changes the current zoom factor.
+  void changeZoomFactor(double zoomFactor, {bool notify = true, ScaleUpdateDetails details});
 
   /// Disposes this controller if enabled.
   /// You should not use it anymore after having called this method.
@@ -86,8 +86,7 @@ class DayViewController extends ZoomController {
   double _previousZoomFactor = 1;
 
   /// The current zoom factor.
-  @override
-  double zoomFactor = 1;
+  double _zoomFactor = 1;
 
   /// Creates a new day view controller instance.
   DayViewController({
@@ -122,17 +121,21 @@ class DayViewController extends ZoomController {
   void scaleStart() => _previousZoomFactor = zoomFactor;
 
   @override
-  void scaleUpdate(ScaleUpdateDetails details) {
-    double zoomFactor = calculateZoomFactor(details.scale);
+  void changeZoomFactor(double zoomFactor, {bool notify = true, ScaleUpdateDetails details}) {
     bool hasChanged = this.zoomFactor != zoomFactor;
     if (hasChanged) {
-      this.zoomFactor = zoomFactor;
-      _listeners.forEach((listener) => listener.onZoomFactorChanged(this, details));
+      _zoomFactor = zoomFactor;
+      if (notify) {
+        _listeners.forEach((listener) => listener.onZoomFactorChanged(this, details ?? ScaleUpdateDetails(scale: scale)));
+      }
     }
   }
 
   @override
   double get scale => zoomFactor / (_previousZoomFactor * zoomCoefficient);
+
+  @override
+  double get zoomFactor => _zoomFactor;
 }
 
 /// Allows to control some parameters of a week view.
@@ -179,24 +182,21 @@ class WeekViewController extends ZoomController {
   void scaleStart() => dayViewControllers.forEach((controller) => controller.scaleStart());
 
   @override
-  void scaleUpdate(ScaleUpdateDetails details) {
-    double zoomFactor = calculateZoomFactor(details.scale);
-    bool hasChanged = this.zoomFactor != zoomFactor;
-    if (hasChanged) {
-      dayViewControllers.forEach((controller) => controller.scaleUpdate(details));
-      _listeners.forEach((listener) => listener.onZoomFactorChanged(this, details));
-    }
-  }
-
-  @override
   double get scale => dayViewControllers.first.scale;
 
   @override
   double get zoomFactor => dayViewControllers.first.zoomFactor;
 
   @override
-  set zoomFactor(double zoomFactor) {
-    dayViewControllers.forEach((controller) => controller.zoomFactor = zoomFactor);
+  void changeZoomFactor(double zoomFactor, {bool notify = true, ScaleUpdateDetails details}) {
+    double zoomFactor = calculateZoomFactor(details.scale);
+    bool hasChanged = this.zoomFactor != zoomFactor;
+    if (hasChanged) {
+      dayViewControllers.forEach((controller) => controller.changeZoomFactor(zoomFactor, notify: notify, details: details));
+      if (notify) {
+        _listeners.forEach((listener) => listener.onZoomFactorChanged(this, details));
+      }
+    }
   }
 
   @override

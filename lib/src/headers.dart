@@ -81,7 +81,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
     super.didUpdateWidget(oldWidget);
 
     if (widget.controller.zoomFactor != oldWidget.controller.zoomFactor) {
-      widget.controller.zoomFactor = oldWidget.controller.zoomFactor;
+      widget.controller.changeZoomFactor(oldWidget.controller.zoomFactor, notify: false);
     }
 
     hourRowHeight = widget._calculateHourRowHeight();
