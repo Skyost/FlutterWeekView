@@ -1,3 +1,7 @@
+## [0.3.0+1] - 2020-05-18
+
+* Fixed an issue with `hourRowHeight`.
+
 ## [0.3.0] - 2020-05-17
 
 * Added a `Style` class for `DayView` and `WeekView`.
