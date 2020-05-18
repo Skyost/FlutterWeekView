@@ -190,7 +190,11 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
       child: DayView(
         date: date,
         events: widget.events,
-        style: widget.dayViewStyleBuilder(date).inWeekView(),
+        style: widget.dayViewStyleBuilder(date).copyWith(
+              dayBarHeight: 0,
+              hoursColumnWidth: 0,
+              hourRowHeight: widget.style.hourRowHeight,
+            ),
         controller: widget.controller.dayViewControllers[index],
         minimumTime: widget.minimumTime,
         maximumTime: widget.maximumTime,

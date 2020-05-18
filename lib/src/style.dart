@@ -125,21 +125,36 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
           hourRowHeight: hourRowHeight,
         );
 
-  /// A day view style that should be placed in a week view.
-  DayViewStyle inWeekView() => DayViewStyle(
-        dateFormatter: dateFormatter,
-        timeFormatter: timeFormatter,
-        dayBarTextStyle: dayBarTextStyle,
-        dayBarHeight: 0,
-        dayBarBackgroundColor: dayBarBackgroundColor,
-        hoursColumnTextStyle: hoursColumnTextStyle,
-        hoursColumnWidth: 0,
-        hoursColumnBackgroundColor: hoursColumnBackgroundColor,
-        hourRowHeight: hourRowHeight,
-        backgroundColor: backgroundColor,
-        backgroundRulesColor: backgroundRulesColor,
-        currentTimeRuleColor: currentTimeRuleColor,
-        currentTimeCircleColor: currentTimeCircleColor,
+  /// Allows to copy the current style instance with your own properties.
+  DayViewStyle copyWith({
+    DateFormatter dateFormatter,
+    TimeFormatter timeFormatter,
+    TextStyle dayBarTextStyle,
+    double dayBarHeight,
+    Color dayBarBackgroundColor,
+    TextStyle hoursColumnTextStyle,
+    double hoursColumnWidth,
+    Color hoursColumnBackgroundColor,
+    double hourRowHeight,
+    Color backgroundColor,
+    Color backgroundRulesColor,
+    Color currentTimeRuleColor,
+    Color currentTimeCircleColor,
+  }) =>
+      DayViewStyle(
+        dateFormatter: dateFormatter ?? this.dateFormatter,
+        timeFormatter: timeFormatter ?? this.timeFormatter,
+        dayBarTextStyle: dayBarTextStyle ?? this.dayBarTextStyle,
+        dayBarHeight: dayBarHeight ?? this.dayBarHeight,
+        dayBarBackgroundColor: dayBarBackgroundColor ?? this.dayBarBackgroundColor,
+        hoursColumnTextStyle: hoursColumnTextStyle ?? this.hoursColumnTextStyle,
+        hoursColumnWidth: hoursColumnWidth ?? this.hoursColumnWidth,
+        hoursColumnBackgroundColor: hoursColumnBackgroundColor ?? this.hoursColumnBackgroundColor,
+        hourRowHeight: hourRowHeight ?? this.hourRowHeight,
+        backgroundColor: backgroundColor ?? this.backgroundColor,
+        backgroundRulesColor: backgroundRulesColor ?? this.backgroundRulesColor,
+        currentTimeRuleColor: currentTimeRuleColor ?? this.currentTimeRuleColor,
+        currentTimeCircleColor: currentTimeCircleColor ?? this.currentTimeCircleColor,
       );
 }
 
@@ -171,4 +186,30 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
           hoursColumnBackgroundColor: hoursColumnBackgroundColor,
           hourRowHeight: hourRowHeight,
         );
+
+  /// Allows to copy the current style instance with your own properties.
+  WeekViewStyle copyWith({
+    DateFormatter dateFormatter,
+    TimeFormatter timeFormatter,
+    TextStyle dayBarTextStyle,
+    double dayBarHeight,
+    Color dayBarBackgroundColor,
+    TextStyle hoursColumnTextStyle,
+    double hoursColumnWidth,
+    Color hoursColumnBackgroundColor,
+    double hourRowHeight,
+    double dayViewWidth,
+  }) =>
+      WeekViewStyle(
+        dateFormatter: dateFormatter ?? this.dateFormatter,
+        timeFormatter: timeFormatter ?? this.timeFormatter,
+        dayBarTextStyle: dayBarTextStyle ?? this.dayBarTextStyle,
+        dayBarHeight: dayBarHeight ?? this.dayBarHeight,
+        dayBarBackgroundColor: dayBarBackgroundColor ?? this.dayBarBackgroundColor,
+        hoursColumnTextStyle: hoursColumnTextStyle ?? this.hoursColumnTextStyle,
+        hoursColumnWidth: hoursColumnWidth ?? this.hoursColumnWidth,
+        hoursColumnBackgroundColor: hoursColumnBackgroundColor ?? this.hoursColumnBackgroundColor,
+        hourRowHeight: hourRowHeight ?? this.hourRowHeight,
+        dayViewWidth: dayViewWidth ?? this.dayViewWidth,
+      );
 }

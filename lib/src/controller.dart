@@ -1,5 +1,5 @@
-import 'dart:math' as math;
 import 'dart:collection';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/utils.dart';
@@ -97,12 +97,12 @@ class DayViewController extends ZoomController {
     double maxZoom,
     bool disposable = true,
   }) : super(
-    verticalScrollController: verticalScrollController,
-    zoomCoefficient: zoomCoefficient,
-    minZoom: minZoom,
-    maxZoom: maxZoom,
-    disposable: disposable,
-  );
+          verticalScrollController: verticalScrollController,
+          zoomCoefficient: zoomCoefficient,
+          minZoom: minZoom,
+          maxZoom: maxZoom,
+          disposable: disposable,
+        );
 
   @override
   double calculateZoomFactor(double scale) {
@@ -157,7 +157,7 @@ class WeekViewController extends ZoomController {
         assert(disposable != null),
         dayViewControllers = List.generate(
           dayViewsCount,
-              (_) => DayViewController(
+          (_) => DayViewController(
             zoomCoefficient: zoomCoefficient,
             minZoom: minZoom,
             maxZoom: maxZoom,
@@ -165,12 +165,12 @@ class WeekViewController extends ZoomController {
           ),
         ),
         super(
-        verticalScrollController: verticalScrollController,
-        zoomCoefficient: zoomCoefficient,
-        minZoom: minZoom,
-        maxZoom: maxZoom,
-        disposable: disposable,
-      );
+          verticalScrollController: verticalScrollController,
+          zoomCoefficient: zoomCoefficient,
+          minZoom: minZoom,
+          maxZoom: maxZoom,
+          disposable: disposable,
+        );
 
   @override
   double calculateZoomFactor(double scale) => dayViewControllers.first.calculateZoomFactor(scale);
