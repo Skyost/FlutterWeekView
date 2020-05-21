@@ -6,7 +6,7 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
-  url_launcher: ^5.4.7
+  url_launcher: ^5.4.10
   flutter:
     sdk: flutter
 

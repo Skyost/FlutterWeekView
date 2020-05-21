@@ -126,7 +126,8 @@ class DayViewController extends ZoomController {
     if (hasChanged) {
       _zoomFactor = zoomFactor;
       if (notify) {
-        _listeners.forEach((listener) => listener.onZoomFactorChanged(this, details ?? ScaleUpdateDetails(scale: scale)));
+        details ??= ScaleUpdateDetails(scale: scale);
+        _listeners.forEach((listener) => listener.onZoomFactorChanged(this, details));
       }
     }
   }
@@ -189,11 +190,11 @@ class WeekViewController extends ZoomController {
 
   @override
   void changeZoomFactor(double zoomFactor, {bool notify = true, ScaleUpdateDetails details}) {
-    double zoomFactor = calculateZoomFactor(details.scale);
     bool hasChanged = this.zoomFactor != zoomFactor;
     if (hasChanged) {
       dayViewControllers.forEach((controller) => controller.changeZoomFactor(zoomFactor, notify: notify, details: details));
       if (notify) {
+        details ??= ScaleUpdateDetails(scale: scale);
         _listeners.forEach((listener) => listener.onZoomFactorChanged(this, details));
       }
     }
