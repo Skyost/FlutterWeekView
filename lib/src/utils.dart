@@ -82,6 +82,11 @@ class DefaultBuilders {
     );
   }
 
+  /// Builds a day view separator for the week view widget.
+  static Widget defaultDayViewSeparatorBuilder(BuildContext context, int index) {
+    return const VerticalDivider(width: 0.0);
+  }
+
   /// Builds a date according to a list.
   static DateTime defaultDateCreator(List<DateTime> dates, int index) => dates[index];
 
