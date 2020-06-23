@@ -158,7 +158,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
         Container(
           height: widget.style.dayBarHeight,
           width: widget.style.hoursColumnWidth,
-          color: widget.style.dayBarBackgroundColor ?? const Color(0xFFEBEBEB),
+          color: widget.style.dayBarBackgroundColor,
         ),
       ],
     );
