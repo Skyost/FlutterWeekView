@@ -169,13 +169,14 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
         children: [
           SizedBox(
             height: calculateHeight(),
-            child: ListView.builder(
+            child: ListView.separated(
               padding: EdgeInsets.only(left: widget.style.hoursColumnWidth),
               controller: widget.controller.horizontalScrollController,
               scrollDirection: Axis.horizontal,
               physics: widget.inScrollableWidget ? MagnetScrollPhysics(itemSize: dayViewWidth) : const NeverScrollableScrollPhysics(),
               itemCount: widget.dateCount,
               itemBuilder: (context, index) => createDayView(index),
+              separatorBuilder: (context, index) => widget.style.dayViewSeparatorBuilder(context, index),
             ),
           ),
           HoursColumn.fromHeadersWidgetState(parent: this),

@@ -163,6 +163,10 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
   /// A day view width.
   final double dayViewWidth;
 
+  /// The separator between the day views (see [ListView.separated]). Defaults to a
+  /// [VerticalDivider] with a width of exactly one device pixel.
+  final IndexedWidgetBuilder dayViewSeparatorBuilder;
+
   /// Creates a new week view style instance.
   const WeekViewStyle({
     DateFormatter dateFormatter,
@@ -175,6 +179,7 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
     Color hoursColumnBackgroundColor,
     double hourRowHeight,
     this.dayViewWidth,
+    this.dayViewSeparatorBuilder = DefaultBuilders.defaultDayViewSeparatorBuilder,
   }) : super(
           dateFormatter: dateFormatter,
           timeFormatter: timeFormatter,
@@ -199,6 +204,7 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
     Color hoursColumnBackgroundColor,
     double hourRowHeight,
     double dayViewWidth,
+    IndexedWidgetBuilder dayViewSeparatorBuilder,
   }) =>
       WeekViewStyle(
         dateFormatter: dateFormatter ?? this.dateFormatter,
@@ -211,5 +217,6 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
         hoursColumnBackgroundColor: hoursColumnBackgroundColor ?? this.hoursColumnBackgroundColor,
         hourRowHeight: hourRowHeight ?? this.hourRowHeight,
         dayViewWidth: dayViewWidth ?? this.dayViewWidth,
+        dayViewSeparatorBuilder: dayViewSeparatorBuilder ?? this.dayViewSeparatorBuilder,
       );
 }
