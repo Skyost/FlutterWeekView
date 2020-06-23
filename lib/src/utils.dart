@@ -32,10 +32,10 @@ class Utils {
 
 /// Contains default builders and formatters.
 class DefaultBuilders {
-  /// Formats a day.
+  /// Formats a day in YYYY-MM-DD format, e.g., 2020-01-15.
   static String defaultDateFormatter(int year, int month, int day) => year.toString() + '-' + Utils.addLeadingZero(month) + '-' + Utils.addLeadingZero(day);
 
-  /// Formats a hour.
+  /// Formats a hour in 24-hour HH:MM format, e.g., 15:00.
   static String defaultTimeFormatter(HourMinute time) => Utils.addLeadingZero(time.hour) + ':' + Utils.addLeadingZero(time.minute);
 
   /// Allows to calculate a top offset according to the specified hour row height.
