@@ -11,6 +11,11 @@ import 'package:flutter_week_view/src/utils.dart';
 /// Builds an event text widget.
 typedef EventTextBuilder = Widget Function(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width);
 
+class CurrentTimeCirclePosition {
+  static const CurrentTimeCirclePositionEnum start = CurrentTimeCirclePositionEnum.start;
+  static const CurrentTimeCirclePositionEnum end = CurrentTimeCirclePositionEnum.end;
+}
+
 /// A (scrollable) day view which is able to display events, zoom and un-zoom and more !
 class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
   /// The events.
@@ -131,9 +136,9 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     }
 
     if (widget.style.currentTimeRuleColor != null && Utils.sameDay(widget.date)) {
-      children.add(createCurrentTimeRule());
+      children.add(createCurrentTimeRule(widget.style.currentTimeRuleHeight));
       if (widget.style.currentTimeCircleColor != null) {
-        children.add(createCurrentTimeCircle());
+        children.add(createCurrentTimeCircle(widget.style.currentTimeCircleRadius, widget.style.circlePosition));
       }
     }
 
@@ -165,23 +170,24 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       );
 
   /// Creates a positioned horizontal rule in the hours column.
-  Widget createCurrentTimeRule() => Positioned(
+  Widget createCurrentTimeRule([double height = 1]) => Positioned(
         top: calculateTopOffset(HourMinute.now()),
         left: widget.style.hoursColumnWidth,
         right: 0,
         child: Container(
-          height: 1,
+          height: height < (widget.style.currentTimeCircleRadius*2) ?  height : 1,
           color: widget.style.currentTimeRuleColor,
         ),
       );
 
   /// Creates a positioned horizontal rule in the hours column.
-  Widget createCurrentTimeCircle([double radius = 15]) => Positioned(
-        top: calculateTopOffset(HourMinute.now()) - (radius / 2),
-        right: 0,
+  Widget createCurrentTimeCircle([double radius = 7.5, CurrentTimeCirclePositionEnum circlePosition = CurrentTimeCirclePositionEnum.start]) => Positioned(
+        top: calculateTopOffset(HourMinute.now()) - radius + (widget.style.currentTimeRuleHeight <= (radius*2) ? widget.style.currentTimeRuleHeight/2 : 1/2),
+        left: circlePosition == CurrentTimeCirclePositionEnum.start ? widget.style.hoursColumnWidth : null,
+        right: circlePosition == CurrentTimeCirclePositionEnum.end ? 0 : null,
         child: Container(
-          height: radius,
-          width: radius,
+          height: (radius * 2),
+          width: (radius * 2),
           decoration: BoxDecoration(
             color: widget.style.currentTimeCircleColor,
             shape: BoxShape.circle,

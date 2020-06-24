@@ -8,6 +8,11 @@ import 'package:flutter_week_view/src/event.dart';
 import 'package:flutter_week_view/src/hour_minute.dart';
 import 'package:flutter_week_view/src/style.dart';
 
+/// Current time circle Position enum
+enum CurrentTimeCirclePositionEnum {
+  start,
+  end,
+}
 /// Contains some useful methods.
 class Utils {
   /// Makes the specified number to have at least two digits by adding a leading zero if needed.

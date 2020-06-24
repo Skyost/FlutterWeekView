@@ -69,6 +69,15 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
   /// The current time circle color.
   final Color currentTimeCircleColor;
 
+  /// The current time circle radius.
+  final double currentTimeCircleRadius;
+
+  /// The current time circle position.
+  final CurrentTimeCirclePositionEnum circlePosition;
+
+  /// The current time circle position.
+  final double currentTimeRuleHeight;
+
   /// Creates a new day view style instance.
   const DayViewStyle({
     DateFormatter dateFormatter,
@@ -84,6 +93,9 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
     this.backgroundRulesColor = const Color(0x1A000000),
     this.currentTimeRuleColor = Colors.pink,
     this.currentTimeCircleColor,
+    this.currentTimeCircleRadius = 7.5,
+    this.circlePosition = CurrentTimeCirclePositionEnum.start,
+    this.currentTimeRuleHeight = 1,
   })  : backgroundColor = backgroundColor ?? const Color(0xFFF2F2F2),
         super(
           dateFormatter: dateFormatter,
@@ -112,6 +124,9 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
     this.backgroundRulesColor = const Color(0x1A000000),
     this.currentTimeRuleColor = Colors.pink,
     this.currentTimeCircleColor,
+    this.currentTimeCircleRadius = 7.5,
+    this.circlePosition = CurrentTimeCirclePositionEnum.start,
+    this.currentTimeRuleHeight = 1,
   })  : backgroundColor = Utils.sameDay(date) ? const Color(0xFFE3F5FF) : const Color(0xFFF2F2F2),
         super(
           dateFormatter: dateFormatter,
@@ -140,6 +155,9 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
     Color backgroundRulesColor,
     Color currentTimeRuleColor,
     Color currentTimeCircleColor,
+    double currentTimeCircleRadius,
+    CurrentTimeCirclePositionEnum circlePosition,
+    double currentTimeRuleHeight,
   }) =>
       DayViewStyle(
         dateFormatter: dateFormatter ?? this.dateFormatter,
@@ -155,6 +173,9 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
         backgroundRulesColor: backgroundRulesColor ?? this.backgroundRulesColor,
         currentTimeRuleColor: currentTimeRuleColor ?? this.currentTimeRuleColor,
         currentTimeCircleColor: currentTimeCircleColor ?? this.currentTimeCircleColor,
+        currentTimeCircleRadius: currentTimeCircleRadius ?? this.currentTimeCircleRadius,
+        circlePosition: circlePosition ?? this.circlePosition,
+        currentTimeRuleHeight: currentTimeRuleHeight ?? this.currentTimeRuleHeight,
       );
 }
 
