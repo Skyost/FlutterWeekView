@@ -26,10 +26,12 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
   /// The maximum time to display.
   final HourMinute maximumTime;
 
-  /// The initial visible time.
+  /// The initial visible time. If this is set, [scrollToCurrentTime] should be false, since
+  /// that takes priority over [initialTime].
   final HourMinute initialTime;
 
-  /// Whether the widget should automatically scroll to the current time (hour and minute).
+  /// Whether the widget should automatically scroll to the current time (hour and minute). This
+  /// takes priority over [initialTime].
   final bool scrollToCurrentTime;
 
   /// Whether the user is able to pinch-to-zoom the widget.
@@ -175,30 +177,34 @@ class DayBar extends StatelessWidget {
   /// The date.
   final DateTime date;
 
-  /// The height.
+  /// The height. Defaults to 40.
   final double height;
 
-  /// The background color.
+  /// The background color. Defaults to light gray.
   final Color backgroundColor;
 
-  /// The bar text style.
+  /// The bar text style. Defaults to a bold font, blue if [date] is today, gray otherwise.
   final TextStyle textStyle;
 
-  /// The day formatter.
+  /// The day formatter. Defaults to YYYY-MM-DD, e.g., 2020-01-15.
   final DateFormatter dateFormatter;
 
   /// Creates a new day bar instance.
   DayBar({
     @required DateTime date,
     double height = 40,
-    this.backgroundColor = const Color(0xFFEBEBEB),
-    this.textStyle,
-    this.dateFormatter = DefaultBuilders.defaultDateFormatter,
+    Color backgroundColor,
+    TextStyle textStyle,
+    DateFormatter dateFormatter,
   })  : assert(date != null),
-        assert(backgroundColor != null),
-        assert(dateFormatter != null),
         date = DateTime(date.year, date.month, date.day),
-        height = math.max(0, height ?? 0);
+        height = math.max(0, height ?? 0),
+        backgroundColor = backgroundColor ?? const Color(0xFFEBEBEB),
+        textStyle = textStyle ?? TextStyle(
+          color: Utils.sameDay(date) ? Colors.blue[800] : Colors.black54,
+          fontWeight: FontWeight.bold,
+        ),
+        dateFormatter = dateFormatter ?? DefaultBuilders.defaultDateFormatter;
 
   /// Creates a new day bar instance from a headers widget instance.
   DayBar.fromHeadersWidget({
@@ -207,7 +213,7 @@ class DayBar extends StatelessWidget {
   }) : this(
           date: date ?? DateTime.now(),
           height: parent.style.dayBarHeight,
-          backgroundColor: parent.style.dayBarBackgroundColor ?? const Color(0xFFEBEBEB),
+          backgroundColor: parent.style.dayBarBackgroundColor,
           textStyle: parent.style.dayBarTextStyle,
           dateFormatter: parent.style.dateFormatter,
         );
@@ -219,11 +225,7 @@ class DayBar extends StatelessWidget {
         child: Center(
           child: Text(
             dateFormatter(date.year, date.month, date.day),
-            style: textStyle ??
-                TextStyle(
-                  color: Utils.sameDay(date) ? Colors.blue[800] : Colors.black54,
-                  fontWeight: FontWeight.bold,
-                ),
+            style: textStyle,
           ),
         ),
       );
@@ -284,8 +286,8 @@ class HoursColumn extends StatelessWidget {
           maximumTime: parent.widget.maximumTime,
           topOffsetCalculator: parent.calculateTopOffset,
           width: parent.widget.style.hoursColumnWidth,
-          backgroundColor: parent.widget.style.hoursColumnBackgroundColor ?? Colors.white,
-          textStyle: parent.widget.style.hoursColumnTextStyle ?? const TextStyle(color: Colors.black54),
+          backgroundColor: parent.widget.style.hoursColumnBackgroundColor,
+          textStyle: parent.widget.style.hoursColumnTextStyle,
           timeFormatter: parent.widget.style.timeFormatter,
           onHoursColumnTappedDown: parent.widget.onHoursColumnTappedDown,
         );

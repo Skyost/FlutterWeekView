@@ -57,7 +57,7 @@ class HourMinute {
   /// Creates a new hour minute time instance.
   HourMinute.now() : this.fromDateTime(dateTime: DateTime.now());
 
-  /// Calculates the difference between this hour minute and another.
+  /// Calculates the sum of this hour minute and another.
   HourMinute add(HourMinute other) {
     int hour = this.hour + other.hour;
     int minute = this.minute + other.minute;

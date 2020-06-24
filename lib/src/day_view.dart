@@ -99,7 +99,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
         Container(
           height: widget.style.dayBarHeight,
           width: widget.style.hoursColumnWidth,
-          color: widget.style.dayBarBackgroundColor ?? const Color(0xFFEBEBEB),
+          color: widget.style.dayBarBackgroundColor,
         ),
       ],
     );
@@ -169,7 +169,8 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
         ),
       );
 
-  /// Creates a positioned horizontal rule in the hours column.
+
+  /// Creates the horizontal rule in the day view column, positioned at the current time of the day.
   Widget createCurrentTimeRule([double height = 1]) => Positioned(
         top: calculateTopOffset(HourMinute.now()),
         left: widget.style.hoursColumnWidth,
@@ -180,7 +181,8 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
         ),
       );
 
-  /// Creates a positioned horizontal rule in the hours column.
+
+  /// Creates the current time circle, shown along with the horizontal rule in the day view column.
   Widget createCurrentTimeCircle([double radius = 7.5, CurrentTimeCirclePositionEnum circlePosition = CurrentTimeCirclePositionEnum.start]) => Positioned(
         top: calculateTopOffset(HourMinute.now()) - radius + (widget.style.currentTimeRuleHeight <= (radius*2) ? widget.style.currentTimeRuleHeight/2 : 1/2),
         left: circlePosition == CurrentTimeCirclePositionEnum.start ? widget.style.hoursColumnWidth : null,

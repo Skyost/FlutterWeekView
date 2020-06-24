@@ -10,31 +10,31 @@ typedef TimeFormatter = String Function(HourMinute time);
 
 /// Allows to style a zoomable header widget style.
 class ZoomableHeaderWidgetStyle {
-  /// The day formatter.
+  /// The day formatter. Defaults to YYYY-MM-DD, e.g., 2020-01-15.
   final DateFormatter dateFormatter;
 
-  /// The hour formatter.
+  /// The hour formatter. Defaults to 24-hour HH:MM, e.g., 15:00.
   final TimeFormatter timeFormatter;
 
-  /// The day bar text style.
+  /// The day bar text style. Defaults to null, which will then format according to [DayBar.textStyle].
   final TextStyle dayBarTextStyle;
 
-  /// The day bar height.
+  /// The day bar height. Defaults to 40.
   final double dayBarHeight;
 
-  /// The day bar background color.
+  /// The day bar background color. Defaults to light gray.
   final Color dayBarBackgroundColor;
 
-  /// The hours column text style.
+  /// The hours column text style. Defaults to light gray text.
   final TextStyle hoursColumnTextStyle;
 
-  /// The hours column width.
+  /// The hours column width. Defaults to 60.
   final double hoursColumnWidth;
 
-  /// The hours column background color.
+  /// The hours column background color. Defaults to [Colors.white].
   final Color hoursColumnBackgroundColor;
 
-  /// An hour row height (with a zoom factor set to 1).
+  /// An hour row height (with a zoom factor set to 1). Defaults to 60.
   final double hourRowHeight;
 
   /// Creates a new zoomable header widget style instance.
@@ -43,30 +43,46 @@ class ZoomableHeaderWidgetStyle {
     TimeFormatter timeFormatter,
     this.dayBarTextStyle,
     double dayBarHeight,
-    this.dayBarBackgroundColor,
-    this.hoursColumnTextStyle,
+    Color dayBarBackgroundColor,
+    TextStyle hoursColumnTextStyle,
     double hoursColumnWidth,
-    this.hoursColumnBackgroundColor,
+    Color hoursColumnBackgroundColor,
     double hourRowHeight,
   })  : dateFormatter = dateFormatter ?? DefaultBuilders.defaultDateFormatter,
         timeFormatter = timeFormatter ?? DefaultBuilders.defaultTimeFormatter,
         dayBarHeight = (dayBarHeight ?? 40) < 0 ? 0 : (dayBarHeight ?? 40),
+        dayBarBackgroundColor = dayBarBackgroundColor ?? const Color(0xFFEBEBEB),
+        hoursColumnTextStyle = hoursColumnTextStyle ?? const TextStyle(color: Colors.black54),
         hoursColumnWidth = (hoursColumnWidth ?? 60) < 0 ? 0 : (hoursColumnWidth ?? 60),
+        hoursColumnBackgroundColor = hoursColumnBackgroundColor ?? Colors.white,
         hourRowHeight = (hourRowHeight ?? 60) < 0 ? 0 : (hourRowHeight ?? 60);
 }
 
 /// Allows to style a day view.
 class DayViewStyle extends ZoomableHeaderWidgetStyle {
-  /// The background color.
+  /// The background color for the day view main column.
+  ///
+  /// Defaults to a light blue if the DayView's date is today (make sure to use [DayViewStyle.fromDate]
+  /// if you're creating your own DayViewStyle and want this behaviour). Otherwise, defaults to a
+  /// light gray.
   final Color backgroundColor;
 
-  /// The rules color.
+  /// The rules color, i.e., the color of the background horizontal lines positioned along with
+  /// each hour shown in the hours column.
+  ///
+  /// Defaults to a semi-transparent gray.
   final Color backgroundRulesColor;
 
-  /// The current time rule color.
+  /// The current time rule color, i.e., the color of the horizontal line in the day view column,
+  /// positioned at the current time of the day. It is only shown if the DayView's date is today.
+  ///
+  /// Defaults to [Colors.pink].
   final Color currentTimeRuleColor;
 
-  /// The current time circle color.
+  /// The current time circle color. This is a small circle to be shown along with the horizontal
+  /// time rule in the hours column, typically colored the same as [currentTimeRuleColor].
+  ///
+  /// If null, the circle is not drawn.
   final Color currentTimeCircleColor;
 
   /// The current time circle radius.
@@ -182,7 +198,13 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
 /// Allows to style a week view.
 class WeekViewStyle extends ZoomableHeaderWidgetStyle {
   /// A day view width.
+  ///
+  /// Defaults to the entire width available for the week view widget.
   final double dayViewWidth;
+
+  /// The separator between the day views (see [ListView.separated]). Defaults to a
+  /// [VerticalDivider] with a width of exactly one device pixel.
+  final IndexedWidgetBuilder dayViewSeparatorBuilder;
 
   /// Creates a new week view style instance.
   const WeekViewStyle({
@@ -196,6 +218,7 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
     Color hoursColumnBackgroundColor,
     double hourRowHeight,
     this.dayViewWidth,
+    this.dayViewSeparatorBuilder = DefaultBuilders.defaultDayViewSeparatorBuilder,
   }) : super(
           dateFormatter: dateFormatter,
           timeFormatter: timeFormatter,
@@ -220,6 +243,7 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
     Color hoursColumnBackgroundColor,
     double hourRowHeight,
     double dayViewWidth,
+    IndexedWidgetBuilder dayViewSeparatorBuilder,
   }) =>
       WeekViewStyle(
         dateFormatter: dateFormatter ?? this.dateFormatter,
@@ -232,5 +256,6 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
         hoursColumnBackgroundColor: hoursColumnBackgroundColor ?? this.hoursColumnBackgroundColor,
         hourRowHeight: hourRowHeight ?? this.hourRowHeight,
         dayViewWidth: dayViewWidth ?? this.dayViewWidth,
+        dayViewSeparatorBuilder: dayViewSeparatorBuilder ?? this.dayViewSeparatorBuilder,
       );
 }
