@@ -50,7 +50,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
         events = events ?? [],
         super(
           style: style ?? const WeekViewStyle(),
-          controller: controller ?? WeekViewController(dayViewsCount: dates.length),
+          controller: controller ?? WeekViewController(),
           inScrollableWidget: inScrollableWidget,
           minimumTime: minimumTime,
           maximumTime: maximumTime,
@@ -81,7 +81,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
         events = events ?? [],
         super(
           style: style ?? const WeekViewStyle(),
-          controller: controller ?? WeekViewController(dayViewsCount: dateCount),
+          controller: controller ?? WeekViewController(),
           inScrollableWidget: inScrollableWidget,
           minimumTime: minimumTime,
           maximumTime: maximumTime,
@@ -100,9 +100,16 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   /// A day view width.
   double dayViewWidth;
 
+  /// The horizontal scroll controller.
+  SilentScrollController horizontalScrollController;
+
   @override
   void initState() {
     super.initState();
+
+    if (widget.inScrollableWidget) {
+      horizontalScrollController = SilentScrollController();
+    }
 
     dayViewWidth = widget.style.dayViewWidth;
     if (dayViewWidth != null) {
@@ -113,7 +120,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       double widgetWidth = (context.findRenderObject() as RenderBox).size.width;
       setState(() {
-        dayViewWidth = widgetWidth - widget.style.hoursColumnWidth - widget.style.dayViewSeparatorWidth;
+        dayViewWidth = widgetWidth - widget.style.hoursColumnWidth;
         scheduleScrolls();
       });
     });
@@ -131,11 +138,11 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   /// Creates the main widget.
   Widget createMainWidget() {
     Widget weekViewStack = createWeekViewStack();
-    if (widget.inScrollableWidget) {
+    if (verticalScrollController != null) {
       weekViewStack = NoGlowBehavior.noGlow(
         child: SingleChildScrollView(
           padding: EdgeInsets.only(top: widget.style.dayBarHeight),
-          controller: widget.controller.verticalScrollController,
+          controller: verticalScrollController,
           child: weekViewStack,
         ),
       );
@@ -144,7 +151,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
     if (isZoomable) {
       weekViewStack = GestureDetector(
         onScaleStart: (_) => widget.controller.scaleStart(),
-        onScaleUpdate: (details) => widget.controller.scaleUpdate(details),
+        onScaleUpdate: widget.controller.scaleUpdate,
         child: weekViewStack,
       );
     }
@@ -152,9 +159,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
     return Stack(
       children: [
         weekViewStack,
-        _AutoScrollDayBar(
-          state: this,
-        ),
+        _AutoScrollDayBar(state: this),
         Container(
           height: widget.style.dayBarHeight,
           width: widget.style.hoursColumnWidth,
@@ -169,17 +174,13 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
         children: [
           SizedBox(
             height: calculateHeight(),
-            child: ListView.separated(
+            child: ListView.builder(
               padding: EdgeInsets.only(left: widget.style.hoursColumnWidth),
-              controller: widget.controller.horizontalScrollController,
+              controller: horizontalScrollController,
               scrollDirection: Axis.horizontal,
-              physics: widget.inScrollableWidget ? MagnetScrollPhysics(itemSize: dayViewWidth) : const NeverScrollableScrollPhysics(),
+              physics: widget.inScrollableWidget ? MagnetScrollPhysics(itemSize: dayViewWidth + widget.style.dayViewSeparatorWidth) : const NeverScrollableScrollPhysics(),
               itemCount: widget.dateCount,
               itemBuilder: (context, index) => createDayView(index),
-              separatorBuilder: (context, index) => VerticalDivider(
-                width: widget.style.dayViewSeparatorWidth,
-                color: widget.style.dayViewSeparatorColor,
-              ),
             ),
           ),
           HoursColumn.fromHeadersWidgetState(parent: this),
@@ -189,27 +190,39 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   /// Creates the day view at the specified index.
   Widget createDayView(int index) {
     DateTime date = widget.dateCreator(index);
-    double width = dayViewWidth;
-    if(index + 1 == widget.dateCount) {
-      width -= widget.style.dayViewSeparatorWidth;
-    }
-    return SizedBox(
-      width: width,
+    Widget dayView = SizedBox(
+      width: dayViewWidth,
       child: DayView(
         date: date,
         events: widget.events,
         style: widget.dayViewStyleBuilder(date).copyWith(
-              dayBarHeight: 0,
-              hoursColumnWidth: 0,
-              hourRowHeight: widget.style.hourRowHeight,
-            ),
-        controller: widget.controller.dayViewControllers[index],
+          dayBarHeight: 0,
+          hoursColumnWidth: 0,
+          hourRowHeight: widget.style.hourRowHeight,
+        ),
+        controller: widget.controller.getDayViewController(date),
         minimumTime: widget.minimumTime,
         maximumTime: widget.maximumTime,
         inScrollableWidget: false,
         userZoomable: false,
         scrollToCurrentTime: false,
       ),
+    );
+
+    double dayViewSeparatorWidth = widget.style.dayViewSeparatorWidth;
+    if (index + 1 == widget.dateCount) {
+      return dayView;
+    }
+
+    return Row(
+      children: [
+        dayView,
+        Container(
+          height: calculateHeight(),
+          width: dayViewSeparatorWidth,
+          color: widget.style.dayViewSeparatorColor,
+        ),
+      ],
     );
   }
 
@@ -226,12 +239,18 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   void scrollToCurrentTime() {
     super.scrollToCurrentTime();
 
-    if (widget.dateCount == null || !widget.inScrollableWidget) {
+    if (widget.dateCount == null || horizontalScrollController == null) {
       return;
     }
 
-    double leftOffset = todayDateIndex * dayViewWidth;
-    widget.controller.horizontalScrollController.jumpTo(math.min<double>(leftOffset, widget.controller.horizontalScrollController.position.maxScrollExtent));
+    double leftOffset = todayDateIndex * (dayViewWidth + widget.style.dayViewSeparatorWidth);
+    horizontalScrollController.jumpTo(math.min<double>(leftOffset, horizontalScrollController.position.maxScrollExtent));
+  }
+
+  @override
+  void dispose() {
+    horizontalScrollController?.dispose();
+    super.dispose();
   }
 
   /// Returns the current date index.
@@ -253,11 +272,15 @@ class _AutoScrollDayBar extends StatefulWidget {
   /// A day view width.
   final double dayViewWidth;
 
+  /// The state's scroll controller.
+  final SilentScrollController stateScrollController;
+
   /// Creates a new positioned day bar instance.
   _AutoScrollDayBar({
     @required _WeekViewState state,
   })  : weekView = state.widget,
-        dayViewWidth = state.dayViewWidth;
+        dayViewWidth = state.dayViewWidth,
+        stateScrollController = state.horizontalScrollController;
 
   @override
   State<StatefulWidget> createState() => _AutoScrollDayBarState();
@@ -274,7 +297,7 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
 
     scrollController = SilentScrollController();
     scrollController.addListener(onScrolledHorizontally);
-    widget.weekView.controller.horizontalScrollController.addListener(updateScrollPosition);
+    widget.stateScrollController.addListener(updateScrollPosition);
 
     WidgetsBinding.instance.scheduleFrameCallback((_) => updateScrollPosition());
   }
@@ -283,7 +306,8 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
   void didUpdateWidget(_AutoScrollDayBar oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    widget.weekView.controller.horizontalScrollController.addListener(updateScrollPosition);
+    oldWidget.stateScrollController.removeListener(updateScrollPosition);
+    widget.stateScrollController.addListener(updateScrollPosition);
   }
 
   @override
@@ -292,13 +316,13 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
         child: ListView.builder(
           itemCount: widget.weekView.dateCount,
           itemBuilder: (context, position) => SizedBox(
-            width: widget.dayViewWidth,
+            width: calculateWidth(position),
             child: DayBar.fromHeadersWidget(
               parent: widget.weekView,
               date: widget.weekView.dateCreator(position),
             ),
           ),
-          physics: MagnetScrollPhysics(itemSize: widget.dayViewWidth),
+          physics: MagnetScrollPhysics(itemSize: calculateWidth()),
           padding: EdgeInsets.only(left: widget.weekView.style.hoursColumnWidth),
           controller: scrollController,
           scrollDirection: Axis.horizontal,
@@ -308,15 +332,18 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
   @override
   void dispose() {
     scrollController.dispose();
-    widget.weekView.controller.horizontalScrollController.removeListener(updateScrollPosition);
+    widget.stateScrollController.removeListener(updateScrollPosition);
     super.dispose();
   }
 
+  /// Returns the widget width.
+  double calculateWidth([int position]) => widget.dayViewWidth + (position == widget.weekView.dateCount ? 0 : widget.weekView.style.dayViewSeparatorWidth);
+
   /// Triggered when this widget is scrolling horizontally.
-  void onScrolledHorizontally() => updateScrollBasedOnAnother(scrollController, widget.weekView.controller.horizontalScrollController);
+  void onScrolledHorizontally() => updateScrollBasedOnAnother(scrollController, widget.stateScrollController);
 
   /// Triggered when the week view is scrolling horizontally.
-  void updateScrollPosition() => updateScrollBasedOnAnother(widget.weekView.controller.horizontalScrollController, scrollController);
+  void updateScrollPosition() => updateScrollBasedOnAnother(widget.stateScrollController, scrollController);
 
   /// Updates a scroll controller position based on another scroll controller.
   void updateScrollBasedOnAnother(ScrollController base, SilentScrollController target) {

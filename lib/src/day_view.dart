@@ -61,9 +61,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     super.initState();
     scheduleScrolls();
     reset();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() => createEventsDrawProperties());
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => setState(createEventsDrawProperties));
   }
 
   @override
@@ -102,7 +100,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
 
     return GestureDetector(
       onScaleStart: (_) => widget.controller.scaleStart(),
-      onScaleUpdate: (details) => widget.controller.scaleUpdate(details),
+      onScaleUpdate: widget.controller.scaleUpdate,
       child: mainStack,
     );
   }
@@ -112,7 +110,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     super.onZoomFactorChanged(controller, details);
 
     if (mounted) {
-      setState(() => createEventsDrawProperties());
+      setState(createEventsDrawProperties);
     }
   }
 
@@ -142,10 +140,10 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       child: Stack(children: children..insert(0, createBackground())),
     );
 
-    if (widget.inScrollableWidget) {
+    if (verticalScrollController != null) {
       mainWidget = NoGlowBehavior.noGlow(
         child: SingleChildScrollView(
-          controller: widget.controller.verticalScrollController,
+          controller: verticalScrollController,
           child: mainWidget,
         ),
       );

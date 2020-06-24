@@ -71,11 +71,18 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
   /// The current hour row height.
   double hourRowHeight;
 
+  /// The vertical scroll controller.
+  ScrollController verticalScrollController;
+
   @override
   void initState() {
     super.initState();
     hourRowHeight = widget._calculateHourRowHeight();
     widget.controller.addListener(this);
+
+    if(widget.inScrollableWidget) {
+      verticalScrollController = ScrollController();
+    }
   }
 
   @override
@@ -98,15 +105,14 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
     }
 
     double hourRowHeight = widget._calculateHourRowHeight(controller);
-
-    if (widget.inScrollableWidget) {
+    if (verticalScrollController != null) {
       double widgetHeight = (context.findRenderObject() as RenderBox).size.height;
       double maxPixels = calculateHeight(hourRowHeight) - widgetHeight + widget.style.dayBarHeight;
 
-      if (hourRowHeight < this.hourRowHeight && controller.verticalScrollController.position.pixels > maxPixels) {
-        controller.verticalScrollController.jumpTo(maxPixels);
+      if (hourRowHeight < this.hourRowHeight && verticalScrollController.position.pixels > maxPixels) {
+        verticalScrollController.jumpTo(maxPixels);
       } else {
-        controller.verticalScrollController.jumpTo(math.min(maxPixels, details.localFocalPoint.dy));
+        verticalScrollController.jumpTo(math.min(maxPixels, details.localFocalPoint.dy));
       }
     }
 
@@ -118,6 +124,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
   @override
   void dispose() {
     widget.controller.dispose();
+    verticalScrollController?.dispose();
     super.dispose();
   }
 
@@ -156,9 +163,9 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
 
   /// Scrolls to a given time if possible.
   void scrollToTime(HourMinute time) {
-    if (widget.inScrollableWidget) {
+    if (verticalScrollController != null) {
       double topOffset = calculateTopOffset(time);
-      widget.controller.verticalScrollController.jumpTo(math.min(topOffset, widget.controller.verticalScrollController.position.maxScrollExtent));
+      verticalScrollController.jumpTo(math.min(topOffset, verticalScrollController.position.maxScrollExtent));
     }
   }
 

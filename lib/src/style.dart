@@ -228,7 +228,7 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
 
   /// The separator color between day views.
   ///
-  /// Defaults to zero.
+  /// Defaults to [Colors.black12].
   final Color dayViewSeparatorColor;
 
   /// Creates a new week view style instance.
@@ -244,7 +244,7 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
     double hourRowHeight,
     this.dayViewWidth,
     double dayViewSeparatorWidth,
-    this.dayViewSeparatorColor,
+    this.dayViewSeparatorColor = Colors.black12,
   })  : dayViewSeparatorWidth = (dayViewSeparatorWidth ?? 0) < 0 ? 0 : (dayViewSeparatorWidth ?? 0),
         super(
           dateFormatter: dateFormatter,
