@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/day_view.dart';
 import 'package:flutter_week_view/src/utils.dart';
 
+/// Builds an event text widget.
+typedef EventTextBuilder = Widget Function(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width);
+
 /// Represents a flutter week view event.
 class FlutterWeekViewEvent extends Comparable<FlutterWeekViewEvent> {
   /// The event title.

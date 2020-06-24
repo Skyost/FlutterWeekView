@@ -8,6 +8,9 @@ typedef DateFormatter = String Function(int year, int month, int day);
 /// Returns a string from a specified hour.
 typedef TimeFormatter = String Function(HourMinute time);
 
+/// Allows to builder a vertical divider according to the specified date.
+typedef VerticalDividerBuilder = VerticalDivider Function(DateTime date);
+
 /// Allows to style a zoomable header widget style.
 class ZoomableHeaderWidgetStyle {
   /// The day formatter. Defaults to YYYY-MM-DD, e.g., 2020-01-15.
@@ -181,9 +184,15 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
   /// Defaults to the entire width available for the week view widget.
   final double dayViewWidth;
 
-  /// The separator between the day views (see [ListView.separated]). Defaults to a
-  /// [VerticalDivider] with a width of exactly one device pixel.
-  final IndexedWidgetBuilder dayViewSeparatorBuilder;
+  /// The separator width between day views.
+  ///
+  /// Defaults to zero.
+  final double dayViewSeparatorWidth;
+
+  /// The separator color between day views.
+  ///
+  /// Defaults to zero.
+  final Color dayViewSeparatorColor;
 
   /// Creates a new week view style instance.
   const WeekViewStyle({
@@ -197,8 +206,10 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
     Color hoursColumnBackgroundColor,
     double hourRowHeight,
     this.dayViewWidth,
-    this.dayViewSeparatorBuilder = DefaultBuilders.defaultDayViewSeparatorBuilder,
-  }) : super(
+    double dayViewSeparatorWidth,
+    this.dayViewSeparatorColor,
+  })  : dayViewSeparatorWidth = (dayViewSeparatorWidth ?? 0) < 0 ? 0 : (dayViewSeparatorWidth ?? 0),
+        super(
           dateFormatter: dateFormatter,
           timeFormatter: timeFormatter,
           dayBarTextStyle: dayBarTextStyle,
@@ -222,7 +233,8 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
     Color hoursColumnBackgroundColor,
     double hourRowHeight,
     double dayViewWidth,
-    IndexedWidgetBuilder dayViewSeparatorBuilder,
+    double dayViewSeparatorWidth,
+    double dayViewSeparatorColor,
   }) =>
       WeekViewStyle(
         dateFormatter: dateFormatter ?? this.dateFormatter,
@@ -235,6 +247,7 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
         hoursColumnBackgroundColor: hoursColumnBackgroundColor ?? this.hoursColumnBackgroundColor,
         hourRowHeight: hourRowHeight ?? this.hourRowHeight,
         dayViewWidth: dayViewWidth ?? this.dayViewWidth,
-        dayViewSeparatorBuilder: dayViewSeparatorBuilder ?? this.dayViewSeparatorBuilder,
+        dayViewSeparatorWidth: dayViewSeparatorWidth ?? this.dayViewSeparatorWidth,
+        dayViewSeparatorColor: dayViewSeparatorColor ?? this.dayViewSeparatorColor,
       );
 }

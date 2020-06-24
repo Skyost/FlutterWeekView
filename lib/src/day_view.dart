@@ -8,9 +8,6 @@ import 'package:flutter_week_view/src/hour_minute.dart';
 import 'package:flutter_week_view/src/style.dart';
 import 'package:flutter_week_view/src/utils.dart';
 
-/// Builds an event text widget.
-typedef EventTextBuilder = Widget Function(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width);
-
 /// A (scrollable) day view which is able to display events, zoom and un-zoom and more !
 class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
   /// The events.

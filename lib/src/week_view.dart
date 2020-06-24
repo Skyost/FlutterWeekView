@@ -113,7 +113,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       double widgetWidth = (context.findRenderObject() as RenderBox).size.width;
       setState(() {
-        dayViewWidth = widgetWidth - widget.style.hoursColumnWidth;
+        dayViewWidth = widgetWidth - widget.style.hoursColumnWidth - widget.style.dayViewSeparatorWidth;
         scheduleScrolls();
       });
     });
@@ -176,7 +176,10 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
               physics: widget.inScrollableWidget ? MagnetScrollPhysics(itemSize: dayViewWidth) : const NeverScrollableScrollPhysics(),
               itemCount: widget.dateCount,
               itemBuilder: (context, index) => createDayView(index),
-              separatorBuilder: (context, index) => widget.style.dayViewSeparatorBuilder(context, index),
+              separatorBuilder: (context, index) => VerticalDivider(
+                width: widget.style.dayViewSeparatorWidth,
+                color: widget.style.dayViewSeparatorColor,
+              ),
             ),
           ),
           HoursColumn.fromHeadersWidgetState(parent: this),
@@ -186,8 +189,12 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   /// Creates the day view at the specified index.
   Widget createDayView(int index) {
     DateTime date = widget.dateCreator(index);
+    double width = dayViewWidth;
+    if(index + 1 == widget.dateCount) {
+      width -= widget.style.dayViewSeparatorWidth;
+    }
     return SizedBox(
-      width: dayViewWidth,
+      width: width,
       child: DayView(
         date: date,
         events: widget.events,
@@ -212,40 +219,29 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
       return false;
     }
 
-    DateTime now = DateTime.now();
-    DateTime today = DateTime(now.year, now.month, now.day);
-
-    bool hasCurrentDay = false;
-    if (widget.dateCount != null) {
-      for (int i = 0; i < widget.dateCount; i++) {
-        if (widget.dateCreator(i) == today) {
-          hasCurrentDay = true;
-          break;
-        }
-      }
-    }
-
-    return dayViewWidth != null && super.shouldScrollToCurrentTime && hasCurrentDay;
+    return dayViewWidth != null && super.shouldScrollToCurrentTime && todayDateIndex != null;
   }
 
   @override
   void scrollToCurrentTime() {
     super.scrollToCurrentTime();
 
-    int index = 0;
-    if (widget.dateCount != null) {
-      for (; index < widget.dateCount; index++) {
-        if (Utils.sameDay(widget.dateCreator(index))) {
-          break;
-        }
-      }
+    if (widget.dateCount == null || !widget.inScrollableWidget) {
+      return;
     }
 
-    double topOffset = calculateTopOffset(HourMinute.now());
-    double leftOffset = dayViewWidth * index;
-
-    widget.controller.verticalScrollController.jumpTo(math.min<double>(topOffset, widget.controller.verticalScrollController.position.maxScrollExtent));
+    double leftOffset = todayDateIndex * dayViewWidth;
     widget.controller.horizontalScrollController.jumpTo(math.min<double>(leftOffset, widget.controller.horizontalScrollController.position.maxScrollExtent));
+  }
+
+  /// Returns the current date index.
+  int get todayDateIndex {
+    for (int i = 0; i < widget.dateCount; i++) {
+      if (Utils.sameDay(widget.dateCreator(i))) {
+        return i;
+      }
+    }
+    return null;
   }
 }
 

@@ -59,7 +59,7 @@ return DayView(
       end: date.add(Duration(hours: 21)),
     ),
   ],
-  // style: const DayViewStyle(currentTimeCircleColor: Colors.pink), // This one is just an example. Try it !
+  style: const DayViewStyle(currentTimeCircleColor: Colors.pink),
 );
 ```
 
@@ -149,7 +149,7 @@ Here are the specific options of `FlutterWeekView` :
 
 Please note that you can create a `FlutterWeekView` instance using a builder.
 All previous options are still available but you don't need to provide the `dates` list.
-However, you need to provide a `DateCreator` (and a date count if you can, if it's impossible for you to do it then `scrollToCurrentTime` will have no effect).
+However, you need to provide a `DateCreator` (and a date count if you can, if it's impossible for you to do it then `scrollToCurrentTime` will not scroll to the current date).
 
 ## Contributions
 
