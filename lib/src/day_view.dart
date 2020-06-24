@@ -127,9 +127,12 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       ));
     }
 
-    if (widget.style.currentTimeRuleColor != null && Utils.sameDay(widget.date)) {
-      children.add(createCurrentTimeRule());
-      if (widget.style.currentTimeCircleColor != null) {
+    if (Utils.sameDay(widget.date)) {
+      if (widget.style.currentTimeRuleColor != null && widget.style.currentTimeRuleHeight > 0) {
+        children.add(createCurrentTimeRule());
+      }
+
+      if (widget.style.currentTimeCircleColor != null && widget.style.currentTimeCircleRadius > 0) {
         children.add(createCurrentTimeCircle());
       }
     }
@@ -167,18 +170,19 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
         left: widget.style.hoursColumnWidth,
         right: 0,
         child: Container(
-          height: 1,
+          height: widget.style.currentTimeRuleHeight,
           color: widget.style.currentTimeRuleColor,
         ),
       );
 
   /// Creates the current time circle, shown along with the horizontal rule in the day view column.
-  Widget createCurrentTimeCircle([double radius = 15]) => Positioned(
-        top: calculateTopOffset(HourMinute.now()) - (radius / 2),
-        right: 0,
+  Widget createCurrentTimeCircle() => Positioned(
+        top: calculateTopOffset(HourMinute.now()) - widget.style.currentTimeCircleRadius,
+        right: widget.style.currentTimeCirclePosition == CurrentTimeCirclePosition.right ? 0 : null,
+        left: widget.style.currentTimeCirclePosition == CurrentTimeCirclePosition.left ? 0 : null,
         child: Container(
-          height: radius,
-          width: radius,
+          height: widget.style.currentTimeCircleRadius * 2,
+          width: widget.style.currentTimeCircleRadius * 2,
           decoration: BoxDecoration(
             color: widget.style.currentTimeCircleColor,
             shape: BoxShape.circle,
@@ -189,7 +193,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   @override
   bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && Utils.sameDay(widget.date);
 
-  /// Resets the events positioning and background painter arguments.
+  /// Resets the events positioning.
   void reset() {
     eventsDrawProperties.clear();
     events = List.of(widget.events)..sort();
