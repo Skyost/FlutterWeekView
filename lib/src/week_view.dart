@@ -227,23 +227,17 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   }
 
   @override
-  bool get shouldScrollToCurrentTime {
-    if (widget.dateCount == null) {
-      return false;
-    }
-
-    return dayViewWidth != null && super.shouldScrollToCurrentTime && todayDateIndex != null;
-  }
+  bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && dayViewWidth != null && todayDateIndex != null;
 
   @override
   void scrollToCurrentTime() {
     super.scrollToCurrentTime();
 
-    if (widget.dateCount == null || horizontalScrollController == null) {
+    if (horizontalScrollController == null) {
       return;
     }
 
-    double leftOffset = todayDateIndex * (dayViewWidth + widget.style.dayViewSeparatorWidth);
+    double leftOffset = (todayDateIndex ?? 0) * (dayViewWidth + widget.style.dayViewSeparatorWidth);
     horizontalScrollController.jumpTo(math.min<double>(leftOffset, horizontalScrollController.position.maxScrollExtent));
   }
 
@@ -255,7 +249,8 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
 
   /// Returns the current date index.
   int get todayDateIndex {
-    for (int i = 0; i < widget.dateCount; i++) {
+    int dateCount = widget.dateCount ?? 0;
+    for (int i = 0; i < dateCount; i++) {
       if (Utils.sameDay(widget.dateCreator(i))) {
         return i;
       }
