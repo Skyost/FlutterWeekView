@@ -1,3 +1,11 @@
+## [0.3.1] - 2020-06-25
+
+* Rewritten the `WeekViewController` class.
+* Fixed a bug when `inScrollableWidget` was set to `false` in the Week View.
+* Improved documentation (thanks [luistrivelatto](https://github.com/luistrivelatto)).
+* Added a separator between day views on the Week View (thanks [luistrivelatto](https://github.com/luistrivelatto)).
+* Added some customisation options for current time rule and circle (thanks [AnkitPanchal10](https://github.com/AnkitPanchal10)).
+
 ## [0.3.0+2] - 2020-05-22
 
 * Fixed an issue with controllers.
@@ -28,6 +36,7 @@
 * Fixed a bug with events positioning.
 * Added the ability to change the initial hour / minute.
 * Fixed day bar positioning in `DayView`.
+* Enabled the possibility to decorate the events (thanks [kuemme01](https://github.com/kuemme01)).
 
 ## [0.2.1+4] - 2020-02-18
 
