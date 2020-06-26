@@ -177,7 +177,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   Widget createCurrentTimeCircle() => Positioned(
         top: calculateTopOffset(HourMinute.now()) - widget.style.currentTimeCircleRadius,
         right: widget.style.currentTimeCirclePosition == CurrentTimeCirclePosition.right ? 0 : null,
-        left: widget.style.currentTimeCirclePosition == CurrentTimeCirclePosition.left ? 0 : null,
+        left: widget.style.currentTimeCirclePosition == CurrentTimeCirclePosition.left ? widget.style.hoursColumnWidth : null,
         child: Container(
           height: widget.style.currentTimeCircleRadius * 2,
           width: widget.style.currentTimeCircleRadius * 2,
