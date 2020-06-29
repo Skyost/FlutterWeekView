@@ -61,7 +61,11 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     super.initState();
     scheduleScrolls();
     reset();
-    WidgetsBinding.instance.addPostFrameCallback((_) => setState(createEventsDrawProperties));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(createEventsDrawProperties);
+      }
+    });
   }
 
   @override
