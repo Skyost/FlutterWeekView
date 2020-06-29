@@ -21,6 +21,10 @@ class WeekView
   /// The number of dates.
   final int dateCount;
 
+  /// The index of the first visible date. If this is set, [scrollToCurrentTime] should be false, since
+  /// that takes priority over [initialDateIndex].
+  final int initialDateIndex;
+
   /// The date creator.
   final DateCreator dateCreator;
 
@@ -35,6 +39,7 @@ class WeekView
     List<FlutterWeekViewEvent> events,
     @required List<DateTime> dates,
     this.dayViewStyleBuilder = DefaultBuilders.defaultDayViewStyleBuilder,
+    int initialDateIndex,
     WeekViewStyle style,
     WeekViewController controller,
     bool inScrollableWidget = true,
@@ -46,6 +51,9 @@ class WeekView
     HoursColumnTappedDownCallback onHoursColumnTappedDown,
   })  : assert(dates != null && dates.isNotEmpty),
         assert(dayViewStyleBuilder != null),
+        assert(initialDateIndex == null ||
+            (initialDateIndex >= 0 && initialDateIndex < dates.length)),
+        initialDateIndex = initialDateIndex ?? 0,
         dateCount = dates?.length ?? 0,
         dateCreator =
             ((index) => DefaultBuilders.defaultDateCreator(dates, index)),
@@ -68,6 +76,7 @@ class WeekView
     this.dateCount,
     @required this.dateCreator,
     this.dayViewStyleBuilder = DefaultBuilders.defaultDayViewStyleBuilder,
+    int initialDateIndex,
     WeekViewStyle style,
     WeekViewController controller,
     bool inScrollableWidget = true,
@@ -80,6 +89,9 @@ class WeekView
   })  : assert(dateCount == null || dateCount >= 0),
         assert(dateCreator != null),
         assert(dayViewStyleBuilder != null),
+        assert(initialDateIndex == null ||
+            (initialDateIndex >= 0 && initialDateIndex < dateCount)),
+        initialDateIndex = initialDateIndex ?? 0,
         events = events ?? [],
         super(
           style: style ?? const WeekViewStyle(),
@@ -253,6 +265,20 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   }
 
   @override
+  void scrollToTime(HourMinute time) {
+    super.scrollToTime(time);
+
+    if (horizontalScrollController == null || widget.initialDateIndex <= 0) {
+      return;
+    }
+
+    double leftOffset = widget.initialDateIndex *
+        (dayViewWidth + widget.style.dayViewSeparatorWidth);
+    horizontalScrollController.jumpTo(math.min<double>(
+        leftOffset, horizontalScrollController.position.maxScrollExtent));
+  }
+
+  @override
   void dispose() {
     horizontalScrollController?.dispose();
     super.dispose();
@@ -336,8 +362,8 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
                 date: date ?? DateTime.now(),
                 height: widget.weekView.style.dayBarHeight,
                 backgroundColor: widget.weekView.style.dayBarBackgroundColor,
-                textStyle:
-                    dayViewStyle?.dayBarTextStyle ?? widget.weekView.style.dayBarTextStyle,
+                textStyle: dayViewStyle?.dayBarTextStyle ??
+                    widget.weekView.style.dayBarTextStyle,
                 dateFormatter: widget.weekView.style.dateFormatter,
               ),
             );
