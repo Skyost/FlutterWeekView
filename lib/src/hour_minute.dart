@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_week_view/src/utils.dart';
 
 /// Simply represents a hour and a minute.
 /// This is not a duration but more of an instant in the current day.
@@ -55,7 +56,7 @@ class HourMinute {
   }
 
   /// Creates a new hour minute time instance.
-  HourMinute.now() : this.fromDateTime(dateTime: DateTime.now());
+  HourMinute.now() : this.fromDateTime(dateTime: DateTimeGetter.now());
 
   /// Calculates the sum of this hour minute and another.
   HourMinute add(HourMinute other) {

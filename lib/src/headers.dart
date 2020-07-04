@@ -218,7 +218,7 @@ class DayBar extends StatelessWidget {
     @required ZoomableHeadersWidget parent,
     DateTime date,
   }) : this(
-          date: date ?? DateTime.now(),
+          date: date ?? DateTimeGetter.now(),
           height: parent.style.dayBarHeight,
           backgroundColor: parent.style.dayBarBackgroundColor,
           textStyle: parent.style.dayBarTextStyle,
