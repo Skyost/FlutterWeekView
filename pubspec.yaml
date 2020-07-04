@@ -11,4 +11,11 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
-  pedantic: ^1.9.0
+  pedantic: ^1.8.0
+  golden_toolkit: ^0.5.1
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  # This is needed for golden_toolkit's loading of fonts for testings to work.
+  uses-material-design: true
