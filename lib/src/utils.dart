@@ -15,7 +15,7 @@ class Utils {
 
   /// Checks whether the provided date is the same year, month and day than the target date.
   static bool sameDay(DateTime date, [DateTime target]) {
-    target = target ?? DateTime.now();
+    target = target ?? DateTimeGetter.now();
     return target.year == date.year && target.month == date.month && target.day == date.day;
   }
 
@@ -28,6 +28,22 @@ class Utils {
 
     return words.getRange(0, words.length - 1).join(' ');
   }
+}
+
+/// A class that allows getting the current time, with the benefit that it can be mocked in tests.
+///
+/// Instead of using DateTime.now() directly, use DateTimeGetter.now() ([DateTimeGetter] is a global
+/// variable set below). Then, on tests, DateTimeGetter can be replaced with a mock that returns
+/// predictable values.
+class NowDateTimeGetter {
+  DateTime now() => DateTime.now();
+}
+
+NowDateTimeGetter DateTimeGetter = NowDateTimeGetter();
+
+// This method is just for extra clarity the [DateTimeGetter] should only be modified on tests.
+void injectDateTimeGetterForTest(NowDateTimeGetter testDateTimeGetter) {
+  DateTimeGetter = testDateTimeGetter;
 }
 
 /// Contains default builders and formatters.
