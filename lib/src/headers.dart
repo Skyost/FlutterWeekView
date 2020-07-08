@@ -267,6 +267,9 @@ class HoursColumn extends StatelessWidget {
   /// The times to display on the side border.
   final List<HourMinute> _sideTimes;
 
+  /// The column decoration
+  final Decoration decoration;
+
   /// Creates a new hours column instance.
   HoursColumn({
     this.minimumTime = HourMinute.MIN,
@@ -277,6 +280,7 @@ class HoursColumn extends StatelessWidget {
     this.textStyle = const TextStyle(color: Colors.black54),
     this.timeFormatter = DefaultBuilders.defaultTimeFormatter,
     this.onHoursColumnTappedDown,
+    this.decoration,
   })  : assert(minimumTime != null),
         assert(maximumTime != null),
         assert(minimumTime < maximumTime),
@@ -297,14 +301,16 @@ class HoursColumn extends StatelessWidget {
           textStyle: parent.widget.style.hoursColumnTextStyle,
           timeFormatter: parent.widget.style.timeFormatter,
           onHoursColumnTappedDown: parent.widget.onHoursColumnTappedDown,
+          decoration: parent.widget.style.hoursDecoration,
         );
 
   @override
   Widget build(BuildContext context) {
     Widget child = Container(
+      decoration: decoration,
       height: topOffsetCalculator(maximumTime),
       width: width,
-      color: backgroundColor,
+      color: decoration == null ? backgroundColor : null,
       child: Stack(
         children: _sideTimes
             .map(

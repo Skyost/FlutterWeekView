@@ -40,6 +40,9 @@ class ZoomableHeaderWidgetStyle {
   /// An hour row height (with a zoom factor set to 1). Defaults to 60.
   final double hourRowHeight;
 
+  /// The decoration of hours
+  final Decoration hoursDecoration;
+
   /// Creates a new zoomable header widget style instance.
   const ZoomableHeaderWidgetStyle({
     DateFormatter dateFormatter,
@@ -50,6 +53,7 @@ class ZoomableHeaderWidgetStyle {
     TextStyle hoursColumnTextStyle,
     double hoursColumnWidth,
     Color hoursColumnBackgroundColor,
+    Decoration hoursDecoration,
     double hourRowHeight,
   })  : dateFormatter = dateFormatter ?? DefaultBuilders.defaultDateFormatter,
         timeFormatter = timeFormatter ?? DefaultBuilders.defaultTimeFormatter,
@@ -58,7 +62,8 @@ class ZoomableHeaderWidgetStyle {
         hoursColumnTextStyle = hoursColumnTextStyle ?? const TextStyle(color: Colors.black54),
         hoursColumnWidth = (hoursColumnWidth ?? 60) < 0 ? 0 : (hoursColumnWidth ?? 60),
         hoursColumnBackgroundColor = hoursColumnBackgroundColor ?? Colors.white,
-        hourRowHeight = (hourRowHeight ?? 60) < 0 ? 0 : (hourRowHeight ?? 60);
+        hourRowHeight = (hourRowHeight ?? 60) < 0 ? 0 : (hourRowHeight ?? 60),
+        hoursDecoration = hoursDecoration;
 }
 
 /// Allows to style a day view.
@@ -115,6 +120,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
     double hoursColumnWidth,
     Color hoursColumnBackgroundColor,
     double hourRowHeight,
+    Decoration hoursDecoration,
     Color backgroundColor,
     this.backgroundRulesColor = const Color(0x1A000000),
     this.currentTimeRuleColor = Colors.pink,
@@ -136,6 +142,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
           hoursColumnWidth: hoursColumnWidth,
           hoursColumnBackgroundColor: hoursColumnBackgroundColor,
           hourRowHeight: hourRowHeight,
+          hoursDecoration: hoursDecoration,
         );
 
   /// Creates a new day view style instance from a given date.
