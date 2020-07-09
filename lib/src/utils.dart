@@ -68,7 +68,7 @@ class DefaultBuilders {
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       TextSpan(
-        text: ' ' + dayView.style.timeFormatter(HourMinute.fromDateTime(dateTime: event.start)) + ' - ' + dayView.style.timeFormatter(HourMinute.fromDateTime(dateTime: event.end)) + '\n\n',
+        text: ' ' + dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.start)) + ' - ' + dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.end)) + '\n\n',
       ),
       TextSpan(
         text: event.description,
@@ -103,6 +103,9 @@ class DefaultBuilders {
 
   /// The default day view style builder.
   static DayViewStyle defaultDayViewStyleBuilder(DateTime date) => DayViewStyle.fromDate(date: date);
+
+  /// The default day view style builder.
+  static DayBarStyle defaultDayBarStyleBuilder(DateTime date) => DayBarStyle.fromDate(date: date);
 
   /// Returns whether this input exceeds the specified height.
   static bool _exceedHeight(List<TextSpan> input, TextStyle textStyle, double height, double width) {

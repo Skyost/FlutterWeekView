@@ -13,56 +13,20 @@ typedef VerticalDividerBuilder = VerticalDivider Function(DateTime date);
 
 /// Allows to style a zoomable header widget style.
 class ZoomableHeaderWidgetStyle {
-  /// The day formatter. Defaults to YYYY-MM-DD, e.g., 2020-01-15.
-  final DateFormatter dateFormatter;
-
-  /// The hour formatter. Defaults to 24-hour HH:MM, e.g., 15:00.
-  final TimeFormatter timeFormatter;
-
-  /// The day bar text style. Defaults to null, which will then format according to [DayBar.textStyle].
-  final TextStyle dayBarTextStyle;
-
-  /// The day bar height. Defaults to 40.
-  final double dayBarHeight;
-
-  /// The day bar background color. Defaults to light gray.
-  final Color dayBarBackgroundColor;
-
-  /// The hours column text style. Defaults to light gray text.
-  final TextStyle hoursColumnTextStyle;
-
-  /// The hours column width. Defaults to 60.
-  final double hoursColumnWidth;
-
-  /// The hours column background color. Defaults to [Colors.white].
-  final Color hoursColumnBackgroundColor;
-
-  /// An hour row height (with a zoom factor set to 1). Defaults to 60.
-  final double hourRowHeight;
+  /// The header size (usually limited to the day bar). Defaults to 60.
+  final double headerSize;
 
   /// Creates a new zoomable header widget style instance.
   const ZoomableHeaderWidgetStyle({
-    DateFormatter dateFormatter,
-    TimeFormatter timeFormatter,
-    this.dayBarTextStyle,
-    double dayBarHeight,
-    Color dayBarBackgroundColor,
-    TextStyle hoursColumnTextStyle,
-    double hoursColumnWidth,
-    Color hoursColumnBackgroundColor,
-    double hourRowHeight,
-  })  : dateFormatter = dateFormatter ?? DefaultBuilders.defaultDateFormatter,
-        timeFormatter = timeFormatter ?? DefaultBuilders.defaultTimeFormatter,
-        dayBarHeight = (dayBarHeight ?? 40) < 0 ? 0 : (dayBarHeight ?? 40),
-        dayBarBackgroundColor = dayBarBackgroundColor ?? const Color(0xFFEBEBEB),
-        hoursColumnTextStyle = hoursColumnTextStyle ?? const TextStyle(color: Colors.black54),
-        hoursColumnWidth = (hoursColumnWidth ?? 60) < 0 ? 0 : (hoursColumnWidth ?? 60),
-        hoursColumnBackgroundColor = hoursColumnBackgroundColor ?? Colors.white,
-        hourRowHeight = (hourRowHeight ?? 60) < 0 ? 0 : (hourRowHeight ?? 60);
+    double headerSize,
+  }) : headerSize = (headerSize ?? 40) < 0 ? 0 : (headerSize ?? 40);
 }
 
 /// Allows to style a day view.
 class DayViewStyle extends ZoomableHeaderWidgetStyle {
+  /// An hour row height (with a zoom factor set to 1). Defaults to 60.
+  final double hourRowHeight;
+
   /// The background color for the day view main column.
   ///
   /// Defaults to a light blue if the DayView's date is today (make sure to use [DayViewStyle.fromDate]
@@ -106,14 +70,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
 
   /// Creates a new day view style instance.
   const DayViewStyle({
-    DateFormatter dateFormatter,
-    TimeFormatter timeFormatter,
-    TextStyle dayBarTextStyle,
-    double dayBarHeight,
-    Color dayBarBackgroundColor,
-    TextStyle hoursColumnTextStyle,
-    double hoursColumnWidth,
-    Color hoursColumnBackgroundColor,
+    double headerSize,
     double hourRowHeight,
     Color backgroundColor,
     this.backgroundRulesColor = const Color(0x1A000000),
@@ -122,34 +79,18 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
     this.currentTimeCircleColor,
     double currentTimeCircleRadius,
     CurrentTimeCirclePosition currentTimeCirclePosition,
-  })  : backgroundColor = backgroundColor ?? const Color(0xFFF2F2F2),
+  })  : hourRowHeight = (hourRowHeight ?? 60) < 0 ? 0 : (hourRowHeight ?? 60),
+        backgroundColor = backgroundColor ?? const Color(0xFFF2F2F2),
         currentTimeRuleHeight = (currentTimeRuleHeight ?? 1) < 0 ? 0 : (currentTimeRuleHeight ?? 1),
         currentTimeCircleRadius = (currentTimeCircleRadius ?? 7.5) < 0 ? 0 : (currentTimeCircleRadius ?? 7.5),
         currentTimeCirclePosition = currentTimeCirclePosition ?? CurrentTimeCirclePosition.right,
-        super(
-          dateFormatter: dateFormatter,
-          timeFormatter: timeFormatter,
-          dayBarTextStyle: dayBarTextStyle,
-          dayBarHeight: dayBarHeight,
-          dayBarBackgroundColor: dayBarBackgroundColor,
-          hoursColumnTextStyle: hoursColumnTextStyle,
-          hoursColumnWidth: hoursColumnWidth,
-          hoursColumnBackgroundColor: hoursColumnBackgroundColor,
-          hourRowHeight: hourRowHeight,
-        );
+        super(headerSize: headerSize);
 
   /// Creates a new day view style instance from a given date.
   DayViewStyle.fromDate({
-    DateFormatter dateFormatter,
-    TimeFormatter timeFormatter,
-    TextStyle dayBarTextStyle,
-    double dayBarHeight,
-    Color dayBarBackgroundColor,
-    TextStyle hoursColumnTextStyle,
-    double hoursColumnWidth,
-    Color hoursColumnBackgroundColor,
-    double hourRowHeight,
     @required DateTime date,
+    double headerSize,
+    double hourRowHeight,
     Color backgroundRulesColor = const Color(0x1A000000),
     Color currentTimeRuleColor = Colors.pink,
     double currentTimeRuleHeight,
@@ -157,14 +98,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
     double currentTimeCircleRadius,
     CurrentTimeCirclePosition currentTimeCirclePosition,
   }) : this(
-          dateFormatter: dateFormatter,
-          timeFormatter: timeFormatter,
-          dayBarTextStyle: dayBarTextStyle,
-          dayBarHeight: dayBarHeight,
-          dayBarBackgroundColor: dayBarBackgroundColor,
-          hoursColumnTextStyle: hoursColumnTextStyle,
-          hoursColumnWidth: hoursColumnWidth,
-          hoursColumnBackgroundColor: hoursColumnBackgroundColor,
+          headerSize: headerSize,
           hourRowHeight: hourRowHeight,
           backgroundColor: Utils.sameDay(date) ? const Color(0xFFE3F5FF) : const Color(0xFFF2F2F2),
           backgroundRulesColor: backgroundRulesColor,
@@ -177,14 +111,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
 
   /// Allows to copy the current style instance with your own properties.
   DayViewStyle copyWith({
-    DateFormatter dateFormatter,
-    TimeFormatter timeFormatter,
-    TextStyle dayBarTextStyle,
-    double dayBarHeight,
-    Color dayBarBackgroundColor,
-    TextStyle hoursColumnTextStyle,
-    double hoursColumnWidth,
-    Color hoursColumnBackgroundColor,
+    double headerSize,
     double hourRowHeight,
     Color backgroundColor,
     Color backgroundRulesColor,
@@ -195,14 +122,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
     CurrentTimeCirclePosition currentTimeCirclePosition,
   }) =>
       DayViewStyle(
-        dateFormatter: dateFormatter ?? this.dateFormatter,
-        timeFormatter: timeFormatter ?? this.timeFormatter,
-        dayBarTextStyle: dayBarTextStyle ?? this.dayBarTextStyle,
-        dayBarHeight: dayBarHeight ?? this.dayBarHeight,
-        dayBarBackgroundColor: dayBarBackgroundColor ?? this.dayBarBackgroundColor,
-        hoursColumnTextStyle: hoursColumnTextStyle ?? this.hoursColumnTextStyle,
-        hoursColumnWidth: hoursColumnWidth ?? this.hoursColumnWidth,
-        hoursColumnBackgroundColor: hoursColumnBackgroundColor ?? this.hoursColumnBackgroundColor,
+        headerSize: headerSize ?? this.headerSize,
         hourRowHeight: hourRowHeight ?? this.hourRowHeight,
         backgroundColor: backgroundColor ?? this.backgroundColor,
         backgroundRulesColor: backgroundRulesColor ?? this.backgroundRulesColor,
@@ -233,59 +153,143 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
 
   /// Creates a new week view style instance.
   const WeekViewStyle({
-    DateFormatter dateFormatter,
-    TimeFormatter timeFormatter,
-    TextStyle dayBarTextStyle,
-    double dayBarHeight,
-    Color dayBarBackgroundColor,
-    TextStyle hoursColumnTextStyle,
-    double hoursColumnWidth,
-    Color hoursColumnBackgroundColor,
-    double hourRowHeight,
+    double headerSize,
     this.dayViewWidth,
     double dayViewSeparatorWidth,
     this.dayViewSeparatorColor = Colors.black12,
   })  : dayViewSeparatorWidth = (dayViewSeparatorWidth ?? 0) < 0 ? 0 : (dayViewSeparatorWidth ?? 0),
-        super(
-          dateFormatter: dateFormatter,
-          timeFormatter: timeFormatter,
-          dayBarTextStyle: dayBarTextStyle,
-          dayBarHeight: dayBarHeight,
-          dayBarBackgroundColor: dayBarBackgroundColor,
-          hoursColumnTextStyle: hoursColumnTextStyle,
-          hoursColumnWidth: hoursColumnWidth,
-          hoursColumnBackgroundColor: hoursColumnBackgroundColor,
-          hourRowHeight: hourRowHeight,
-        );
+        super(headerSize: headerSize);
 
   /// Allows to copy the current style instance with your own properties.
   WeekViewStyle copyWith({
-    DateFormatter dateFormatter,
-    TimeFormatter timeFormatter,
-    TextStyle dayBarTextStyle,
-    double dayBarHeight,
-    Color dayBarBackgroundColor,
-    TextStyle hoursColumnTextStyle,
-    double hoursColumnWidth,
-    Color hoursColumnBackgroundColor,
-    double hourRowHeight,
+    double headerSize,
     double dayViewWidth,
     double dayViewSeparatorWidth,
     double dayViewSeparatorColor,
   }) =>
       WeekViewStyle(
-        dateFormatter: dateFormatter ?? this.dateFormatter,
-        timeFormatter: timeFormatter ?? this.timeFormatter,
-        dayBarTextStyle: dayBarTextStyle ?? this.dayBarTextStyle,
-        dayBarHeight: dayBarHeight ?? this.dayBarHeight,
-        dayBarBackgroundColor: dayBarBackgroundColor ?? this.dayBarBackgroundColor,
-        hoursColumnTextStyle: hoursColumnTextStyle ?? this.hoursColumnTextStyle,
-        hoursColumnWidth: hoursColumnWidth ?? this.hoursColumnWidth,
-        hoursColumnBackgroundColor: hoursColumnBackgroundColor ?? this.hoursColumnBackgroundColor,
-        hourRowHeight: hourRowHeight ?? this.hourRowHeight,
+        headerSize: headerSize ?? this.headerSize,
         dayViewWidth: dayViewWidth ?? this.dayViewWidth,
         dayViewSeparatorWidth: dayViewSeparatorWidth ?? this.dayViewSeparatorWidth,
         dayViewSeparatorColor: dayViewSeparatorColor ?? this.dayViewSeparatorColor,
+      );
+}
+
+/// Allows to configure the hours column style.
+class HoursColumnStyle {
+  /// The hour formatter. Defaults to 24-hour HH:MM, e.g., 15:00.
+  final TimeFormatter timeFormatter;
+
+  /// The hours column text style. Defaults to light gray text.
+  final TextStyle textStyle;
+
+  /// The hours column width. Defaults to 60.
+  final double width;
+
+  /// The hours column background color. Defaults to [Colors.white].
+  final Color color;
+
+  /// The hours column decoration. Defaults to null.
+  final Decoration decoration;
+
+  /// The hours text alignment. Defaults to [Alignment.center].
+  final Alignment textAlignment;
+
+  /// Creates a new hour column style instance.
+  const HoursColumnStyle({
+    TimeFormatter timeFormatter,
+    TextStyle textStyle,
+    double width,
+    Color color,
+    this.decoration,
+    Alignment textAlignment,
+  })  : timeFormatter = timeFormatter ?? DefaultBuilders.defaultTimeFormatter,
+        textStyle = textStyle ?? const TextStyle(color: Colors.black54),
+        width = (width ?? 60) < 0 ? 0 : (width ?? 60),
+        color = color ?? Colors.white,
+        textAlignment = textAlignment ?? Alignment.center;
+
+  /// Allows to copy the current style instance with your own properties.
+  HoursColumnStyle copyWith({
+    TimeFormatter timeFormatter,
+    TextStyle textStyle,
+    double width,
+    Color color,
+    Decoration decoration,
+    Alignment textAlignment,
+  }) =>
+      HoursColumnStyle(
+        timeFormatter: timeFormatter ?? this.timeFormatter,
+        textStyle: textStyle ?? this.textStyle,
+        width: width ?? this.width,
+        color: color ?? this.color,
+        decoration: decoration ?? this.decoration,
+        textAlignment: textAlignment ?? this.textAlignment,
+      );
+}
+
+/// Allows to configure the day bar style.
+class DayBarStyle {
+  /// The day formatter. Defaults to YYYY-MM-DD, e.g., 2020-01-15.
+  final DateFormatter dateFormatter;
+
+  /// The day bar text style. Defaults to null, which will then format according to [DayBar.textStyle].
+  final TextStyle textStyle;
+
+  /// The day bar background color. Defaults to light gray.
+  final Color color;
+
+  /// The day bar decoration. Defaults to null.
+  final Decoration decoration;
+
+  /// The day bar text alignment. Defaults to [Alignment.center].
+  final Alignment textAlignment;
+
+  /// Creates a new day bar style instance.
+  const DayBarStyle({
+    DateFormatter dateFormatter,
+    this.textStyle,
+    Color color,
+    this.decoration,
+    Alignment textAlignment,
+  })  : dateFormatter = dateFormatter ?? DefaultBuilders.defaultDateFormatter,
+        color = color ?? const Color(0xFFEBEBEB),
+        textAlignment = textAlignment ?? Alignment.center;
+
+  /// Creates a new day bar style according to the specified date.
+  DayBarStyle.fromDate({
+    @required DateTime date,
+    DateFormatter dateFormatter,
+    TextStyle textStyle,
+    Color color,
+    Decoration decoration,
+    Alignment textAlignment,
+  }) : this(
+          dateFormatter: dateFormatter,
+          textStyle: textStyle ??
+              TextStyle(
+                color: Utils.sameDay(date) ? Colors.blue[800] : Colors.black54,
+                fontWeight: FontWeight.bold,
+              ),
+          color: color,
+          decoration: decoration,
+          textAlignment: textAlignment,
+        );
+
+  /// Allows to copy the current style instance with your own properties.
+  DayBarStyle copyWith({
+    DateFormatter dateFormatter,
+    TextStyle textStyle,
+    Color color,
+    Decoration decoration,
+    Alignment textAlignment,
+  }) =>
+      DayBarStyle(
+        dateFormatter: dateFormatter ?? this.dateFormatter,
+        textStyle: textStyle ?? this.textStyle,
+        color: color ?? this.color,
+        decoration: decoration ?? this.decoration,
+        textAlignment: textAlignment ?? this.textAlignment,
       );
 }
 

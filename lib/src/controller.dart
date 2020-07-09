@@ -165,6 +165,7 @@ class WeekViewController extends ZoomController {
   void dispose() {
     super.dispose();
     _dayViewControllers.values.forEach((controller) => controller.dispose());
+    _dayViewControllers.clear();
   }
 
   /// Triggered when a day view controller is disposed.

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/controller.dart';
 import 'package:flutter_week_view/src/hour_minute.dart';
@@ -16,6 +17,9 @@ typedef HoursColumnTappedDownCallback = Function(HourMinute time);
 abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C extends ZoomController> extends StatefulWidget {
   /// The widget style.
   final S style;
+
+  /// The hours column style.
+  final HoursColumnStyle hoursColumnStyle;
 
   /// Whether the widget should automatically be placed in a scrollable widget.
   final bool inScrollableWidget;
@@ -46,6 +50,7 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
   /// Creates a new zoomable headers widget instance.
   const ZoomableHeadersWidget({
     @required this.style,
+    HoursColumnStyle hoursColumnStyle,
     @required this.inScrollableWidget,
     this.minimumTime = HourMinute.MIN,
     this.maximumTime = HourMinute.MAX,
@@ -54,16 +59,15 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
     @required this.userZoomable,
     this.onHoursColumnTappedDown,
     @required this.controller,
-  })  : assert(minimumTime != null),
+  })  : hoursColumnStyle = hoursColumnStyle ?? const HoursColumnStyle(),
+        assert(style != null),
+        assert(minimumTime != null),
         assert(maximumTime != null),
         assert(minimumTime < maximumTime),
         assert(initialTime != null),
         assert(inScrollableWidget != null),
         assert(scrollToCurrentTime != null),
         assert(userZoomable != null);
-
-  /// Calculates the hour row height.
-  double _calculateHourRowHeight([C controller]) => style.hourRowHeight * (controller ?? this.controller).zoomFactor;
 }
 
 /// An abstract widget state that shows both headers and can be zoomed.
@@ -77,10 +81,10 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
   @override
   void initState() {
     super.initState();
-    hourRowHeight = widget._calculateHourRowHeight();
+    hourRowHeight = _calculateHourRowHeight();
     widget.controller.addListener(this);
 
-    if(widget.inScrollableWidget) {
+    if (widget.inScrollableWidget) {
       verticalScrollController = ScrollController();
     }
   }
@@ -93,7 +97,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
       widget.controller.changeZoomFactor(oldWidget.controller.zoomFactor, notify: false);
     }
 
-    hourRowHeight = widget._calculateHourRowHeight();
+    hourRowHeight = _calculateHourRowHeight();
     oldWidget.controller.removeListener(this);
     widget.controller.addListener(this);
   }
@@ -104,10 +108,10 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
       return;
     }
 
-    double hourRowHeight = widget._calculateHourRowHeight(controller);
+    double hourRowHeight = _calculateHourRowHeight(controller);
     if (verticalScrollController != null) {
       double widgetHeight = (context.findRenderObject() as RenderBox).size.height;
-      double maxPixels = calculateHeight(hourRowHeight) - widgetHeight + widget.style.dayBarHeight;
+      double maxPixels = calculateHeight(hourRowHeight) - widgetHeight + widget.style.headerSize;
 
       if (hourRowHeight < this.hourRowHeight && verticalScrollController.position.pixels > maxPixels) {
         verticalScrollController.jumpTo(maxPixels);
@@ -127,6 +131,9 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
     verticalScrollController?.dispose();
     super.dispose();
   }
+
+  /// Returns the current day view style.
+  DayViewStyle get currentDayViewStyle;
 
   /// Schedules both scroll if needed.
   void scheduleScrolls() {
@@ -177,6 +184,9 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
 
   /// Calculates the widget height.
   double calculateHeight([double hourRowHeight]) => calculateTopOffset(widget.maximumTime, hourRowHeight: hourRowHeight);
+
+  /// Calculates the hour row height.
+  double _calculateHourRowHeight([ZoomController controller]) => currentDayViewStyle.hourRowHeight * (controller ?? widget.controller).zoomFactor;
 }
 
 /// A bar which is showing a day.
@@ -184,56 +194,40 @@ class DayBar extends StatelessWidget {
   /// The date.
   final DateTime date;
 
-  /// The height. Defaults to 40.
+  /// The widget style.
+  final DayBarStyle style;
+
+  /// The widget height.
   final double height;
 
-  /// The background color. Defaults to light gray.
-  final Color backgroundColor;
+  /// The width width.
+  final double width;
 
-  /// The bar text style. Defaults to a bold font, blue if [date] is today, gray otherwise.
-  final TextStyle textStyle;
-
-  /// The day formatter. Defaults to YYYY-MM-DD, e.g., 2020-01-15.
-  final DateFormatter dateFormatter;
+  /// The hours column width.
+  final double hoursColumnWidth;
 
   /// Creates a new day bar instance.
   DayBar({
     @required DateTime date,
-    double height = 40,
-    Color backgroundColor,
-    TextStyle textStyle,
-    DateFormatter dateFormatter,
+    @required this.style,
+    this.height,
+    this.width,
+    this.hoursColumnWidth,
   })  : assert(date != null),
-        date = DateTime(date.year, date.month, date.day),
-        height = math.max(0, height ?? 0),
-        backgroundColor = backgroundColor ?? const Color(0xFFEBEBEB),
-        textStyle = textStyle ?? TextStyle(
-          color: Utils.sameDay(date) ? Colors.blue[800] : Colors.black54,
-          fontWeight: FontWeight.bold,
-        ),
-        dateFormatter = dateFormatter ?? DefaultBuilders.defaultDateFormatter;
-
-  /// Creates a new day bar instance from a headers widget instance.
-  DayBar.fromHeadersWidget({
-    @required ZoomableHeadersWidget parent,
-    DateTime date,
-  }) : this(
-          date: date ?? DateTimeGetter.now(),
-          height: parent.style.dayBarHeight,
-          backgroundColor: parent.style.dayBarBackgroundColor,
-          textStyle: parent.style.dayBarTextStyle,
-          dateFormatter: parent.style.dateFormatter,
-        );
+        assert(style != null),
+        date = DateTime(date.year, date.month, date.day);
 
   @override
   Widget build(BuildContext context) => Container(
+        padding: hoursColumnWidth == null ? null : EdgeInsets.only(left: hoursColumnWidth),
         height: height,
-        color: backgroundColor,
-        child: Center(
-          child: Text(
-            dateFormatter(date.year, date.month, date.day),
-            style: textStyle,
-          ),
+        width: width,
+        color: style.decoration == null ? style.color : null,
+        decoration: style.decoration,
+        alignment: style.textAlignment,
+        child: Text(
+          style.dateFormatter(date.year, date.month, date.day),
+          style: style.textStyle,
         ),
       );
 }
@@ -249,17 +243,8 @@ class HoursColumn extends StatelessWidget {
   /// The top offset calculator.
   final TopOffsetCalculator topOffsetCalculator;
 
-  /// The width.
-  final double width;
-
-  /// The background color.
-  final Color backgroundColor;
-
-  /// The text style.
-  final TextStyle textStyle;
-
-  /// The hour formatter.
-  final TimeFormatter timeFormatter;
+  /// The widget style.
+  final HoursColumnStyle style;
 
   /// Triggered when the hours column has been tapped down.
   final HoursColumnTappedDownCallback onHoursColumnTappedDown;
@@ -272,17 +257,13 @@ class HoursColumn extends StatelessWidget {
     this.minimumTime = HourMinute.MIN,
     this.maximumTime = HourMinute.MAX,
     TopOffsetCalculator topOffsetCalculator,
-    double width = 60,
-    this.backgroundColor = Colors.white,
-    this.textStyle = const TextStyle(color: Colors.black54),
-    this.timeFormatter = DefaultBuilders.defaultTimeFormatter,
+    HoursColumnStyle style,
     this.onHoursColumnTappedDown,
   })  : assert(minimumTime != null),
         assert(maximumTime != null),
         assert(minimumTime < maximumTime),
         topOffsetCalculator = topOffsetCalculator ?? DefaultBuilders.defaultTopOffsetCalculator,
-        width = math.max(0, width ?? 0),
-        assert(timeFormatter != null),
+        style = style ?? const HoursColumnStyle(),
         _sideTimes = getSideTimes(minimumTime, maximumTime);
 
   /// Creates a new hours column instance from a headers widget instance.
@@ -292,10 +273,7 @@ class HoursColumn extends StatelessWidget {
           minimumTime: parent.widget.minimumTime,
           maximumTime: parent.widget.maximumTime,
           topOffsetCalculator: parent.calculateTopOffset,
-          width: parent.widget.style.hoursColumnWidth,
-          backgroundColor: parent.widget.style.hoursColumnBackgroundColor,
-          textStyle: parent.widget.style.hoursColumnTextStyle,
-          timeFormatter: parent.widget.style.timeFormatter,
+          style: parent.widget.hoursColumnStyle,
           onHoursColumnTappedDown: parent.widget.onHoursColumnTappedDown,
         );
 
@@ -303,19 +281,22 @@ class HoursColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget child = Container(
       height: topOffsetCalculator(maximumTime),
-      width: width,
-      color: backgroundColor,
+      width: style.width,
+      color: style.decoration == null ? style.color : null,
+      decoration: style.decoration,
       child: Stack(
         children: _sideTimes
             .map(
               (time) => Positioned(
-                top: topOffsetCalculator(time) - ((textStyle?.fontSize ?? 14) / 2),
+                top: topOffsetCalculator(time) - ((style.textStyle?.fontSize ?? 14) / 2),
                 left: 0,
                 right: 0,
-                child: Text(
-                  timeFormatter(time),
-                  style: textStyle,
-                  textAlign: TextAlign.center,
+                child: Align(
+                  alignment: style.textAlignment,
+                  child: Text(
+                    style.timeFormatter(time),
+                    style: style.textStyle,
+                  ),
                 ),
               ),
             )

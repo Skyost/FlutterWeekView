@@ -16,11 +16,16 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
   /// The day view date.
   final DateTime date;
 
+  /// The day bar style.
+  final DayBarStyle dayBarStyle;
+
   /// Creates a new day view instance.
   DayView({
     List<FlutterWeekViewEvent> events,
     @required DateTime date,
     DayViewStyle style,
+    HoursColumnStyle hoursColumnStyle,
+    DayBarStyle dayBarStyle,
     DayViewController controller,
     bool inScrollableWidget = true,
     HourMinute minimumTime = HourMinute.MIN,
@@ -32,8 +37,10 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
   })  : assert(date != null),
         date = DateTime(date.year, date.month, date.day),
         events = events ?? [],
+        dayBarStyle = dayBarStyle ?? DayBarStyle.fromDate(date: date),
         super(
           style: style ?? DayViewStyle.fromDate(date: date),
+          hoursColumnStyle: hoursColumnStyle,
           controller: controller ?? DayViewController(),
           inScrollableWidget: inScrollableWidget,
           minimumTime: minimumTime,
@@ -78,34 +85,30 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
 
   @override
   Widget build(BuildContext context) {
-    Widget mainStack = Stack(
-      children: [
-        createMainWidget(),
-        Positioned(
-          top: 0,
-          left: widget.style.hoursColumnWidth,
-          right: 0,
-          child: DayBar.fromHeadersWidget(
-            parent: widget,
+    Widget mainWidget = createMainWidget();
+    if (widget.style.headerSize > 0 || widget.hoursColumnStyle.width > 0) {
+      mainWidget = Stack(
+        children: [
+          mainWidget,
+          DayBar(
             date: widget.date,
+            style: widget.dayBarStyle,
+            height: widget.style.headerSize,
+            width: double.infinity,
+            hoursColumnWidth: widget.hoursColumnStyle.width,
           ),
-        ),
-        Container(
-          height: widget.style.dayBarHeight,
-          width: widget.style.hoursColumnWidth,
-          color: widget.style.dayBarBackgroundColor,
-        ),
-      ],
-    );
+        ],
+      );
+    }
 
     if (!isZoomable) {
-      return mainStack;
+      return mainWidget;
     }
 
     return GestureDetector(
       onScaleStart: (_) => widget.controller.scaleStart(),
       onScaleUpdate: widget.controller.scaleUpdate,
-      child: mainStack,
+      child: mainWidget,
     );
   }
 
@@ -118,10 +121,16 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     }
   }
 
+  @override
+  DayViewStyle get currentDayViewStyle => widget.style;
+
+  @override
+  bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && Utils.sameDay(widget.date);
+
   /// Creates the main widget, with a hours column and an events column.
   Widget createMainWidget() {
     List<Widget> children = eventsDrawProperties.entries.map((entry) => entry.value.createWidget(context, widget, entry.key)).toList();
-    if (widget.style.hoursColumnWidth > 0) {
+    if (widget.hoursColumnStyle.width > 0) {
       children.add(Positioned(
         top: 0,
         left: 0,
@@ -154,7 +163,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     }
 
     return Padding(
-      padding: EdgeInsets.only(top: widget.style.dayBarHeight),
+      padding: EdgeInsets.only(top: widget.style.headerSize),
       child: mainWidget,
     );
   }
@@ -169,7 +178,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   /// Creates the horizontal rule in the day view column, positioned at the current time of the day.
   Widget createCurrentTimeRule() => Positioned(
         top: calculateTopOffset(HourMinute.now()),
-        left: widget.style.hoursColumnWidth,
+        left: widget.hoursColumnStyle.width,
         right: 0,
         child: Container(
           height: widget.style.currentTimeRuleHeight,
@@ -181,7 +190,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   Widget createCurrentTimeCircle() => Positioned(
         top: calculateTopOffset(HourMinute.now()) - widget.style.currentTimeCircleRadius,
         right: widget.style.currentTimeCirclePosition == CurrentTimeCirclePosition.right ? 0 : null,
-        left: widget.style.currentTimeCirclePosition == CurrentTimeCirclePosition.left ? widget.style.hoursColumnWidth : null,
+        left: widget.style.currentTimeCirclePosition == CurrentTimeCirclePosition.left ? widget.hoursColumnStyle.width : null,
         child: Container(
           height: widget.style.currentTimeCircleRadius * 2,
           width: widget.style.currentTimeCircleRadius * 2,
@@ -191,9 +200,6 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
           ),
         ),
       );
-
-  @override
-  bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && Utils.sameDay(widget.date);
 
   /// Resets the events positioning.
   void reset() {
@@ -220,8 +226,8 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     }
 
     if (eventsGrid.drawPropertiesList.isNotEmpty) {
-      double eventsColumnWidth = (context.findRenderObject() as RenderBox).size.width - widget.style.hoursColumnWidth;
-      eventsGrid.processEvents(widget.style.hoursColumnWidth, eventsColumnWidth);
+      double eventsColumnWidth = (context.findRenderObject() as RenderBox).size.width - widget.hoursColumnStyle.width;
+      eventsGrid.processEvents(widget.hoursColumnStyle.width, eventsColumnWidth);
     }
   }
 }
@@ -273,7 +279,7 @@ class _EventsColumnBackgroundPainter extends CustomPainter {
   }
 }
 
-/// An utility class that allows to position events in a grid.
+/// An useful class that allows to position events in a grid.
 /// Thanks to https://stackoverflow.com/a/11323909/3608831.
 class _EventsGrid {
   /// Events draw properties added to the grid.
