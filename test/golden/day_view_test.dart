@@ -173,15 +173,7 @@ void main() {
         scrollToCurrentTime: false,
         initialTime: const HourMinute(hour: 7),
         style: DayViewStyle(
-          dateFormatter: (year, month, day) => '$day/$month/$year',
-          timeFormatter: (hourMinute) =>
-              '${hourMinute.hour}h${hourMinute.minute.toString().padLeft(2, '0')}',
-          dayBarTextStyle: const TextStyle(color: Colors.green),
-          dayBarHeight: 60.0,
-          dayBarBackgroundColor: Colors.yellow,
-          hoursColumnTextStyle: const TextStyle(color: Colors.green),
-          hoursColumnWidth: 80.0,
-          hoursColumnBackgroundColor: Colors.orange[200],
+          headerSize: 60.0,
           hourRowHeight: 80.0,
           backgroundColor: Colors.black54,
           backgroundRulesColor: Colors.white,
@@ -190,6 +182,17 @@ void main() {
           currentTimeCircleColor: Colors.yellow,
           currentTimeCircleRadius: 20,
           currentTimeCirclePosition: CurrentTimeCirclePosition.left,
+        ),
+        dayBarStyle: DayBarStyle(
+          dateFormatter: (year, month, day) => '$day/$month/$year',
+          textStyle: const TextStyle(color: Colors.green),
+          color: Colors.yellow,
+        ),
+        hoursColumnStyle: HoursColumnStyle(
+          timeFormatter: (hourMinute) => '${hourMinute.hour}h${hourMinute.minute.toString().padLeft(2, '0')}',
+          textStyle: const TextStyle(color: Colors.green),
+          width: 80.0,
+          color: Colors.orange[200],
         ),
         events: [
           FlutterWeekViewEvent(

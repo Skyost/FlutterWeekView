@@ -78,15 +78,12 @@ void main() {
     await screenMatchesGolden(tester, 'week_view_starts_at_initial_time');
   });
 
-  testGoldens('Week view correctly shows events which span more than 1 day',
-      (WidgetTester tester) async {
+  testGoldens('Week view correctly shows events which span more than 1 day', (WidgetTester tester) async {
     await tester.pumpWidgetBuilder(
       WeekView(
         dates: dates,
-        style: const WeekViewStyle(
-          hourRowHeight: 30.0,
-          dayViewWidth: 90.0,
-        ),
+        style: const WeekViewStyle(dayViewWidth: 90.0),
+        dayViewStyleBuilder: (date) => const DayViewStyle(hourRowHeight: 30.0),
         events: [
           FlutterWeekViewEvent(
             title: 'An event 1',
@@ -122,83 +119,31 @@ void main() {
         scrollToCurrentTime: false,
         initialTime: const HourMinute(hour: 6),
         events: events,
-        style: WeekViewStyle(
-          dateFormatter: (year, month, day) => '$day/$month/$year',
-          timeFormatter: (hourMinute) =>
-              '${hourMinute.hour}h${hourMinute.minute.toString().padLeft(2, '0')}',
-          dayBarTextStyle: const TextStyle(color: Colors.green),
-          dayBarHeight: 60.0,
-          dayBarBackgroundColor: Colors.yellow,
-          hoursColumnTextStyle: const TextStyle(color: Colors.green),
-          hoursColumnWidth: 80.0,
-          hoursColumnBackgroundColor: Colors.orange[200],
-          hourRowHeight: 80.0,
+        style: const WeekViewStyle(
+          headerSize: 60.0,
           dayViewWidth: 80.0,
           dayViewSeparatorWidth: 5.0,
           dayViewSeparatorColor: Colors.yellow,
+        ),
+        dayBarStyleBuilder: (date) => DayBarStyle(
+          dateFormatter: (year, month, day) => '$day/$month/$year',
+          textStyle: const TextStyle(color: Colors.green),
+          color: Colors.yellow,
+        ),
+        hoursColumnStyle: HoursColumnStyle(
+          timeFormatter: (hourMinute) => '${hourMinute.hour}h${hourMinute.minute.toString().padLeft(2, '0')}',
+          textStyle: const TextStyle(color: Colors.green),
+          width: 80.0,
+          color: Colors.orange[200],
+        ),
+        dayViewStyleBuilder: (date) => const DayViewStyle(
+            hourRowHeight: 80.0
         ),
       ),
       surfaceSize: Device.iphone11.size,
     );
 
     await screenMatchesGolden(tester, 'week_view_styling_options');
-  });
-
-  testGoldens('dayViewStyleBuilder arg takes priority over WeekViewStyle',
-      (WidgetTester tester) async {
-    await tester.pumpWidgetBuilder(
-      WeekView(
-        dates: dates,
-        scrollToCurrentTime: false,
-        initialTime: const HourMinute(hour: 6),
-        events: events,
-        style: WeekViewStyle(
-          dateFormatter: (year, month, day) => '$day',
-          timeFormatter: (hourMinute) => '${hourMinute.hour}',
-          dayBarTextStyle: const TextStyle(color: Colors.black),
-          dayBarBackgroundColor: Colors.pink,
-          hoursColumnTextStyle: const TextStyle(color: Colors.black),
-          hoursColumnBackgroundColor: Colors.pink,
-          // These params are week-view only
-          dayViewWidth: 80.0,
-          dayViewSeparatorWidth: 5.0,
-          dayViewSeparatorColor: Colors.yellow,
-          // These 3 params should have priority over the dayViewStyleBuilder's ones
-          hourRowHeight: 80.0,
-          dayBarHeight: 60.0,
-          hoursColumnWidth: 80.0,
-        ),
-        dayViewStyleBuilder: (date) => DayViewStyle(
-          dateFormatter: (year, month, day) => '$day/$month/$year',
-          timeFormatter: (hourMinute) =>
-              '${hourMinute.hour}h${hourMinute.minute.toString().padLeft(2, '0')}',
-          dayBarTextStyle: const TextStyle(color: Colors.green),
-          dayBarBackgroundColor: Colors.yellow,
-          hoursColumnTextStyle: const TextStyle(color: Colors.green),
-          hoursColumnBackgroundColor: Colors.pink[200],
-          // These params are not present in WeekViewStyle
-          backgroundColor: Colors.black54,
-          backgroundRulesColor: Colors.white,
-          currentTimeRuleColor: Colors.red,
-          currentTimeRuleHeight: 5,
-          currentTimeCircleColor: Colors.yellow,
-          currentTimeCircleRadius: 20,
-          currentTimeCirclePosition: CurrentTimeCirclePosition.left,
-          // These 3 params should be ignored by the WeekView in favor of the style's same params
-          hourRowHeight: 10000.0,
-          dayBarHeight: 10000.0,
-          hoursColumnWidth: 10000.0,
-        ),
-      ),
-      surfaceSize: Device.iphone11.size,
-    );
-
-    await screenMatchesGolden(tester, 'week_view_dayview_style_builder');
-
-    assert(
-        false,
-        'This test should currently fail, see issue #43: '
-        'https://github.com/Skyost/FlutterWeekView/issues/43');
   });
 
   testGoldens('Week view minimum and maximum time are respected', (WidgetTester tester) async {
