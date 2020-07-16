@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_week_view/flutter_week_view.dart';
+import 'package:flutter_week_view/src/headers.dart';
 import 'package:flutter_week_view/src/hour_minute.dart';
 import 'package:flutter_week_view/src/utils.dart';
 
@@ -86,7 +88,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
         currentTimeCirclePosition = currentTimeCirclePosition ?? CurrentTimeCirclePosition.right,
         super(headerSize: headerSize);
 
-  /// Creates a new day view style instance from a given date.
+  /// Allows to automatically customize the day view background color according to the specified date.
   DayViewStyle.fromDate({
     @required DateTime date,
     double headerSize,
@@ -100,7 +102,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
   }) : this(
           headerSize: headerSize,
           hourRowHeight: hourRowHeight,
-          backgroundColor: Utils.sameDay(date) ? const Color(0xFFE3F5FF) : const Color(0xFFF2F2F2),
+          backgroundColor: Utils.sameDay(date) ? const Color(0xFFE3F5FF) : null,
           backgroundRulesColor: backgroundRulesColor,
           currentTimeRuleColor: currentTimeRuleColor,
           currentTimeRuleHeight: currentTimeRuleHeight,
@@ -131,6 +133,18 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
         currentTimeCircleColor: currentTimeCircleColor ?? this.currentTimeCircleColor,
         currentTimeCircleRadius: currentTimeCircleRadius ?? this.currentTimeCircleRadius,
         currentTimeCirclePosition: currentTimeCirclePosition ?? this.currentTimeCirclePosition,
+      );
+
+  /// Creates the background painter.
+  CustomPainter createBackgroundPainter({
+    @required DayView dayView,
+    @required TopOffsetCalculator topOffsetCalculator,
+  }) =>
+      _EventsColumnBackgroundPainter(
+        minimumTime: dayView.minimumTime,
+        maximumTime: dayView.maximumTime,
+        topOffsetCalculator: topOffsetCalculator,
+        dayViewStyle: this,
       );
 }
 
@@ -300,4 +314,47 @@ enum CurrentTimeCirclePosition {
 
   /// Whether it should be placed at the end of the current time rule.
   right,
+}
+
+/// The events column background painter.
+class _EventsColumnBackgroundPainter extends CustomPainter {
+  /// The minimum time to display.
+  final HourMinute minimumTime;
+
+  /// The maximum time to display.
+  final HourMinute maximumTime;
+
+  /// The top offset calculator.
+  final TopOffsetCalculator topOffsetCalculator;
+
+  /// The day view style.
+  final DayViewStyle dayViewStyle;
+
+  /// Creates a new events column background painter.
+  _EventsColumnBackgroundPainter({
+    @required this.minimumTime,
+    @required this.maximumTime,
+    @required this.topOffsetCalculator,
+    @required this.dayViewStyle,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (dayViewStyle.backgroundColor != null) {
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()..color = dayViewStyle.backgroundColor);
+    }
+
+    if (dayViewStyle.backgroundRulesColor != null) {
+      final List<HourMinute> sideTimes = HoursColumn.getSideTimes(minimumTime, maximumTime);
+      for (HourMinute time in sideTimes) {
+        double topOffset = topOffsetCalculator(time);
+        canvas.drawLine(Offset(0, topOffset), Offset(size.width, topOffset), Paint()..color = dayViewStyle.backgroundRulesColor);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_EventsColumnBackgroundPainter oldDayViewBackgroundPainter) {
+    return dayViewStyle.backgroundColor != oldDayViewBackgroundPainter.dayViewStyle.backgroundColor || dayViewStyle.backgroundRulesColor != oldDayViewBackgroundPainter.dayViewStyle.backgroundRulesColor || topOffsetCalculator != oldDayViewBackgroundPainter.topOffsetCalculator;
+  }
 }

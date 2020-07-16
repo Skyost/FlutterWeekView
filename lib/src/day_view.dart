@@ -180,7 +180,10 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   /// Creates the background widgets that should be added to a stack.
   Widget createBackground() => Positioned.fill(
         child: CustomPaint(
-          painter: _EventsColumnBackgroundPainter.fromDayViewState(parent: this),
+          painter: widget.style.createBackgroundPainter(
+            dayView: widget,
+            topOffsetCalculator: calculateTopOffset,
+          ),
         ),
       );
 
@@ -238,53 +241,6 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       double eventsColumnWidth = (context.findRenderObject() as RenderBox).size.width - widget.hoursColumnStyle.width;
       eventsGrid.processEvents(widget.hoursColumnStyle.width, eventsColumnWidth);
     }
-  }
-}
-
-/// The events column background painter.
-class _EventsColumnBackgroundPainter extends CustomPainter {
-  /// The minimum time to display.
-  final HourMinute minimumTime;
-
-  /// The maximum time to display.
-  final HourMinute maximumTime;
-
-  /// The color.
-  final Color backgroundColor;
-
-  /// The rules color.
-  final Color rulesColor;
-
-  /// The top offset calculator.
-  final TopOffsetCalculator topOffsetCalculator;
-
-  /// Creates a new events column background painter.
-  _EventsColumnBackgroundPainter.fromDayViewState({
-    @required _DayViewState parent,
-  })  : minimumTime = parent.widget.minimumTime,
-        maximumTime = parent.widget.maximumTime,
-        backgroundColor = parent.widget.style.backgroundColor,
-        rulesColor = parent.widget.style.backgroundRulesColor,
-        topOffsetCalculator = parent.calculateTopOffset;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (backgroundColor != null) {
-      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()..color = backgroundColor);
-    }
-
-    if (rulesColor != null) {
-      final List<HourMinute> sideTimes = HoursColumn.getSideTimes(minimumTime, maximumTime);
-      for (HourMinute time in sideTimes) {
-        double topOffset = topOffsetCalculator(time);
-        canvas.drawLine(Offset(0, topOffset), Offset(size.width, topOffset), Paint()..color = rulesColor);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_EventsColumnBackgroundPainter oldDayViewBackgroundPainter) {
-    return backgroundColor != oldDayViewBackgroundPainter.backgroundColor || rulesColor != oldDayViewBackgroundPainter.rulesColor || topOffsetCalculator != oldDayViewBackgroundPainter.topOffsetCalculator;
   }
 }
 

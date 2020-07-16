@@ -137,7 +137,10 @@ class _DemoDayView extends StatelessWidget {
           end: date.add(const Duration(hours: 21)),
         ),
       ],
-      style: const DayViewStyle(currentTimeCircleColor: Colors.pink),
+      style: DayViewStyle.fromDate(
+        date: date,
+        currentTimeCircleColor: Colors.pink,
+      ),
     );
   }
 }
