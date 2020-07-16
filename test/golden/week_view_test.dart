@@ -105,11 +105,6 @@ void main() {
     );
 
     await screenMatchesGolden(tester, 'week_view_multi_day_event');
-
-    assert(
-        false,
-        'This test should currently fail, see issue #42: '
-        'https://github.com/Skyost/FlutterWeekView/issues/42');
   });
 
   testGoldens('Week view styling options work', (WidgetTester tester) async {
