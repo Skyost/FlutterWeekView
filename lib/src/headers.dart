@@ -203,23 +203,18 @@ class DayBar extends StatelessWidget {
   /// The width width.
   final double width;
 
-  /// The hours column width.
-  final double hoursColumnWidth;
-
   /// Creates a new day bar instance.
   DayBar({
     @required DateTime date,
     @required this.style,
     this.height,
     this.width,
-    this.hoursColumnWidth,
   })  : assert(date != null),
         assert(style != null),
         date = DateTime(date.year, date.month, date.day);
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: hoursColumnWidth == null ? null : EdgeInsets.only(left: hoursColumnWidth),
         height: height,
         width: width,
         color: style.decoration == null ? style.color : null,

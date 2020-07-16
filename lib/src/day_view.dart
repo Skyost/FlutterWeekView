@@ -90,12 +90,21 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       mainWidget = Stack(
         children: [
           mainWidget,
-          DayBar(
-            date: widget.date,
-            style: widget.dayBarStyle,
+          Positioned(
+            top: 0,
+            left: widget.hoursColumnStyle.width,
+            right: 0,
+            child: DayBar(
+              date: widget.date,
+              style: widget.dayBarStyle,
+              height: widget.style.headerSize,
+              width: double.infinity,
+            ),
+          ),
+          Container(
             height: widget.style.headerSize,
-            width: double.infinity,
-            hoursColumnWidth: widget.hoursColumnStyle.width,
+            width: widget.hoursColumnStyle.width,
+            color: widget.dayBarStyle.color,
           ),
         ],
       );
@@ -373,7 +382,10 @@ class _EventDrawProperties {
 
   /// Creates a new flutter week view event draw properties from the specified day view and the specified day view event.
   _EventDrawProperties(DayView dayView, FlutterWeekViewEvent event) {
-    if (shouldDraw || (!Utils.sameDay(event.start, dayView.date) && !Utils.sameDay(event.end, dayView.date))) {
+    DateTime currentDate = dayView.date;
+    DateTime tomorrow = currentDate.add(const Duration(days: 1));
+
+    if (shouldDraw || (event.start.isBefore(currentDate) && event.end.isBefore(currentDate)) || (event.start.isAfter(tomorrow) && event.end.isAfter(tomorrow))) {
       return;
     }
 
