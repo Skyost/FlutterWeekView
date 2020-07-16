@@ -309,10 +309,5 @@ void main() {
     );
 
     await screenMatchesGolden(tester, 'day_view_minimum_maximum_time');
-
-    assert(
-        false,
-        'This test should currently fail, see issue #44: '
-        'https://github.com/Skyost/FlutterWeekView/issues/44');
   });
 }

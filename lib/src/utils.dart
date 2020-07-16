@@ -8,6 +8,15 @@ import 'package:flutter_week_view/src/event.dart';
 import 'package:flutter_week_view/src/hour_minute.dart';
 import 'package:flutter_week_view/src/style.dart';
 
+/// Contains some useful methods for dates.
+extension DateTimeUtils on DateTime {
+  /// Returns a truncated date time (at the day).
+  DateTime get yearMonthDay => DateTime(year, month, day);
+
+  /// Returns a truncated date time (at the minute).
+  DateTime get yearMonthDayHourMinute => DateTime(year, month, day, hour, minute);
+}
+
 /// Contains some useful methods.
 class Utils {
   /// Makes the specified number to have at least two digits by adding a leading zero if needed.

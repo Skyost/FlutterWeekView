@@ -211,7 +211,7 @@ class DayBar extends StatelessWidget {
     this.width,
   })  : assert(date != null),
         assert(style != null),
-        date = DateTime(date.year, date.month, date.day);
+        date = date.yearMonthDay;
 
   @override
   Widget build(BuildContext context) => Container(

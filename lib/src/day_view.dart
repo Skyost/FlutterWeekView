@@ -35,7 +35,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
     bool userZoomable = true,
     HoursColumnTappedDownCallback onHoursColumnTappedDown,
   })  : assert(date != null),
-        date = DateTime(date.year, date.month, date.day),
+        date = date.yearMonthDay,
         events = events ?? [],
         dayBarStyle = dayBarStyle ?? DayBarStyle.fromDate(date: date),
         super(
@@ -147,7 +147,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       ));
     }
 
-    if (Utils.sameDay(widget.date)) {
+    if (Utils.sameDay(widget.date) && widget.minimumTime.atDate(widget.date).isBefore(DateTime.now()) && widget.maximumTime.atDate(widget.date).isAfter(DateTime.now())) {
       if (widget.style.currentTimeRuleColor != null && widget.style.currentTimeRuleHeight > 0) {
         children.add(createCurrentTimeRule());
       }
@@ -382,24 +382,22 @@ class _EventDrawProperties {
 
   /// Creates a new flutter week view event draw properties from the specified day view and the specified day view event.
   _EventDrawProperties(DayView dayView, FlutterWeekViewEvent event) {
-    DateTime currentDate = dayView.date;
-    DateTime tomorrow = currentDate.add(const Duration(days: 1));
+    DateTime minimum = dayView.minimumTime.atDate(dayView.date);
+    DateTime maximum = dayView.maximumTime.atDate(dayView.date);
 
-    if (shouldDraw || (event.start.isBefore(currentDate) && event.end.isBefore(currentDate)) || (event.start.isAfter(tomorrow) && event.end.isAfter(tomorrow))) {
+    if (shouldDraw || (event.start.isBefore(minimum) && event.end.isBefore(minimum)) || (event.start.isAfter(maximum) && event.end.isAfter(maximum))) {
       return;
     }
 
     start = event.start;
     end = event.end;
 
-    DateTime dayViewMin = dayView.date.add(Duration(hours: dayView.minimumTime.hour, minutes: dayView.minimumTime.minute));
-    if (start.isBefore(dayViewMin)) {
-      start = dayViewMin;
+    if (start.isBefore(minimum)) {
+      start = minimum;
     }
 
-    DateTime dayViewMax = dayView.date.add(Duration(hours: dayView.maximumTime.hour, minutes: dayView.maximumTime.minute));
-    if (end.isAfter(dayViewMax)) {
-      end = dayViewMax;
+    if (end.isAfter(maximum)) {
+      end = maximum;
     }
   }
 

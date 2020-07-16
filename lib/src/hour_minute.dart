@@ -123,6 +123,12 @@ class HourMinute {
     return _calculateDifference(other) >= 0;
   }
 
+  /// Attaches this instant to a provided date.
+  DateTime atDate(DateTime date) => date.yearMonthDay.add(asDuration);
+
+  /// Converts this instance into a duration.
+  Duration get asDuration => Duration(hours: hour, minutes: minute);
+
   @override
   int get hashCode => hour.hashCode + minute.hashCode;
 
