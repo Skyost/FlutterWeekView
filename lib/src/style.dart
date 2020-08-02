@@ -145,6 +145,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
         maximumTime: dayView.maximumTime,
         topOffsetCalculator: topOffsetCalculator,
         dayViewStyle: this,
+        interval: dayView.hoursColumnStyle.interval,
       );
 }
 
@@ -209,6 +210,9 @@ class HoursColumnStyle {
   /// The hours text alignment. Defaults to [Alignment.center].
   final Alignment textAlignment;
 
+  /// The interval between two durations displayed on the hours column. Defaults to [Duration(hours: 1)].
+  final Duration interval;
+
   /// Creates a new hour column style instance.
   const HoursColumnStyle({
     TimeFormatter timeFormatter,
@@ -217,11 +221,13 @@ class HoursColumnStyle {
     Color color,
     this.decoration,
     Alignment textAlignment,
+    Duration interval,
   })  : timeFormatter = timeFormatter ?? DefaultBuilders.defaultTimeFormatter,
         textStyle = textStyle ?? const TextStyle(color: Colors.black54),
         width = (width ?? 60) < 0 ? 0 : (width ?? 60),
         color = color ?? Colors.white,
-        textAlignment = textAlignment ?? Alignment.center;
+        textAlignment = textAlignment ?? Alignment.center,
+        interval = interval ?? const Duration(hours: 1);
 
   /// Allows to copy the current style instance with your own properties.
   HoursColumnStyle copyWith({
@@ -231,6 +237,7 @@ class HoursColumnStyle {
     Color color,
     Decoration decoration,
     Alignment textAlignment,
+    Duration interval,
   }) =>
       HoursColumnStyle(
         timeFormatter: timeFormatter ?? this.timeFormatter,
@@ -239,6 +246,7 @@ class HoursColumnStyle {
         color: color ?? this.color,
         decoration: decoration ?? this.decoration,
         textAlignment: textAlignment ?? this.textAlignment,
+        interval: interval ?? this.interval,
       );
 }
 
@@ -330,12 +338,16 @@ class _EventsColumnBackgroundPainter extends CustomPainter {
   /// The day view style.
   final DayViewStyle dayViewStyle;
 
+  /// The interval between two lines.
+  final Duration interval;
+
   /// Creates a new events column background painter.
   _EventsColumnBackgroundPainter({
     @required this.minimumTime,
     @required this.maximumTime,
     @required this.topOffsetCalculator,
     @required this.dayViewStyle,
+    @required this.interval,
   });
 
   @override
@@ -345,7 +357,7 @@ class _EventsColumnBackgroundPainter extends CustomPainter {
     }
 
     if (dayViewStyle.backgroundRulesColor != null) {
-      final List<HourMinute> sideTimes = HoursColumn.getSideTimes(minimumTime, maximumTime);
+      final List<HourMinute> sideTimes = HoursColumn.getSideTimes(minimumTime, maximumTime, interval);
       for (HourMinute time in sideTimes) {
         double topOffset = topOffsetCalculator(time);
         canvas.drawLine(Offset(0, topOffset), Offset(size.width, topOffset), Paint()..color = dayViewStyle.backgroundRulesColor);

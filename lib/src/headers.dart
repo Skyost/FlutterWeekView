@@ -287,7 +287,7 @@ class HoursColumn extends StatelessWidget {
         assert(minimumTime < maximumTime),
         topOffsetCalculator = topOffsetCalculator ?? DefaultBuilders.defaultTopOffsetCalculator,
         style = style ?? const HoursColumnStyle(),
-        _sideTimes = getSideTimes(minimumTime, maximumTime);
+        _sideTimes = getSideTimes(minimumTime, maximumTime, style.interval);
 
   /// Creates a new hours column instance from a headers widget instance.
   HoursColumn.fromHeadersWidgetState({
@@ -345,12 +345,12 @@ class HoursColumn extends StatelessWidget {
   }
 
   /// Creates the side times.
-  static List<HourMinute> getSideTimes(HourMinute minimumTime, HourMinute maximumTime) {
+  static List<HourMinute> getSideTimes(HourMinute minimumTime, HourMinute maximumTime, Duration interval) {
     List<HourMinute> sideTimes = [];
     HourMinute currentHour = HourMinute(hour: minimumTime.hour + 1);
     while (currentHour < maximumTime) {
       sideTimes.add(currentHour);
-      currentHour = currentHour.add(const HourMinute(hour: 1));
+      currentHour = currentHour.add(HourMinute.fromDuration(duration: interval));
     }
     return sideTimes;
   }
