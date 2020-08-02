@@ -16,7 +16,6 @@ void main() {
     await tester.pumpWidgetBuilder(
       DayView(
         date: date,
-        scrollToCurrentTime: true,
         style: DayViewStyle.fromDate(
           date: date,
           currentTimeCircleColor: Colors.pink,
@@ -49,7 +48,6 @@ void main() {
     await tester.pumpWidgetBuilder(
       DayView(
         date: date,
-        scrollToCurrentTime: false,
         initialTime: const HourMinute(hour: 10),
         events: [
           FlutterWeekViewEvent(
@@ -134,7 +132,6 @@ void main() {
     await tester.pumpWidgetBuilder(
       DayView(
         date: date,
-        scrollToCurrentTime: true,
         events: [
           FlutterWeekViewEvent(
             title: 'A small event 1',
@@ -170,7 +167,6 @@ void main() {
     await tester.pumpWidgetBuilder(
       DayView(
         date: date,
-        scrollToCurrentTime: false,
         initialTime: const HourMinute(hour: 7),
         style: DayViewStyle(
           headerSize: 60.0,
@@ -221,7 +217,6 @@ void main() {
     await tester.pumpWidgetBuilder(
       DayView(
         date: date,
-        scrollToCurrentTime: false,
         initialTime: const HourMinute(hour: 7),
         events: [
           FlutterWeekViewEvent(
@@ -249,7 +244,6 @@ void main() {
     await tester.pumpWidgetBuilder(
       DayView(
         date: date,
-        scrollToCurrentTime: false,
         initialTime: const HourMinute(hour: 7),
         events: [
           FlutterWeekViewEvent(
@@ -281,7 +275,6 @@ void main() {
     await tester.pumpWidgetBuilder(
       DayView(
         date: date,
-        scrollToCurrentTime: true,
         minimumTime: const HourMinute(hour: 14),
         maximumTime: const HourMinute(hour: 19, minute: 30),
         style: DayViewStyle.fromDate(
