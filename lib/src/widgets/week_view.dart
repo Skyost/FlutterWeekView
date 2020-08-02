@@ -17,7 +17,6 @@ import 'package:flutter_week_view/src/widgets/zoomable_header_widget.dart';
 
 import 'day_view.dart';
 
-
 /// Builds a day view style according to the specified date.
 typedef DayViewStyleBuilder = DayViewStyle Function(DateTime date);
 
@@ -59,6 +58,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
     DateTime initialTime,
     bool scrollToCurrentTime,
     bool userZoomable,
+    CurrentTimeIndicatorBuilder currentTimeIndicatorBuilder,
     HoursColumnTapCallback onHoursColumnTappedDown,
     DayBarTapCallback onDayBarTappedDown,
   }) : this.builder(
@@ -74,8 +74,8 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
           minimumTime: minimumTime,
           maximumTime: maximumTime,
           initialTime: initialTime,
-          scrollToCurrentTime: scrollToCurrentTime,
           userZoomable: userZoomable,
+          currentTimeIndicatorBuilder: currentTimeIndicatorBuilder,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
           onDayBarTappedDown: onDayBarTappedDown,
         );
@@ -96,6 +96,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
     DateTime initialTime,
     bool scrollToCurrentTime,
     bool userZoomable,
+    CurrentTimeIndicatorBuilder currentTimeIndicatorBuilder,
     HoursColumnTapCallback onHoursColumnTappedDown,
     DayBarTapCallback onDayBarTappedDown,
   })  : assert(dateCreator != null),
@@ -112,6 +113,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
           maximumTime: maximumTime ?? HourMinute.MAX,
           initialTime: initialTime ?? DateTime.now(),
           userZoomable: userZoomable ?? true,
+          currentTimeIndicatorBuilder: currentTimeIndicatorBuilder ?? DefaultBuilders.defaultCurrentTimeIndicatorBuilder,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
           onDayBarTappedDown: onDayBarTappedDown,
         );
@@ -266,9 +268,9 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
         controller: widget.controller.getDayViewController(date),
         minimumTime: widget.minimumTime,
         maximumTime: widget.maximumTime,
+        currentTimeIndicatorBuilder: widget.currentTimeIndicatorBuilder,
         inScrollableWidget: false,
         userZoomable: false,
-        scrollToCurrentTime: false,
       ),
     );
 

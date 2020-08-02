@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_week_view/flutter_week_view.dart';
 import 'package:flutter_week_view/src/controller/zoom_controller.dart';
 import 'package:flutter_week_view/src/styles/day_view.dart';
 import 'package:flutter_week_view/src/styles/hours_column.dart';
@@ -18,7 +19,7 @@ typedef HoursColumnTapCallback = Function(HourMinute time);
 typedef DayBarTapCallback = Function(DateTime date);
 
 /// Allows to build the current time indicator (rule and circle).
-typedef CurrentTimeIndicatorBuilder = Function(DayViewStyle style, TopOffsetCalculator topOffsetCalculator);
+typedef CurrentTimeIndicatorBuilder = Widget Function(DayViewStyle dayViewStyle, TopOffsetCalculator topOffsetCalculator, double hoursColumnWidth);
 
 /// A widget which is showing both headers and can be zoomed.
 abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C extends ZoomController> extends StatefulWidget {
@@ -43,6 +44,9 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
   /// Whether the user is able to pinch-to-zoom the widget.
   final bool userZoomable;
 
+  /// The current time indicator builder.
+  final CurrentTimeIndicatorBuilder currentTimeIndicatorBuilder;
+
   /// Triggered when the hours column has been tapped down.
   final HoursColumnTapCallback onHoursColumnTappedDown;
 
@@ -61,6 +65,7 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
     @required this.maximumTime,
     @required this.initialTime,
     @required this.userZoomable,
+    this.currentTimeIndicatorBuilder,
     this.onHoursColumnTappedDown,
     this.onDayBarTappedDown,
     @required this.controller,
@@ -140,7 +145,9 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
 
   /// Schedules a scroll to the default hour.
   void scheduleScrollToInitialTime() {
-    WidgetsBinding.instance.addPostFrameCallback((_) => scrollToInitialTime());
+    if (shouldScrollToInitialTime) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToInitialTime());
+    }
   }
 
   /// Checks whether the widget should scroll to current time.
@@ -148,7 +155,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
 
   /// Scrolls to the initial time.
   void scrollToInitialTime() {
-    if (verticalScrollController != null) {
+    if (mounted && verticalScrollController != null) {
       double topOffset = calculateTopOffset(HourMinute.fromDateTime(dateTime: widget.initialTime));
       verticalScrollController.jumpTo(math.min(topOffset, verticalScrollController.position.maxScrollExtent));
     }

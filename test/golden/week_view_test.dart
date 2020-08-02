@@ -69,7 +69,7 @@ void main() {
       WeekView(
         dates: dates,
         scrollToCurrentTime: false,
-        initialTime: const HourMinute(hour: 6),
+        initialTime: const HourMinute(hour: 6).atDate(DateTime.now()),
         events: events,
       ),
       surfaceSize: Device.iphone11.size,
@@ -112,7 +112,7 @@ void main() {
       WeekView(
         dates: dates,
         scrollToCurrentTime: false,
-        initialTime: const HourMinute(hour: 6),
+        initialTime: const HourMinute(hour: 6).atDate(DateTime.now()),
         events: events,
         style: const WeekViewStyle(
           headerSize: 60.0,

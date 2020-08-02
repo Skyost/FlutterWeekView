@@ -6,6 +6,7 @@ import 'package:flutter_week_view/src/event.dart';
 import 'package:flutter_week_view/src/styles/day_bar.dart';
 import 'package:flutter_week_view/src/styles/day_view.dart';
 import 'package:flutter_week_view/src/styles/hours_column.dart';
+import 'package:flutter_week_view/src/utils/builders.dart';
 import 'package:flutter_week_view/src/utils/event_grid.dart';
 import 'package:flutter_week_view/src/utils/hour_minute.dart';
 import 'package:flutter_week_view/src/utils/scroll.dart';
@@ -37,8 +38,8 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
     HourMinute minimumTime,
     HourMinute maximumTime,
     HourMinute initialTime,
-    bool scrollToCurrentTime,
     bool userZoomable,
+    CurrentTimeIndicatorBuilder currentTimeIndicatorBuilder,
     HoursColumnTapCallback onHoursColumnTappedDown,
     DayBarTapCallback onDayBarTappedDown,
   })  : assert(date != null),
@@ -52,8 +53,9 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
           inScrollableWidget: inScrollableWidget ?? true,
           minimumTime: minimumTime ?? HourMinute.MIN,
           maximumTime: maximumTime ?? HourMinute.MAX,
-          initialTime: (initialTime ?? HourMinute.now()).atDate(DateTime.now()),
+          initialTime: initialTime?.atDate(date) ?? (Utils.sameDay(date) ? HourMinute.now() : const HourMinute()).atDate(date),
           userZoomable: userZoomable ?? true,
+          currentTimeIndicatorBuilder: currentTimeIndicatorBuilder ?? DefaultBuilders.defaultCurrentTimeIndicatorBuilder,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
           onDayBarTappedDown: onDayBarTappedDown,
         );
@@ -152,12 +154,9 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     }
 
     if (Utils.sameDay(widget.date) && widget.minimumTime.atDate(widget.date).isBefore(DateTime.now()) && widget.maximumTime.atDate(widget.date).isAfter(DateTime.now())) {
-      if (widget.style.currentTimeRuleColor != null && widget.style.currentTimeRuleHeight > 0) {
-        children.add(createCurrentTimeRule());
-      }
-
-      if (widget.style.currentTimeCircleColor != null && widget.style.currentTimeCircleRadius > 0) {
-        children.add(createCurrentTimeCircle());
+      Widget currentTimeIndicator = (widget.currentTimeIndicatorBuilder ?? DefaultBuilders.defaultCurrentTimeIndicatorBuilder)(widget.style, calculateTopOffset, widget.hoursColumnStyle.width);
+      if (currentTimeIndicator != null) {
+        children.add(currentTimeIndicator);
       }
     }
 
@@ -187,32 +186,6 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
           painter: widget.style.createBackgroundPainter(
             dayView: widget,
             topOffsetCalculator: calculateTopOffset,
-          ),
-        ),
-      );
-
-  /// Creates the horizontal rule in the day view column, positioned at the current time of the day.
-  Widget createCurrentTimeRule() => Positioned(
-        top: calculateTopOffset(HourMinute.now()),
-        left: widget.hoursColumnStyle.width,
-        right: 0,
-        child: Container(
-          height: widget.style.currentTimeRuleHeight,
-          color: widget.style.currentTimeRuleColor,
-        ),
-      );
-
-  /// Creates the current time circle, shown along with the horizontal rule in the day view column.
-  Widget createCurrentTimeCircle() => Positioned(
-        top: calculateTopOffset(HourMinute.now()) - widget.style.currentTimeCircleRadius,
-        right: widget.style.currentTimeCirclePosition == CurrentTimeCirclePosition.right ? 0 : null,
-        left: widget.style.currentTimeCirclePosition == CurrentTimeCirclePosition.left ? widget.hoursColumnStyle.width : null,
-        child: Container(
-          height: widget.style.currentTimeCircleRadius * 2,
-          width: widget.style.currentTimeCircleRadius * 2,
-          decoration: BoxDecoration(
-            color: widget.style.currentTimeCircleColor,
-            shape: BoxShape.circle,
           ),
         ),
       );

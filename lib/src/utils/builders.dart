@@ -1,12 +1,14 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_week_view/flutter_week_view.dart';
 import 'package:flutter_week_view/src/event.dart';
 import 'package:flutter_week_view/src/styles/day_bar.dart';
 import 'package:flutter_week_view/src/styles/day_view.dart';
 import 'package:flutter_week_view/src/utils/hour_minute.dart';
 import 'package:flutter_week_view/src/utils/utils.dart';
 import 'package:flutter_week_view/src/widgets/day_view.dart';
+import 'package:flutter_week_view/src/widgets/zoomable_header_widget.dart';
 
 /// Contains default builders and formatters.
 class DefaultBuilders {
@@ -62,6 +64,39 @@ class DefaultBuilders {
 
   /// Builds a date according to a list.
   static DateTime defaultDateCreator(List<DateTime> dates, int index) => dates[index];
+
+  /// Builds the current time indicator builder.
+  static Widget defaultCurrentTimeIndicatorBuilder(DayViewStyle dayViewStyle, TopOffsetCalculator topOffsetCalculator, double hoursColumnWidth) {
+    List<Widget> children = [
+      if (dayViewStyle.currentTimeRuleHeight > 0 && dayViewStyle.currentTimeRuleColor != null)
+        Expanded(
+          child: Container(
+            height: dayViewStyle.currentTimeRuleHeight,
+            color: dayViewStyle.currentTimeRuleColor,
+          ),
+        ),
+      if (dayViewStyle.currentTimeCircleRadius > 0 && dayViewStyle.currentTimeCircleColor != null)
+        Container(
+          height: dayViewStyle.currentTimeCircleRadius * 2,
+          width: dayViewStyle.currentTimeCircleRadius * 2,
+          decoration: BoxDecoration(
+            color: dayViewStyle.currentTimeCircleColor,
+            shape: BoxShape.circle,
+          ),
+        ),
+    ];
+
+    if (dayViewStyle.currentTimeCirclePosition == CurrentTimeCirclePosition.left) {
+      children = children.reversed.toList();
+    }
+
+    return Positioned(
+      top: topOffsetCalculator(HourMinute.now()),
+      left: hoursColumnWidth,
+      right: 0,
+      child: Row(children: children),
+    );
+  }
 
   /// The default day view style builder.
   static DayViewStyle defaultDayViewStyleBuilder(DateTime date) => DayViewStyle.fromDate(date: date);

@@ -152,7 +152,7 @@ class _DemoWeekView extends StatelessWidget {
     DateTime now = DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day);
     return WeekView(
-      initialTime: const HourMinute(hour: 7),
+      initialTime: const HourMinute(hour: 7).atDate(DateTime.now()),
       dates: [date.subtract(const Duration(days: 1)), date, date.add(const Duration(days: 1))],
       events: [
         FlutterWeekViewEvent(
