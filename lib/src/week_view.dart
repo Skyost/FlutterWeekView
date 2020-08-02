@@ -29,6 +29,9 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
   /// The events.
   final List<FlutterWeekViewEvent> events;
 
+  /// The initially shown date. Defaults to today (if possible) or the leftmost date to be shown.
+  final DateTime initialDate;
+
   /// The day view style builder.
   final DayViewStyleBuilder dayViewStyleBuilder;
 
@@ -39,6 +42,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
   WeekView({
     List<FlutterWeekViewEvent> events,
     @required List<DateTime> dates,
+    DateTime initialDate,
     DayViewStyleBuilder dayViewStyleBuilder,
     DayBarStyleBuilder dayBarStyleBuilder,
     WeekViewStyle style,
@@ -56,6 +60,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
           events: events,
           dateCount: dates?.length,
           dateCreator: ((index) => DefaultBuilders.defaultDateCreator(dates, index)),
+          initialDate: initialDate,
           dayViewStyleBuilder: dayViewStyleBuilder,
           dayBarStyleBuilder: dayBarStyleBuilder,
           style: style,
@@ -76,6 +81,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
     List<FlutterWeekViewEvent> events,
     int dateCount,
     @required this.dateCreator,
+    DateTime initialDate,
     DayViewStyleBuilder dayViewStyleBuilder,
     DayBarStyleBuilder dayBarStyleBuilder,
     WeekViewStyle style,
@@ -90,13 +96,14 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
     HoursColumnTapCallback onHoursColumnTappedDown,
     DayBarTapCallback onDayBarTappedDown,
   })  : assert(dateCreator != null),
+        events = events ?? [],
         dayViewStyleBuilder = dayViewStyleBuilder ?? DefaultBuilders.defaultDayViewStyleBuilder,
         dayBarStyleBuilder = dayBarStyleBuilder ?? DefaultBuilders.defaultDayBarStyleBuilder,
         dateCount = math.max(dateCount ?? 0, 0),
-        events = events ?? [],
+        initialDate = initialDate ?? DateTime.now(),
         super(
           style: style ?? const WeekViewStyle(),
-          hoursColumnStyle: hoursColumnStyle,
+          hoursColumnStyle: hoursColumnStyle ?? const HoursColumnStyle(),
           controller: controller ?? WeekViewController(),
           inScrollableWidget: inScrollableWidget ?? true,
           minimumTime: minimumTime ?? HourMinute.MIN,
@@ -159,7 +166,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   }
 
   @override
-  bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && dayViewWidth != null && todayDateIndex != null;
+  bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && dayViewWidth != null && initialDateIndex != null;
 
   @override
   void scrollToCurrentTime() {
@@ -169,7 +176,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
       return;
     }
 
-    double leftOffset = (todayDateIndex ?? 0) * (dayViewWidth + widget.style.dayViewSeparatorWidth);
+    double leftOffset = (initialDateIndex ?? 0) * (dayViewWidth + widget.style.dayViewSeparatorWidth);
     horizontalScrollController.jumpTo(math.min<double>(leftOffset, horizontalScrollController.position.maxScrollExtent));
   }
 
@@ -282,10 +289,10 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   }
 
   /// Returns the current date index.
-  int get todayDateIndex {
+  int get initialDateIndex {
     int dateCount = widget.dateCount ?? 0;
     for (int i = 0; i < dateCount; i++) {
-      if (Utils.sameDay(widget.dateCreator(i))) {
+      if (Utils.sameDay(widget.dateCreator(i), widget.initialDate)) {
         return i;
       }
     }
