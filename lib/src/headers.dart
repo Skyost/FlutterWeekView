@@ -11,7 +11,10 @@ import 'package:flutter_week_view/src/utils.dart';
 typedef TopOffsetCalculator = double Function(HourMinute time);
 
 /// Triggered when the hours column has been tapped down.
-typedef HoursColumnTappedDownCallback = Function(HourMinute time);
+typedef HoursColumnTapCallback = Function(HourMinute time);
+
+/// Triggered when the day bar has been tapped down.
+typedef DayBarTapCallback = Function(DateTime date);
 
 /// A widget which is showing both headers and can be zoomed.
 abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C extends ZoomController> extends StatefulWidget {
@@ -42,7 +45,10 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
   final bool userZoomable;
 
   /// Triggered when the hours column has been tapped down.
-  final HoursColumnTappedDownCallback onHoursColumnTappedDown;
+  final HoursColumnTapCallback onHoursColumnTappedDown;
+
+  /// Triggered when the day bar has been tapped down.
+  final DayBarTapCallback onDayBarTappedDown;
 
   /// The current day view controller.
   final C controller;
@@ -58,6 +64,7 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
     @required this.scrollToCurrentTime,
     @required this.userZoomable,
     this.onHoursColumnTappedDown,
+    this.onDayBarTappedDown,
     @required this.controller,
   })  : hoursColumnStyle = hoursColumnStyle ?? const HoursColumnStyle(),
         assert(style != null),
@@ -203,26 +210,47 @@ class DayBar extends StatelessWidget {
   /// The width width.
   final double width;
 
+  /// Triggered when the day bar has been tapped down.
+  final DayBarTapCallback onDayBarTappedDown;
+
   /// Creates a new day bar instance.
   DayBar({
     @required DateTime date,
     @required this.style,
     this.height,
     this.width,
+    this.onDayBarTappedDown,
   })  : assert(date != null),
         assert(style != null),
         date = date.yearMonthDay;
 
+  /// Creates a new day bar instance from a headers widget instance.
+  DayBar.fromHeadersWidgetState({
+    @required ZoomableHeadersWidget parent,
+    @required DateTime date,
+    @required DayBarStyle style,
+    double width,
+  }) : this(
+          date: date,
+          style: style,
+          height: parent.style.headerSize,
+          width: width,
+          onDayBarTappedDown: parent.onDayBarTappedDown,
+        );
+
   @override
-  Widget build(BuildContext context) => Container(
-        height: height,
-        width: width,
-        color: style.decoration == null ? style.color : null,
-        decoration: style.decoration,
-        alignment: style.textAlignment,
-        child: Text(
-          style.dateFormatter(date.year, date.month, date.day),
-          style: style.textStyle,
+  Widget build(BuildContext context) => GestureDetector(
+        onTapDown: (details) => (onDayBarTappedDown ?? (date) {})(date),
+        child: Container(
+          height: height,
+          width: width,
+          color: style.decoration == null ? style.color : null,
+          decoration: style.decoration,
+          alignment: style.textAlignment,
+          child: Text(
+            style.dateFormatter(date.year, date.month, date.day),
+            style: style.textStyle,
+          ),
         ),
       );
 }
@@ -242,7 +270,7 @@ class HoursColumn extends StatelessWidget {
   final HoursColumnStyle style;
 
   /// Triggered when the hours column has been tapped down.
-  final HoursColumnTappedDownCallback onHoursColumnTappedDown;
+  final HoursColumnTapCallback onHoursColumnTappedDown;
 
   /// The times to display on the side border.
   final List<HourMinute> _sideTimes;

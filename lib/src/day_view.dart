@@ -33,7 +33,8 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
     HourMinute initialTime = HourMinute.MIN,
     bool scrollToCurrentTime = true,
     bool userZoomable = true,
-    HoursColumnTappedDownCallback onHoursColumnTappedDown,
+    HoursColumnTapCallback onHoursColumnTappedDown,
+    DayBarTapCallback onDayBarTappedDown,
   })  : assert(date != null),
         date = date.yearMonthDay,
         events = events ?? [],
@@ -49,6 +50,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
           scrollToCurrentTime: scrollToCurrentTime,
           userZoomable: userZoomable,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
+          onDayBarTappedDown: onDayBarTappedDown,
         );
 
   @override
@@ -94,10 +96,10 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
             top: 0,
             left: widget.hoursColumnStyle.width,
             right: 0,
-            child: DayBar(
+            child: DayBar.fromHeadersWidgetState(
+              parent: widget,
               date: widget.date,
               style: widget.dayBarStyle,
-              height: widget.style.headerSize,
               width: double.infinity,
             ),
           ),

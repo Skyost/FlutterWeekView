@@ -50,7 +50,8 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
     HourMinute initialTime,
     bool scrollToCurrentTime,
     bool userZoomable,
-    HoursColumnTappedDownCallback onHoursColumnTappedDown,
+    HoursColumnTapCallback onHoursColumnTappedDown,
+    DayBarTapCallback onDayBarTappedDown,
   }) : this.builder(
           events: events,
           dateCount: dates?.length,
@@ -67,6 +68,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
           scrollToCurrentTime: scrollToCurrentTime,
           userZoomable: userZoomable,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
+          onDayBarTappedDown: onDayBarTappedDown,
         );
 
   /// Creates a new week view instance.
@@ -85,7 +87,8 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
     HourMinute initialTime,
     bool scrollToCurrentTime,
     bool userZoomable,
-    HoursColumnTappedDownCallback onHoursColumnTappedDown,
+    HoursColumnTapCallback onHoursColumnTappedDown,
+    DayBarTapCallback onDayBarTappedDown,
   })  : assert(dateCreator != null),
         dayViewStyleBuilder = dayViewStyleBuilder ?? DefaultBuilders.defaultDayViewStyleBuilder,
         dayBarStyleBuilder = dayBarStyleBuilder ?? DefaultBuilders.defaultDayBarStyleBuilder,
@@ -102,6 +105,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
           scrollToCurrentTime: scrollToCurrentTime ?? true,
           userZoomable: userZoomable ?? true,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
+          onDayBarTappedDown: onDayBarTappedDown,
         );
 
   @override
@@ -346,10 +350,10 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
           itemCount: widget.weekView.dateCount,
           itemBuilder: (context, position) {
             DateTime date = widget.weekView.dateCreator(position);
-            return DayBar(
+            return DayBar.fromHeadersWidgetState(
+              parent: widget.weekView,
               date: date,
               style: widget.dayBarStyleBuilder(date),
-              height: widget.weekView.style.headerSize,
               width: calculateWidth(position),
             );
           },
