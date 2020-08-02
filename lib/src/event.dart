@@ -1,8 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_week_view/src/day_view.dart';
-import 'package:flutter_week_view/src/utils.dart';
+import 'package:flutter_week_view/src/utils/builders.dart';
+import 'package:flutter_week_view/src/utils/utils.dart';
+import 'package:flutter_week_view/src/widgets/day_view.dart';
 
 /// Builds an event text widget.
 typedef EventTextBuilder = Widget Function(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width);

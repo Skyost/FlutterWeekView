@@ -1,4 +1,4 @@
-import 'package:flutter_week_view/src/utils.dart';
+import 'package:flutter_week_view/src/utils/utils.dart';
 
 class StubNowDateTimeGetter implements NowDateTimeGetter {
   final DateTime _now;

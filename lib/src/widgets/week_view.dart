@@ -1,13 +1,22 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_week_view/src/controller.dart';
-import 'package:flutter_week_view/src/day_view.dart';
+import 'package:flutter_week_view/src/controller/week_view.dart';
 import 'package:flutter_week_view/src/event.dart';
-import 'package:flutter_week_view/src/headers.dart';
-import 'package:flutter_week_view/src/hour_minute.dart';
-import 'package:flutter_week_view/src/style.dart';
-import 'package:flutter_week_view/src/utils.dart';
+import 'package:flutter_week_view/src/styles/day_bar.dart';
+import 'package:flutter_week_view/src/styles/day_view.dart';
+import 'package:flutter_week_view/src/styles/hours_column.dart';
+import 'package:flutter_week_view/src/styles/week_view.dart';
+import 'package:flutter_week_view/src/utils/builders.dart';
+import 'package:flutter_week_view/src/utils/hour_minute.dart';
+import 'package:flutter_week_view/src/utils/scroll.dart';
+import 'package:flutter_week_view/src/utils/utils.dart';
+import 'package:flutter_week_view/src/widgets/day_bar.dart';
+import 'package:flutter_week_view/src/widgets/hours_column.dart';
+import 'package:flutter_week_view/src/widgets/zoomable_header_widget.dart';
+
+import 'day_view.dart';
+
 
 /// Builds a day view style according to the specified date.
 typedef DayViewStyleBuilder = DayViewStyle Function(DateTime date);

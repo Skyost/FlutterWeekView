@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_week_view/flutter_week_view.dart';
-import 'package:flutter_week_view/src/utils.dart';
+import 'package:flutter_week_view/src/utils/utils.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 
 import '../test_utils.dart';
