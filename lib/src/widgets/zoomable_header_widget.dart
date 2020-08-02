@@ -37,13 +37,8 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
   /// The maximum time to display.
   final HourMinute maximumTime;
 
-  /// The initial visible time. If this is set, [scrollToCurrentTime] should be false, since
-  /// that takes priority over [initialTime].
-  final HourMinute initialTime;
-
-  /// Whether the widget should automatically scroll to the current time (hour and minute). This
-  /// takes priority over [initialTime].
-  final bool scrollToCurrentTime;
+  /// The initial visible time. Defaults to the current hour of the day (if possible).
+  final DateTime initialTime;
 
   /// Whether the user is able to pinch-to-zoom the widget.
   final bool userZoomable;
@@ -65,7 +60,6 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
     @required this.minimumTime,
     @required this.maximumTime,
     @required this.initialTime,
-    @required this.scrollToCurrentTime,
     @required this.userZoomable,
     this.onHoursColumnTappedDown,
     this.onDayBarTappedDown,
@@ -76,7 +70,6 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
         assert(minimumTime < maximumTime),
         assert(initialTime != null),
         assert(inScrollableWidget != null),
-        assert(scrollToCurrentTime != null),
         assert(userZoomable != null);
 }
 
@@ -145,43 +138,18 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
   /// Returns the current day view style.
   DayViewStyle get currentDayViewStyle;
 
-  /// Schedules both scroll if needed.
-  void scheduleScrolls() {
-    if (!scheduleScrollToCurrentTimeIfNeeded()) {
-      scheduleScrollToInitialHour();
-    }
-  }
-
-  /// Schedules a scroll to the current time if needed.
-  bool scheduleScrollToCurrentTimeIfNeeded() {
-    if (shouldScrollToCurrentTime) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToCurrentTime());
-      return true;
-    }
-    return false;
-  }
-
   /// Schedules a scroll to the default hour.
-  void scheduleScrollToInitialHour() {
-    if (mounted) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToTime(widget.initialTime));
-    }
+  void scheduleScrollToInitialTime() {
+    WidgetsBinding.instance.addPostFrameCallback((_) => scrollToInitialTime());
   }
 
   /// Checks whether the widget should scroll to current time.
-  bool get shouldScrollToCurrentTime => widget.scrollToCurrentTime;
+  bool get shouldScrollToInitialTime => widget.minimumTime.atDate(widget.initialTime).isBefore(widget.initialTime) && widget.maximumTime.atDate(widget.initialTime).isAfter(widget.initialTime);
 
-  /// Scrolls to current time.
-  void scrollToCurrentTime() {
-    if (mounted) {
-      scrollToTime(HourMinute.now());
-    }
-  }
-
-  /// Scrolls to a given time if possible.
-  void scrollToTime(HourMinute time) {
+  /// Scrolls to the initial time.
+  void scrollToInitialTime() {
     if (verticalScrollController != null) {
-      double topOffset = calculateTopOffset(time);
+      double topOffset = calculateTopOffset(HourMinute.fromDateTime(dateTime: widget.initialTime));
       verticalScrollController.jumpTo(math.min(topOffset, verticalScrollController.position.maxScrollExtent));
     }
   }

@@ -52,8 +52,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
           inScrollableWidget: inScrollableWidget ?? true,
           minimumTime: minimumTime ?? HourMinute.MIN,
           maximumTime: maximumTime ?? HourMinute.MAX,
-          initialTime: initialTime ?? HourMinute.MIN,
-          scrollToCurrentTime: scrollToCurrentTime ?? true,
+          initialTime: (initialTime ?? HourMinute.now()).atDate(DateTime.now()),
           userZoomable: userZoomable ?? true,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
           onDayBarTappedDown: onDayBarTappedDown,
@@ -74,7 +73,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   @override
   void initState() {
     super.initState();
-    scheduleScrolls();
+    scheduleScrollToInitialTime();
     reset();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -140,9 +139,6 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
 
   @override
   DayViewStyle get currentDayViewStyle => widget.style;
-
-  @override
-  bool get shouldScrollToCurrentTime => super.shouldScrollToCurrentTime && Utils.sameDay(widget.date);
 
   /// Creates the main widget, with a hours column and an events column.
   Widget createMainWidget() {
