@@ -1,3 +1,10 @@
+## [1.0.0] - 2020-08-05
+
+* Added `currentTimeIndicatorBuilder`, `onDayBarTappedDown` and `dayBarStyleBuilder` parameters.
+* Removed `scrollToCurrentTime` in favor of `initialTime`.
+* Various internal changes.
+* Fixed a lot of bugs.
+
 ## [0.3.1] - 2020-06-25
 
 * Rewritten the `WeekViewController` class.
