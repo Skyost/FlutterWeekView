@@ -187,7 +187,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   DayViewStyle get currentDayViewStyle => widget.dayViewStyleBuilder(leftMostDisplayedDate);
 
   DateTime get leftMostDisplayedDate {
-    if (horizontalScrollController == null) {
+    if (horizontalScrollController == null || !horizontalScrollController.hasClients) {
       return widget.dateCreator(0);
     }
 
