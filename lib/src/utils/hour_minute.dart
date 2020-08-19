@@ -34,7 +34,9 @@ class HourMinute {
     int minute = 0,
   }) : this._internal(
           hour: hour == null ? 0 : (hour < 0 ? 0 : (hour > 23 ? 23 : hour)),
-          minute: minute == null ? 0 : (minute < 0 ? 0 : (minute > 59 ? 59 : minute)),
+          minute: minute == null
+              ? 0
+              : (minute < 0 ? 0 : (minute > 59 ? 59 : minute)),
         );
 
   /// Creates a new hour minute time instance from a given date time object.
@@ -91,7 +93,8 @@ class HourMinute {
     if (other is! HourMinute) {
       return false;
     }
-    return identical(this, other) || (hour == other.hour && minute == other.minute);
+    return identical(this, other) ||
+        (hour == other.hour && minute == other.minute);
   }
 
   bool operator <(other) {
@@ -133,5 +136,6 @@ class HourMinute {
   int get hashCode => hour.hashCode + minute.hashCode;
 
   /// Returns the difference in minutes between this and another hour minute time instance.
-  int _calculateDifference(HourMinute other) => (hour * 60 - other.hour * 60) + (minute - other.minute);
+  int _calculateDifference(HourMinute other) =>
+      (hour * 60 - other.hour * 60) + (minute - other.minute);
 }

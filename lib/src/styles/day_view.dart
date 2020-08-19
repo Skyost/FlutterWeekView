@@ -65,9 +65,13 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
     CurrentTimeCirclePosition currentTimeCirclePosition,
   })  : hourRowHeight = (hourRowHeight ?? 60) < 0 ? 0 : (hourRowHeight ?? 60),
         backgroundColor = backgroundColor ?? const Color(0xFFF2F2F2),
-        currentTimeRuleHeight = (currentTimeRuleHeight ?? 1) < 0 ? 0 : (currentTimeRuleHeight ?? 1),
-        currentTimeCircleRadius = (currentTimeCircleRadius ?? 7.5) < 0 ? 0 : (currentTimeCircleRadius ?? 7.5),
-        currentTimeCirclePosition = currentTimeCirclePosition ?? CurrentTimeCirclePosition.right,
+        currentTimeRuleHeight =
+            (currentTimeRuleHeight ?? 1) < 0 ? 0 : (currentTimeRuleHeight ?? 1),
+        currentTimeCircleRadius = (currentTimeCircleRadius ?? 7.5) < 0
+            ? 0
+            : (currentTimeCircleRadius ?? 7.5),
+        currentTimeCirclePosition =
+            currentTimeCirclePosition ?? CurrentTimeCirclePosition.right,
         super(headerSize: headerSize);
 
   /// Allows to automatically customize the day view background color according to the specified date.
@@ -82,16 +86,16 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
     double currentTimeCircleRadius,
     CurrentTimeCirclePosition currentTimeCirclePosition,
   }) : this(
-    headerSize: headerSize,
-    hourRowHeight: hourRowHeight,
-    backgroundColor: Utils.sameDay(date) ? const Color(0xFFE3F5FF) : null,
-    backgroundRulesColor: backgroundRulesColor,
-    currentTimeRuleColor: currentTimeRuleColor,
-    currentTimeRuleHeight: currentTimeRuleHeight,
-    currentTimeCircleColor: currentTimeCircleColor,
-    currentTimeCircleRadius: currentTimeCircleRadius,
-    currentTimeCirclePosition: currentTimeCirclePosition,
-  );
+          headerSize: headerSize,
+          hourRowHeight: hourRowHeight,
+          backgroundColor: Utils.sameDay(date) ? const Color(0xFFE3F5FF) : null,
+          backgroundRulesColor: backgroundRulesColor,
+          currentTimeRuleColor: currentTimeRuleColor,
+          currentTimeRuleHeight: currentTimeRuleHeight,
+          currentTimeCircleColor: currentTimeCircleColor,
+          currentTimeCircleRadius: currentTimeCircleRadius,
+          currentTimeCirclePosition: currentTimeCirclePosition,
+        );
 
   /// Allows to copy the current style instance with your own properties.
   DayViewStyle copyWith({
@@ -111,10 +115,14 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
         backgroundColor: backgroundColor ?? this.backgroundColor,
         backgroundRulesColor: backgroundRulesColor ?? this.backgroundRulesColor,
         currentTimeRuleColor: currentTimeRuleColor ?? this.currentTimeRuleColor,
-        currentTimeRuleHeight: currentTimeRuleHeight ?? this.currentTimeRuleHeight,
-        currentTimeCircleColor: currentTimeCircleColor ?? this.currentTimeCircleColor,
-        currentTimeCircleRadius: currentTimeCircleRadius ?? this.currentTimeCircleRadius,
-        currentTimeCirclePosition: currentTimeCirclePosition ?? this.currentTimeCirclePosition,
+        currentTimeRuleHeight:
+            currentTimeRuleHeight ?? this.currentTimeRuleHeight,
+        currentTimeCircleColor:
+            currentTimeCircleColor ?? this.currentTimeCircleColor,
+        currentTimeCircleRadius:
+            currentTimeCircleRadius ?? this.currentTimeCircleRadius,
+        currentTimeCirclePosition:
+            currentTimeCirclePosition ?? this.currentTimeCirclePosition,
       );
 
   /// Creates the background painter.
@@ -169,20 +177,28 @@ class _EventsColumnBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     if (dayViewStyle.backgroundColor != null) {
-      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), Paint()..color = dayViewStyle.backgroundColor);
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height),
+          Paint()..color = dayViewStyle.backgroundColor);
     }
 
     if (dayViewStyle.backgroundRulesColor != null) {
-      final List<HourMinute> sideTimes = HoursColumn.getSideTimes(minimumTime, maximumTime, interval);
+      final List<HourMinute> sideTimes =
+          HoursColumn.getSideTimes(minimumTime, maximumTime, interval);
       for (HourMinute time in sideTimes) {
         double topOffset = topOffsetCalculator(time);
-        canvas.drawLine(Offset(0, topOffset), Offset(size.width, topOffset), Paint()..color = dayViewStyle.backgroundRulesColor);
+        canvas.drawLine(Offset(0, topOffset), Offset(size.width, topOffset),
+            Paint()..color = dayViewStyle.backgroundRulesColor);
       }
     }
   }
 
   @override
-  bool shouldRepaint(_EventsColumnBackgroundPainter oldDayViewBackgroundPainter) {
-    return dayViewStyle.backgroundColor != oldDayViewBackgroundPainter.dayViewStyle.backgroundColor || dayViewStyle.backgroundRulesColor != oldDayViewBackgroundPainter.dayViewStyle.backgroundRulesColor || topOffsetCalculator != oldDayViewBackgroundPainter.topOffsetCalculator;
+  bool shouldRepaint(
+      _EventsColumnBackgroundPainter oldDayViewBackgroundPainter) {
+    return dayViewStyle.backgroundColor !=
+            oldDayViewBackgroundPainter.dayViewStyle.backgroundColor ||
+        dayViewStyle.backgroundRulesColor !=
+            oldDayViewBackgroundPainter.dayViewStyle.backgroundRulesColor ||
+        topOffsetCalculator != oldDayViewBackgroundPainter.topOffsetCalculator;
   }
 }

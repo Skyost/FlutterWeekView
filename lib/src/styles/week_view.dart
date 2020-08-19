@@ -24,7 +24,8 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
     this.dayViewWidth,
     double dayViewSeparatorWidth,
     this.dayViewSeparatorColor = Colors.black12,
-  })  : dayViewSeparatorWidth = (dayViewSeparatorWidth ?? 0) < 0 ? 0 : (dayViewSeparatorWidth ?? 0),
+  })  : dayViewSeparatorWidth =
+            (dayViewSeparatorWidth ?? 0) < 0 ? 0 : (dayViewSeparatorWidth ?? 0),
         super(headerSize: headerSize);
 
   /// Allows to copy the current style instance with your own properties.
@@ -37,7 +38,9 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
       WeekViewStyle(
         headerSize: headerSize ?? this.headerSize,
         dayViewWidth: dayViewWidth ?? this.dayViewWidth,
-        dayViewSeparatorWidth: dayViewSeparatorWidth ?? this.dayViewSeparatorWidth,
-        dayViewSeparatorColor: dayViewSeparatorColor ?? this.dayViewSeparatorColor,
+        dayViewSeparatorWidth:
+            dayViewSeparatorWidth ?? this.dayViewSeparatorWidth,
+        dayViewSeparatorColor:
+            dayViewSeparatorColor ?? this.dayViewSeparatorColor,
       );
 }

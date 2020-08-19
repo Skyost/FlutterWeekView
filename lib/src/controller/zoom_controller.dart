@@ -39,7 +39,8 @@ abstract class ZoomController {
   void addListener(ZoomControllerListener listener) => _listeners.add(listener);
 
   /// Removes a listener.
-  void removeListener(ZoomControllerListener listener) => _listeners.remove(listener);
+  void removeListener(ZoomControllerListener listener) =>
+      _listeners.remove(listener);
 
   /// Calculates a zoom factor according to the specified scale.
   double calculateZoomFactor(double scale) {
@@ -59,7 +60,8 @@ abstract class ZoomController {
   void scaleStart() => previousZoomFactor = zoomFactor;
 
   /// Should be called when the scale operation has an update.
-  void scaleUpdate(ScaleUpdateDetails details) => changeZoomFactor(calculateZoomFactor(details.scale), details: details);
+  void scaleUpdate(ScaleUpdateDetails details) =>
+      changeZoomFactor(calculateZoomFactor(details.scale), details: details);
 
   /// Returns the current scale.
   double get scale => zoomFactor / (previousZoomFactor * zoomCoefficient);
@@ -72,13 +74,15 @@ abstract class ZoomController {
   set zoomFactor(double zoomFactor) => _zoomFactor = zoomFactor;
 
   /// Changes the current zoom factor.
-  void changeZoomFactor(double zoomFactor, {bool notify = true, ScaleUpdateDetails details}) {
+  void changeZoomFactor(double zoomFactor,
+      {bool notify = true, ScaleUpdateDetails details}) {
     bool hasChanged = this.zoomFactor != zoomFactor;
     if (hasChanged) {
       _zoomFactor = zoomFactor;
       if (notify) {
         details ??= ScaleUpdateDetails(scale: scale);
-        _listeners.forEach((listener) => listener.onZoomFactorChanged(this, details));
+        _listeners
+            .forEach((listener) => listener.onZoomFactorChanged(this, details));
       }
     }
   }
@@ -93,5 +97,6 @@ abstract class ZoomController {
 /// A day view controller listener.
 mixin ZoomControllerListener {
   /// Triggered when the day view zoom factor has changed.
-  void onZoomFactorChanged(covariant ZoomController controller, ScaleUpdateDetails details);
+  void onZoomFactorChanged(
+      covariant ZoomController controller, ScaleUpdateDetails details);
 }

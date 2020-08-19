@@ -4,18 +4,22 @@ extension DateTimeUtils on DateTime {
   DateTime get yearMonthDay => DateTime(year, month, day);
 
   /// Returns a truncated date time (at the minute).
-  DateTime get yearMonthDayHourMinute => DateTime(year, month, day, hour, minute);
+  DateTime get yearMonthDayHourMinute =>
+      DateTime(year, month, day, hour, minute);
 }
 
 /// Contains some useful methods.
 class Utils {
   /// Makes the specified number to have at least two digits by adding a leading zero if needed.
-  static String addLeadingZero(int number) => (number < 10 ? '0' : '') + number.toString();
+  static String addLeadingZero(int number) =>
+      (number < 10 ? '0' : '') + number.toString();
 
   /// Checks whether the provided date is the same year, month and day than the target date.
   static bool sameDay(DateTime date, [DateTime target]) {
     target = target ?? DateTimeGetter.now();
-    return target.year == date.year && target.month == date.month && target.day == date.day;
+    return target.year == date.year &&
+        target.month == date.month &&
+        target.day == date.day;
   }
 
   /// Removes the last word from a string.

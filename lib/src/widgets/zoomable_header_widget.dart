@@ -19,10 +19,12 @@ typedef HoursColumnTapCallback = Function(HourMinute time);
 typedef DayBarTapCallback = Function(DateTime date);
 
 /// Allows to build the current time indicator (rule and circle).
-typedef CurrentTimeIndicatorBuilder = Widget Function(DayViewStyle dayViewStyle, TopOffsetCalculator topOffsetCalculator, double hoursColumnWidth);
+typedef CurrentTimeIndicatorBuilder = Widget Function(DayViewStyle dayViewStyle,
+    TopOffsetCalculator topOffsetCalculator, double hoursColumnWidth);
 
 /// A widget which is showing both headers and can be zoomed.
-abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C extends ZoomController> extends StatefulWidget {
+abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
+    C extends ZoomController> extends StatefulWidget {
   /// The widget style.
   final S style;
 
@@ -79,7 +81,8 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
 }
 
 /// An abstract widget state that shows both headers and can be zoomed.
-abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> extends State<W> with ZoomControllerListener {
+abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
+    extends State<W> with ZoomControllerListener {
   /// The current hour row height.
   double hourRowHeight;
 
@@ -102,7 +105,8 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
     super.didUpdateWidget(oldWidget);
 
     if (widget.controller.zoomFactor != oldWidget.controller.zoomFactor) {
-      widget.controller.changeZoomFactor(oldWidget.controller.zoomFactor, notify: false);
+      widget.controller
+          .changeZoomFactor(oldWidget.controller.zoomFactor, notify: false);
     }
 
     hourRowHeight = _calculateHourRowHeight();
@@ -111,20 +115,26 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
   }
 
   @override
-  void onZoomFactorChanged(ZoomController controller, ScaleUpdateDetails details) {
+  void onZoomFactorChanged(
+      ZoomController controller, ScaleUpdateDetails details) {
     if (!mounted) {
       return;
     }
 
     double hourRowHeight = _calculateHourRowHeight(controller);
     if (verticalScrollController != null) {
-      double widgetHeight = (context.findRenderObject() as RenderBox).size.height;
-      double maxPixels = calculateHeight(hourRowHeight) - widgetHeight + widget.style.headerSize;
+      double widgetHeight =
+          (context.findRenderObject() as RenderBox).size.height;
+      double maxPixels = calculateHeight(hourRowHeight) -
+          widgetHeight +
+          widget.style.headerSize;
 
-      if (hourRowHeight < this.hourRowHeight && verticalScrollController.position.pixels > maxPixels) {
+      if (hourRowHeight < this.hourRowHeight &&
+          verticalScrollController.position.pixels > maxPixels) {
         verticalScrollController.jumpTo(maxPixels);
       } else {
-        verticalScrollController.jumpTo(math.min(maxPixels, details.localFocalPoint.dy));
+        verticalScrollController
+            .jumpTo(math.min(maxPixels, details.localFocalPoint.dy));
       }
     }
 
@@ -146,30 +156,45 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
   /// Schedules a scroll to the default hour.
   void scheduleScrollToInitialTime() {
     if (shouldScrollToInitialTime) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToInitialTime());
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => scrollToInitialTime());
     }
   }
 
   /// Checks whether the widget should scroll to current time.
-  bool get shouldScrollToInitialTime => widget.minimumTime.atDate(widget.initialTime).isBefore(widget.initialTime) && widget.maximumTime.atDate(widget.initialTime).isAfter(widget.initialTime);
+  bool get shouldScrollToInitialTime =>
+      widget.minimumTime
+          .atDate(widget.initialTime)
+          .isBefore(widget.initialTime) &&
+      widget.maximumTime.atDate(widget.initialTime).isAfter(widget.initialTime);
 
   /// Scrolls to the initial time.
   void scrollToInitialTime() {
     if (mounted && verticalScrollController != null) {
-      double topOffset = calculateTopOffset(HourMinute.fromDateTime(dateTime: widget.initialTime));
-      verticalScrollController.jumpTo(math.min(topOffset, verticalScrollController.position.maxScrollExtent));
+      double topOffset = calculateTopOffset(
+          HourMinute.fromDateTime(dateTime: widget.initialTime));
+      verticalScrollController.jumpTo(math.min(
+          topOffset, verticalScrollController.position.maxScrollExtent));
     }
   }
 
   /// Returns whether this widget should be zoomable.
-  bool get isZoomable => widget.userZoomable && widget.controller.zoomCoefficient > 0;
+  bool get isZoomable =>
+      widget.userZoomable && widget.controller.zoomCoefficient > 0;
 
   /// Calculates the top offset of a given time.
-  double calculateTopOffset(HourMinute time, {HourMinute minimumTime, double hourRowHeight}) => DefaultBuilders.defaultTopOffsetCalculator(time, minimumTime: minimumTime ?? widget.minimumTime, hourRowHeight: hourRowHeight ?? this.hourRowHeight);
+  double calculateTopOffset(HourMinute time,
+          {HourMinute minimumTime, double hourRowHeight}) =>
+      DefaultBuilders.defaultTopOffsetCalculator(time,
+          minimumTime: minimumTime ?? widget.minimumTime,
+          hourRowHeight: hourRowHeight ?? this.hourRowHeight);
 
   /// Calculates the widget height.
-  double calculateHeight([double hourRowHeight]) => calculateTopOffset(widget.maximumTime, hourRowHeight: hourRowHeight);
+  double calculateHeight([double hourRowHeight]) =>
+      calculateTopOffset(widget.maximumTime, hourRowHeight: hourRowHeight);
 
   /// Calculates the hour row height.
-  double _calculateHourRowHeight([ZoomController controller]) => currentDayViewStyle.hourRowHeight * (controller ?? widget.controller).zoomFactor;
+  double _calculateHourRowHeight([ZoomController controller]) =>
+      currentDayViewStyle.hourRowHeight *
+      (controller ?? widget.controller).zoomFactor;
 }
