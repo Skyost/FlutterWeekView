@@ -1,3 +1,7 @@
+## [1.0.0+1] - 2020-08-19
+
+* Fixed a bug when updating the Week View.
+
 ## [1.0.0] - 2020-08-05
 
 * Added `currentTimeIndicatorBuilder`, `onDayBarTappedDown` and `dayBarStyleBuilder` parameters.
