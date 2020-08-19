@@ -1,5 +1,9 @@
 # Flutter Week View
 
+[![Likes](https://badges.bar/flutter_week_view/likes)](https://pub.dev/packages/flutter_week_view/score)
+[![Popularity](https://badges.bar/flutter_week_view/popularity)](https://pub.dev/packages/flutter_week_view/score)
+[![Pub points](https://badges.bar/flutter_week_view/pub%20points)](https://pub.dev/packages/flutter_week_view/score)
+
 Displays a highly customizable week view (or day view) which is able to display events, to be scrolled, to be zoomed-in & out and a lot more !
 
 Flutter Week View is highly inspired by [Android Week View](https://github.com/thellmund/Android-Week-View).
