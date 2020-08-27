@@ -24,6 +24,9 @@ class HoursColumn extends StatelessWidget {
   /// The times to display on the side border.
   final List<HourMinute> _sideTimes;
 
+  /// Building method for building the time displayed on the side border.
+  final SideTimeBuilder sideTimeBuilder;
+
   /// Creates a new hours column instance.
   HoursColumn({
     this.minimumTime = HourMinute.MIN,
@@ -31,12 +34,15 @@ class HoursColumn extends StatelessWidget {
     TopOffsetCalculator topOffsetCalculator,
     HoursColumnStyle style,
     this.onHoursColumnTappedDown,
+    SideTimeBuilder sideTimeBuilder,
   })  : assert(minimumTime != null),
         assert(maximumTime != null),
         assert(minimumTime < maximumTime),
         topOffsetCalculator =
             topOffsetCalculator ?? DefaultBuilders.defaultTopOffsetCalculator,
         style = style ?? const HoursColumnStyle(),
+        sideTimeBuilder =
+            sideTimeBuilder ?? DefaultBuilders.defaultSideTimeBuilder,
         _sideTimes = getSideTimes(minimumTime, maximumTime, style.interval);
 
   /// Creates a new hours column instance from a headers widget instance.
@@ -48,6 +54,7 @@ class HoursColumn extends StatelessWidget {
           topOffsetCalculator: parent.calculateTopOffset,
           style: parent.widget.hoursColumnStyle,
           onHoursColumnTappedDown: parent.widget.onHoursColumnTappedDown,
+          sideTimeBuilder: parent.widget.sideTimeBuilder,
         );
 
   @override
@@ -67,10 +74,7 @@ class HoursColumn extends StatelessWidget {
                 right: 0,
                 child: Align(
                   alignment: style.textAlignment,
-                  child: Text(
-                    style.timeFormatter(time),
-                    style: style.textStyle,
-                  ),
+                  child: sideTimeBuilder(style, time),
                 ),
               ),
             )

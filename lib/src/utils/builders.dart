@@ -117,6 +117,15 @@ class DefaultBuilders {
     );
   }
 
+  /// Builds the time displayed on the side border.
+  static Widget defaultSideTimeBuilder(
+      HoursColumnStyle hoursColumnStyle, HourMinute time) {
+    return Text(
+      hoursColumnStyle.timeFormatter(time),
+      style: hoursColumnStyle.textStyle,
+    );
+  }
+
   /// The default day view style builder.
   static DayViewStyle defaultDayViewStyleBuilder(DateTime date) =>
       DayViewStyle.fromDate(date: date);

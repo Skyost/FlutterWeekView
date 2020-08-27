@@ -22,6 +22,10 @@ typedef DayBarTapCallback = Function(DateTime date);
 typedef CurrentTimeIndicatorBuilder = Widget Function(DayViewStyle dayViewStyle,
     TopOffsetCalculator topOffsetCalculator, double hoursColumnWidth);
 
+/// Allows to build the time displayed on the side border.
+typedef SideTimeBuilder = Widget Function(
+    HoursColumnStyle dayViewStyle, HourMinute time);
+
 /// A widget which is showing both headers and can be zoomed.
 abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
     C extends ZoomController> extends StatefulWidget {
@@ -49,6 +53,9 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
   /// The current time indicator builder.
   final CurrentTimeIndicatorBuilder currentTimeIndicatorBuilder;
 
+  /// Building method for building the time displayed on the side border.
+  final SideTimeBuilder sideTimeBuilder;
+
   /// Triggered when the hours column has been tapped down.
   final HoursColumnTapCallback onHoursColumnTappedDown;
 
@@ -71,6 +78,7 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
     this.onHoursColumnTappedDown,
     this.onDayBarTappedDown,
     @required this.controller,
+    this.sideTimeBuilder,
   })  : assert(style != null),
         assert(minimumTime != null),
         assert(maximumTime != null),

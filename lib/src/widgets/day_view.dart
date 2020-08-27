@@ -40,6 +40,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
     HourMinute initialTime,
     bool userZoomable,
     CurrentTimeIndicatorBuilder currentTimeIndicatorBuilder,
+    SideTimeBuilder sideTimeBuilder,
     HoursColumnTapCallback onHoursColumnTappedDown,
     DayBarTapCallback onDayBarTappedDown,
   })  : assert(date != null),
@@ -57,6 +58,8 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
               (Utils.sameDay(date) ? HourMinute.now() : const HourMinute())
                   .atDate(date),
           userZoomable: userZoomable ?? true,
+          sideTimeBuilder:
+              sideTimeBuilder ?? DefaultBuilders.defaultSideTimeBuilder,
           currentTimeIndicatorBuilder: currentTimeIndicatorBuilder ??
               DefaultBuilders.defaultCurrentTimeIndicatorBuilder,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
