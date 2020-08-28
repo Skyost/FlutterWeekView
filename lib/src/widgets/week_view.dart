@@ -60,7 +60,7 @@ class WeekView
     bool scrollToCurrentTime,
     bool userZoomable,
     CurrentTimeIndicatorBuilder currentTimeIndicatorBuilder,
-    SideTimeBuilder sideTimeBuilder,
+    HoursColumnTimeBuilder hoursColumnTimeBuilder,
     HoursColumnTapCallback onHoursColumnTappedDown,
     DayBarTapCallback onDayBarTappedDown,
   }) : this.builder(
@@ -79,7 +79,7 @@ class WeekView
           initialTime: initialTime,
           userZoomable: userZoomable,
           currentTimeIndicatorBuilder: currentTimeIndicatorBuilder,
-          sideTimeBuilder: sideTimeBuilder,
+          hoursColumnTimeBuilder: hoursColumnTimeBuilder,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
           onDayBarTappedDown: onDayBarTappedDown,
         );
@@ -101,7 +101,7 @@ class WeekView
     bool scrollToCurrentTime,
     bool userZoomable,
     CurrentTimeIndicatorBuilder currentTimeIndicatorBuilder,
-    SideTimeBuilder sideTimeBuilder,
+    HoursColumnTimeBuilder hoursColumnTimeBuilder,
     HoursColumnTapCallback onHoursColumnTappedDown,
     DayBarTapCallback onDayBarTappedDown,
   })  : assert(dateCreator != null),
@@ -122,8 +122,8 @@ class WeekView
           userZoomable: userZoomable ?? true,
           currentTimeIndicatorBuilder: currentTimeIndicatorBuilder ??
               DefaultBuilders.defaultCurrentTimeIndicatorBuilder,
-          sideTimeBuilder:
-              sideTimeBuilder ?? DefaultBuilders.defaultSideTimeBuilder,
+          hoursColumnTimeBuilder: hoursColumnTimeBuilder ??
+              DefaultBuilders.defaultHoursColumnTimeBuilder,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
           onDayBarTappedDown: onDayBarTappedDown,
         );

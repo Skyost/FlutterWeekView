@@ -118,7 +118,7 @@ class DefaultBuilders {
   }
 
   /// Builds the time displayed on the side border.
-  static Widget defaultSideTimeBuilder(
+  static Widget defaultHoursColumnTimeBuilder(
       HoursColumnStyle hoursColumnStyle, HourMinute time) {
     return Text(
       hoursColumnStyle.timeFormatter(time),

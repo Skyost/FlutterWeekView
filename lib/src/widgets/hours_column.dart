@@ -25,7 +25,7 @@ class HoursColumn extends StatelessWidget {
   final List<HourMinute> _sideTimes;
 
   /// Building method for building the time displayed on the side border.
-  final SideTimeBuilder sideTimeBuilder;
+  final HoursColumnTimeBuilder hoursColumnTimeBuilder;
 
   /// Creates a new hours column instance.
   HoursColumn({
@@ -34,15 +34,15 @@ class HoursColumn extends StatelessWidget {
     TopOffsetCalculator topOffsetCalculator,
     HoursColumnStyle style,
     this.onHoursColumnTappedDown,
-    SideTimeBuilder sideTimeBuilder,
+    HoursColumnTimeBuilder hoursColumnTimeBuilder,
   })  : assert(minimumTime != null),
         assert(maximumTime != null),
         assert(minimumTime < maximumTime),
         topOffsetCalculator =
             topOffsetCalculator ?? DefaultBuilders.defaultTopOffsetCalculator,
         style = style ?? const HoursColumnStyle(),
-        sideTimeBuilder =
-            sideTimeBuilder ?? DefaultBuilders.defaultSideTimeBuilder,
+        hoursColumnTimeBuilder = hoursColumnTimeBuilder ??
+            DefaultBuilders.defaultHoursColumnTimeBuilder,
         _sideTimes = getSideTimes(minimumTime, maximumTime, style.interval);
 
   /// Creates a new hours column instance from a headers widget instance.
@@ -54,7 +54,7 @@ class HoursColumn extends StatelessWidget {
           topOffsetCalculator: parent.calculateTopOffset,
           style: parent.widget.hoursColumnStyle,
           onHoursColumnTappedDown: parent.widget.onHoursColumnTappedDown,
-          sideTimeBuilder: parent.widget.sideTimeBuilder,
+          hoursColumnTimeBuilder: parent.widget.hoursColumnTimeBuilder,
         );
 
   @override
@@ -74,7 +74,7 @@ class HoursColumn extends StatelessWidget {
                 right: 0,
                 child: Align(
                   alignment: style.textAlignment,
-                  child: sideTimeBuilder(style, time),
+                  child: hoursColumnTimeBuilder(style, time),
                 ),
               ),
             )
