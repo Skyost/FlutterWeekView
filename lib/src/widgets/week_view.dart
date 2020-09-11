@@ -143,19 +143,14 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
       horizontalScrollController = SilentScrollController();
     }
 
-    dayViewWidth = widget.style.dayViewWidth;
-    if (dayViewWidth != null) {
-      scheduleScrollToInitialTime();
-      return;
-    }
+    _calculateWidth(andScrollToCurrentTime: true);
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      double widgetWidth = (context.findRenderObject() as RenderBox).size.width;
-      setState(() {
-        dayViewWidth = widgetWidth - widget.hoursColumnStyle.width;
-        scheduleScrollToInitialTime();
-      });
-    });
+  @override
+  void didUpdateWidget(WeekView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    _calculateWidth();
   }
 
   @override
@@ -318,6 +313,25 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
       }
     }
     return null;
+  }
+
+  /// Calculates the widget width and scroll to current time if needed.
+  void _calculateWidth({bool andScrollToCurrentTime = false}) {
+    dayViewWidth = widget.style.dayViewWidth;
+    if (dayViewWidth != null && andScrollToCurrentTime) {
+      scheduleScrollToInitialTime();
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      double widgetWidth = (context.findRenderObject() as RenderBox).size.width;
+      setState(() {
+        dayViewWidth = widgetWidth - widget.hoursColumnStyle.width;
+        if (andScrollToCurrentTime) {
+          scheduleScrollToInitialTime();
+        }
+      });
+    });
   }
 }
 
