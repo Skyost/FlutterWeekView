@@ -168,7 +168,7 @@ void main() {
       DayView(
         date: date,
         initialTime: const HourMinute(hour: 7),
-        style: DayViewStyle(
+        style: const DayViewStyle(
           headerSize: 60.0,
           hourRowHeight: 80.0,
           backgroundColor: Colors.black54,
