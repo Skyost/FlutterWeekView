@@ -73,7 +73,10 @@ class HourMinute {
 
   /// Calculates the difference between this hour minute and another.
   HourMinute subtract(HourMinute other) {
-    int hour = math.max(this.hour - other.hour, 0);
+    int hour = this.hour - other.hour;
+    if(hour < 0) {
+      return HourMinute.ZERO;
+    }
     int minute = this.minute - other.minute;
     while (minute < 0) {
       if (hour == 0) {
