@@ -69,7 +69,8 @@ class _FlutterWeekViewDemoAppBody extends StatelessWidget {
             ),
             RaisedButton(
               child: const Text('Demo dynamic day view'),
-              onPressed: () => Navigator.pushNamed(context, '/dynamic-day-view'),
+              onPressed: () =>
+                  Navigator.pushNamed(context, '/dynamic-day-view'),
             ),
             const Expanded(
               child: SizedBox.expand(),
@@ -102,40 +103,26 @@ class _DemoDayView extends StatelessWidget {
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day);
-    return DayView(
+
+    return FullWeekView(
       initialTime: const HourMinute(hour: 7),
       date: now,
+      userZoomable: false,
+      hoursColumnStyle: const HoursColumnStyle(width: 50),
+      minimumTime: const HourMinute(hour: 6),
       events: [
-        FlutterWeekViewEvent(
-          title: 'An event 1',
-          description: 'A description 1',
-          start: date.subtract(const Duration(hours: 1)),
-          end: date.add(const Duration(hours: 18, minutes: 30)),
-        ),
-        FlutterWeekViewEvent(
-          title: 'An event 2',
-          description: 'A description 2',
-          start: date.add(const Duration(hours: 19)),
-          end: date.add(const Duration(hours: 22)),
-        ),
-        FlutterWeekViewEvent(
-          title: 'An event 3',
-          description: 'A description 3',
-          start: date.add(const Duration(hours: 23, minutes: 30)),
-          end: date.add(const Duration(hours: 25, minutes: 30)),
-        ),
-        FlutterWeekViewEvent(
-          title: 'An event 4',
-          description: 'A description 4',
-          start: date.add(const Duration(hours: 20)),
-          end: date.add(const Duration(hours: 21)),
-        ),
-        FlutterWeekViewEvent(
-          title: 'An event 5',
-          description: 'A description 5',
-          start: date.add(const Duration(hours: 20)),
-          end: date.add(const Duration(hours: 21)),
-        ),
+        WeekEvent(
+            start: const TimeOfDay(hour: 8, minute: 25),
+            end: const TimeOfDay(hour: 9, minute: 25),
+            day: [0]),
+        WeekEvent(
+            start: const TimeOfDay(hour: 12, minute: 25),
+            end: const TimeOfDay(hour: 14, minute: 55),
+            day: [1]),
+        WeekEvent(
+            start: const TimeOfDay(hour: 11, minute: 0),
+            end: const TimeOfDay(hour: 16, minute: 15),
+            day: [5])
       ],
       style: DayViewStyle.fromDate(
         date: date,
@@ -152,8 +139,13 @@ class _DemoWeekView extends StatelessWidget {
     DateTime now = DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day);
     return WeekView(
+      style: const WeekViewStyle(dayViewWidth: 90.0),
       initialTime: const HourMinute(hour: 7).atDate(DateTime.now()),
-      dates: [date.subtract(const Duration(days: 1)), date, date.add(const Duration(days: 1))],
+      dates: [
+        date.subtract(const Duration(days: 1)),
+        date,
+        date.add(const Duration(days: 1))
+      ],
       events: [
         FlutterWeekViewEvent(
           title: 'An event 1',
@@ -212,7 +204,8 @@ class _DynamicDayViewState extends State<_DynamicDayView> {
           IconButton(
             onPressed: () {
               setState(() {
-                DateTime start = DateTime(now.year, now.month, now.day, Random().nextInt(24), Random().nextInt(60));
+                DateTime start = DateTime(now.year, now.month, now.day,
+                    Random().nextInt(24), Random().nextInt(60));
                 events.add(FlutterWeekViewEvent(
                   title: 'Event ' + (events.length + 1).toString(),
                   start: start,

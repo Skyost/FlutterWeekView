@@ -1,0 +1,8 @@
+{
+  
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnSave": false,
+    "editor.rulers": []
+  }
+}
