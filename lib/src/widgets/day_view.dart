@@ -95,6 +95,10 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   void didUpdateWidget(DayView oldWidget) {
     super.didUpdateWidget(oldWidget);
 
+    if (oldWidget.date != widget.date) {
+      scheduleScrollToInitialTime();
+    }
+
     reset();
     createEventsDrawProperties();
   }

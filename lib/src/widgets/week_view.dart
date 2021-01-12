@@ -149,8 +149,10 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   void didUpdateWidget(WeekView oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.style.dayViewWidth != oldWidget.style.dayViewWidth) {
-      _calculateWidth(setState: true);
+    bool widthHasChanged = widget.style.dayViewWidth != oldWidget.style.dayViewWidth;
+    bool scrollToCurrentTime = oldWidget.initialTime != widget.initialTime;
+    if (widthHasChanged || scrollToCurrentTime) {
+      _calculateWidth(setState: widthHasChanged, andScrollToCurrentTime: scrollToCurrentTime);
     }
   }
 

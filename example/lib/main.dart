@@ -221,7 +221,7 @@ class _DynamicDayViewState extends State<_DynamicDayView> {
                 ));
               });
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.add,
               color: Colors.white,
             ),
