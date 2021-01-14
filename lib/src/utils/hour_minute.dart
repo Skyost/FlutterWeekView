@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/utils/utils.dart';
@@ -74,7 +73,7 @@ class HourMinute {
   /// Calculates the difference between this hour minute and another.
   HourMinute subtract(HourMinute other) {
     int hour = this.hour - other.hour;
-    if(hour < 0) {
+    if (hour < 0) {
       return HourMinute.ZERO;
     }
     int minute = this.minute - other.minute;
