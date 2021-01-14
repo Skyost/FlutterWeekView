@@ -1,3 +1,8 @@
+## [1.0.0+2] - 2021-01-14
+
+* Fixed a subtraction logic error (thanks [Yoropiata](https://github.com/Yoropiata)).
+* Fixed various state errors.
+
 ## [1.0.0+1] - 2020-08-19
 
 * Fixed a bug when updating the Week View.
