@@ -15,7 +15,7 @@ class Utils {
       (number < 10 ? '0' : '') + number.toString();
 
   /// Checks whether the provided date is the same year, month and day than the target date.
-  static bool sameDay(DateTime date, [DateTime target]) {
+  static bool sameDay(DateTime date, [DateTime? target]) {
     target = target ?? dateTimeGetter.now();
     return target.year == date.year &&
         target.month == date.month &&

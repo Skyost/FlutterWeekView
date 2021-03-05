@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/utils/utils.dart';
 
 /// Simply represents a hour and a minute.
@@ -23,8 +22,8 @@ class HourMinute {
 
   /// Allows to internally create a new hour minute time instance.
   const HourMinute._internal({
-    @required this.hour,
-    @required this.minute,
+    required this.hour,
+    required this.minute,
   });
 
   /// Creates a new hour minute time instance.
@@ -32,20 +31,18 @@ class HourMinute {
     int hour = 0,
     int minute = 0,
   }) : this._internal(
-          hour: hour == null ? 0 : (hour < 0 ? 0 : (hour > 23 ? 23 : hour)),
-          minute: minute == null
-              ? 0
-              : (minute < 0 ? 0 : (minute > 59 ? 59 : minute)),
+          hour: hour < 0 ? 0 : (hour > 23 ? 23 : hour),
+          minute: minute < 0 ? 0 : (minute > 59 ? 59 : minute),
         );
 
   /// Creates a new hour minute time instance from a given date time object.
   HourMinute.fromDateTime({
-    @required DateTime dateTime,
+    required DateTime dateTime,
   }) : this._internal(hour: dateTime.hour, minute: dateTime.minute);
 
   /// Creates a new hour minute time instance from a given date time object.
   factory HourMinute.fromDuration({
-    @required Duration duration,
+    required Duration duration,
   }) {
     int hour = 0;
     int minute = duration.inMinutes;

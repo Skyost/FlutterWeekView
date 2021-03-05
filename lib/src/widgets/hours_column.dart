@@ -19,7 +19,7 @@ class HoursColumn extends StatelessWidget {
   final HoursColumnStyle style;
 
   /// Triggered when the hours column has been tapped down.
-  final HoursColumnTapCallback onHoursColumnTappedDown;
+  final HoursColumnTapCallback? onHoursColumnTappedDown;
 
   /// The times to display on the side border.
   final List<HourMinute> _sideTimes;
@@ -31,23 +31,20 @@ class HoursColumn extends StatelessWidget {
   HoursColumn({
     this.minimumTime = HourMinute.MIN,
     this.maximumTime = HourMinute.MAX,
-    TopOffsetCalculator topOffsetCalculator,
-    HoursColumnStyle style,
+    TopOffsetCalculator? topOffsetCalculator,
+    this.style = const HoursColumnStyle(),
     this.onHoursColumnTappedDown,
-    HoursColumnTimeBuilder hoursColumnTimeBuilder,
-  })  : assert(minimumTime != null),
-        assert(maximumTime != null),
-        assert(minimumTime < maximumTime),
+    HoursColumnTimeBuilder? hoursColumnTimeBuilder,
+  })  : assert(minimumTime < maximumTime),
         topOffsetCalculator =
             topOffsetCalculator ?? DefaultBuilders.defaultTopOffsetCalculator,
-        style = style ?? const HoursColumnStyle(),
         hoursColumnTimeBuilder = hoursColumnTimeBuilder ??
             DefaultBuilders.defaultHoursColumnTimeBuilder,
         _sideTimes = getSideTimes(minimumTime, maximumTime, style.interval);
 
   /// Creates a new hours column instance from a headers widget instance.
   HoursColumn.fromHeadersWidgetState({
-    @required ZoomableHeadersWidgetState parent,
+    required ZoomableHeadersWidgetState parent,
   }) : this(
           minimumTime: parent.widget.minimumTime,
           maximumTime: parent.widget.maximumTime,
@@ -69,7 +66,7 @@ class HoursColumn extends StatelessWidget {
             .map(
               (time) => Positioned(
                 top: topOffsetCalculator(time) -
-                    ((style.textStyle?.fontSize ?? 14) / 2),
+                    ((style.textStyle.fontSize ?? 14) / 2),
                 left: 0,
                 right: 0,
                 child: Align(
@@ -94,7 +91,7 @@ class HoursColumn extends StatelessWidget {
 
         int hour = hourMinutesInHour.floor();
         int minute = ((hourMinutesInHour - hour) * 60).round();
-        onHoursColumnTappedDown(
+        onHoursColumnTappedDown!(
             minimumTime.add(HourMinute(hour: hour, minute: minute)));
       },
       child: child,

@@ -6,7 +6,7 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
   /// A day view width.
   ///
   /// Defaults to the entire width available for the week view widget.
-  final double dayViewWidth;
+  final double? dayViewWidth;
 
   /// The separator width between day views.
   ///
@@ -20,27 +20,24 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
 
   /// Creates a new week view style instance.
   const WeekViewStyle({
-    double headerSize,
+    double? headerSize,
     this.dayViewWidth,
-    double dayViewSeparatorWidth,
+    double? dayViewSeparatorWidth,
     this.dayViewSeparatorColor = Colors.black12,
-  })  : dayViewSeparatorWidth =
-            (dayViewSeparatorWidth ?? 0) < 0 ? 0 : (dayViewSeparatorWidth ?? 0),
+  })  : dayViewSeparatorWidth = (dayViewSeparatorWidth ?? 0) < 0 ? 0 : (dayViewSeparatorWidth ?? 0),
         super(headerSize: headerSize);
 
   /// Allows to copy the current style instance with your own properties.
   WeekViewStyle copyWith({
-    double headerSize,
-    double dayViewWidth,
-    double dayViewSeparatorWidth,
-    double dayViewSeparatorColor,
+    double? headerSize,
+    double? dayViewWidth,
+    double? dayViewSeparatorWidth,
+    Color? dayViewSeparatorColor,
   }) =>
       WeekViewStyle(
         headerSize: headerSize ?? this.headerSize,
         dayViewWidth: dayViewWidth ?? this.dayViewWidth,
-        dayViewSeparatorWidth:
-            dayViewSeparatorWidth ?? this.dayViewSeparatorWidth,
-        dayViewSeparatorColor:
-            dayViewSeparatorColor ?? this.dayViewSeparatorColor,
+        dayViewSeparatorWidth: dayViewSeparatorWidth ?? this.dayViewSeparatorWidth,
+        dayViewSeparatorColor: dayViewSeparatorColor ?? this.dayViewSeparatorColor,
       );
 }

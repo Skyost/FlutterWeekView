@@ -1,3 +1,7 @@
+## [1.1.0] - 2021-03-05
+
+* Migrated to null safety.
+
 ## [1.0.0+2] - 2021-01-14
 
 * Fixed a subtraction logic error (thanks [Yoropiata](https://github.com/Yoropiata)).

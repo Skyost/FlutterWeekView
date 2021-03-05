@@ -14,10 +14,10 @@ class HoursColumnStyle {
   final double width;
 
   /// The hours column background color. Defaults to [Colors.white].
-  final Color color;
+  final Color? color;
 
   /// The hours column decoration. Defaults to null.
-  final Decoration decoration;
+  final Decoration? decoration;
 
   /// The hours text alignment. Defaults to [Alignment.center].
   final Alignment textAlignment;
@@ -27,13 +27,13 @@ class HoursColumnStyle {
 
   /// Creates a new hour column style instance.
   const HoursColumnStyle({
-    TimeFormatter timeFormatter,
-    TextStyle textStyle,
-    double width,
-    Color color,
+    TimeFormatter? timeFormatter,
+    TextStyle? textStyle,
+    double? width,
+    Color? color,
     this.decoration,
-    Alignment textAlignment,
-    Duration interval,
+    Alignment? textAlignment,
+    Duration? interval,
   })  : timeFormatter = timeFormatter ?? DefaultBuilders.defaultTimeFormatter,
         textStyle = textStyle ?? const TextStyle(color: Colors.black54),
         width = (width ?? 60) < 0 ? 0 : (width ?? 60),
@@ -43,13 +43,13 @@ class HoursColumnStyle {
 
   /// Allows to copy the current style instance with your own properties.
   HoursColumnStyle copyWith({
-    TimeFormatter timeFormatter,
-    TextStyle textStyle,
-    double width,
-    Color color,
-    Decoration decoration,
-    Alignment textAlignment,
-    Duration interval,
+    TimeFormatter? timeFormatter,
+    TextStyle? textStyle,
+    double? width,
+    Color? color,
+    Decoration? decoration,
+    Alignment? textAlignment,
+    Duration? interval,
   }) =>
       HoursColumnStyle(
         timeFormatter: timeFormatter ?? this.timeFormatter,

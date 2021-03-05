@@ -24,35 +24,35 @@ class FlutterWeekViewEvent extends Comparable<FlutterWeekViewEvent> {
   final DateTime end;
 
   /// The event widget background color.
-  final Color backgroundColor;
+  final Color? backgroundColor;
 
   /// The event widget decoration.
-  final BoxDecoration decoration;
+  final BoxDecoration? decoration;
 
   /// The event text widget text style.
-  final TextStyle textStyle;
+  final TextStyle? textStyle;
 
   /// The event widget padding.
-  final EdgeInsets padding;
+  final EdgeInsets? padding;
 
   /// The event widget margin.
-  final EdgeInsets margin;
+  final EdgeInsets? margin;
 
   /// The event widget tap event.
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   /// The event widget long press event.
-  final VoidCallback onLongPress;
+  final VoidCallback? onLongPress;
 
   /// The event text builder.
-  final EventTextBuilder eventTextBuilder;
+  final EventTextBuilder? eventTextBuilder;
 
   /// Creates a new flutter week view event instance.
   FlutterWeekViewEvent({
-    @required this.title,
-    @required this.description,
-    @required DateTime start,
-    @required DateTime end,
+    required this.title,
+    required this.description,
+    required DateTime start,
+    required DateTime end,
     this.backgroundColor = const Color(0xCC2196F3),
     this.decoration,
     this.textStyle = const TextStyle(color: Colors.white),
@@ -62,11 +62,7 @@ class FlutterWeekViewEvent extends Comparable<FlutterWeekViewEvent> {
     this.onLongPress,
     this.eventTextBuilder,
   })  : start = start.yearMonthDayHourMinute,
-        end = end.yearMonthDayHourMinute,
-        assert(title != null),
-        assert(description != null),
-        assert(start != null),
-        assert(end != null);
+        end = end.yearMonthDayHourMinute;
 
   /// Builds the event widget.
   Widget build(

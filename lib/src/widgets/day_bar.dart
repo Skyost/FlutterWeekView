@@ -12,31 +12,29 @@ class DayBar extends StatelessWidget {
   final DayBarStyle style;
 
   /// The widget height.
-  final double height;
+  final double? height;
 
   /// The width width.
-  final double width;
+  final double? width;
 
   /// Triggered when the day bar has been tapped down.
-  final DayBarTapCallback onDayBarTappedDown;
+  final DayBarTapCallback? onDayBarTappedDown;
 
   /// Creates a new day bar instance.
   DayBar({
-    @required DateTime date,
-    @required this.style,
+    required DateTime date,
+    required this.style,
     this.height,
     this.width,
     this.onDayBarTappedDown,
-  })  : assert(date != null),
-        assert(style != null),
-        date = date.yearMonthDay;
+  }) : date = date.yearMonthDay;
 
   /// Creates a new day bar instance from a headers widget instance.
   DayBar.fromHeadersWidgetState({
-    @required ZoomableHeadersWidget parent,
-    @required DateTime date,
-    @required DayBarStyle style,
-    double width,
+    required ZoomableHeadersWidget parent,
+    required DateTime date,
+    required DayBarStyle style,
+    double? width,
   }) : this(
           date: date,
           style: style,

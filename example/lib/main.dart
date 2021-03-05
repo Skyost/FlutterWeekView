@@ -29,7 +29,7 @@ class _FlutterWeekViewDemoApp extends StatelessWidget {
 
   static Widget inScaffold({
     String title = 'Flutter Week View',
-    @required Widget body,
+    required Widget body,
   }) =>
       Scaffold(
         appBar: AppBar(
@@ -59,15 +59,17 @@ class _FlutterWeekViewDemoAppBody extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
             ),
-            RaisedButton(
+            ElevatedButton(
               child: const Text('Demo day view'),
               onPressed: () => Navigator.pushNamed(context, '/day-view'),
             ),
-            RaisedButton(
+            const SizedBox(height: 10),
+            ElevatedButton(
               child: const Text('Demo week view'),
               onPressed: () => Navigator.pushNamed(context, '/week-view'),
             ),
-            RaisedButton(
+            const SizedBox(height: 10),
+            ElevatedButton(
               child: const Text('Demo dynamic day view'),
               onPressed: () => Navigator.pushNamed(context, '/dynamic-day-view'),
             ),

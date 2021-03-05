@@ -17,6 +17,6 @@ class ZoomableHeaderWidgetStyle {
 
   /// Creates a new zoomable header widget style instance.
   const ZoomableHeaderWidgetStyle({
-    double headerSize,
+    double? headerSize,
   }) : headerSize = (headerSize ?? 40) < 0 ? 0 : (headerSize ?? 40);
 }

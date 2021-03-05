@@ -22,7 +22,7 @@ import 'package:golden_toolkit/golden_toolkit.dart';
 /// 3) Different OSes/Flutter versions generate different files: https://github.com/flutter/flutter/issues/36667
 /// Thus, if you're doing a PR, you may want to generate your own golden images before starting
 /// editing, use them to check that everything's ok, but don't push them.
-Future<void> main(FutureOr<void> testMain()) async {
+Future<void> main(List<String> arguments, FutureOr<void> Function() testMain) async {
   // Loading fonts as in (1) above
   await loadAppFonts();
   return testMain();
