@@ -53,10 +53,14 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
           inScrollableWidget: inScrollableWidget ?? true,
           minimumTime: minimumTime ?? HourMinute.MIN,
           maximumTime: maximumTime ?? HourMinute.MAX,
-          initialTime: initialTime?.atDate(date) ?? (Utils.sameDay(date) ? HourMinute.now() : const HourMinute()).atDate(date),
+          initialTime: initialTime?.atDate(date) ??
+              (Utils.sameDay(date) ? HourMinute.now() : const HourMinute())
+                  .atDate(date),
           userZoomable: userZoomable ?? true,
-          hoursColumnTimeBuilder: hoursColumnTimeBuilder ?? DefaultBuilders.defaultHoursColumnTimeBuilder,
-          currentTimeIndicatorBuilder: currentTimeIndicatorBuilder ?? DefaultBuilders.defaultCurrentTimeIndicatorBuilder,
+          hoursColumnTimeBuilder: hoursColumnTimeBuilder ??
+              DefaultBuilders.defaultHoursColumnTimeBuilder,
+          currentTimeIndicatorBuilder: currentTimeIndicatorBuilder ??
+              DefaultBuilders.defaultCurrentTimeIndicatorBuilder,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
           onDayBarTappedDown: onDayBarTappedDown,
         );
@@ -68,7 +72,8 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
 /// The day view state.
 class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   /// Contains all events draw properties.
-  final Map<FlutterWeekViewEvent, EventDrawProperties> eventsDrawProperties = HashMap();
+  final Map<FlutterWeekViewEvent, EventDrawProperties> eventsDrawProperties =
+      HashMap();
 
   /// The flutter week view events.
   late List<FlutterWeekViewEvent> events;
@@ -136,7 +141,8 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   }
 
   @override
-  void onZoomFactorChanged(DayViewController controller, ScaleUpdateDetails details) {
+  void onZoomFactorChanged(
+      DayViewController controller, ScaleUpdateDetails details) {
     super.onZoomFactorChanged(controller, details);
 
     if (mounted) {
@@ -149,7 +155,9 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
 
   /// Creates the main widget, with a hours column and an events column.
   Widget createMainWidget() {
-    List<Widget> children = eventsDrawProperties.entries.map((entry) => entry.value.createWidget(context, widget, entry.key)).toList();
+    List<Widget> children = eventsDrawProperties.entries
+        .map((entry) => entry.value.createWidget(context, widget, entry.key))
+        .toList();
     if (widget.hoursColumnStyle.width > 0) {
       children.add(Positioned(
         top: 0,
@@ -158,8 +166,12 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       ));
     }
 
-    if (Utils.sameDay(widget.date) && widget.minimumTime.atDate(widget.date).isBefore(DateTime.now()) && widget.maximumTime.atDate(widget.date).isAfter(DateTime.now())) {
-      Widget? currentTimeIndicator = (widget.currentTimeIndicatorBuilder ?? DefaultBuilders.defaultCurrentTimeIndicatorBuilder)(widget.style, calculateTopOffset, widget.hoursColumnStyle.width);
+    if (Utils.sameDay(widget.date) &&
+        widget.minimumTime.atDate(widget.date).isBefore(DateTime.now()) &&
+        widget.maximumTime.atDate(widget.date).isAfter(DateTime.now())) {
+      Widget? currentTimeIndicator = (widget.currentTimeIndicatorBuilder ??
+              DefaultBuilders.defaultCurrentTimeIndicatorBuilder)(
+          widget.style, calculateTopOffset, widget.hoursColumnStyle.width);
       if (currentTimeIndicator != null) {
         children.add(currentTimeIndicator);
       }
@@ -205,7 +217,8 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   void createEventsDrawProperties() {
     EventGrid eventsGrid = EventGrid();
     for (FlutterWeekViewEvent event in List.of(events)) {
-      EventDrawProperties drawProperties = eventsDrawProperties[event] ?? EventDrawProperties(widget, event);
+      EventDrawProperties drawProperties =
+          eventsDrawProperties[event] ?? EventDrawProperties(widget, event);
       if (!drawProperties.shouldDraw) {
         events.remove(event);
         continue;
@@ -220,8 +233,11 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     }
 
     if (eventsGrid.drawPropertiesList.isNotEmpty) {
-      double eventsColumnWidth = (context.findRenderObject() as RenderBox).size.width - widget.hoursColumnStyle.width;
-      eventsGrid.processEvents(widget.hoursColumnStyle.width, eventsColumnWidth);
+      double eventsColumnWidth =
+          (context.findRenderObject() as RenderBox).size.width -
+              widget.hoursColumnStyle.width;
+      eventsGrid.processEvents(
+          widget.hoursColumnStyle.width, eventsColumnWidth);
     }
   }
 }

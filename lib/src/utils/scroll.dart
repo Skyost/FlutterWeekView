@@ -7,7 +7,8 @@ import 'package:flutter/rendering.dart';
 /// Allows to not show the glow effect in scrollable widgets.
 class NoGlowBehavior extends ScrollBehavior {
   @override
-  Widget buildViewportChrome(BuildContext context, Widget child, AxisDirection axisDirection) {
+  Widget buildViewportChrome(
+      BuildContext context, Widget child, AxisDirection axisDirection) {
     return child;
   }
 
@@ -41,23 +42,30 @@ class MagnetScrollPhysics extends ScrollPhysics {
   }
 
   @override
-  Simulation? createBallisticSimulation(ScrollMetrics position, double velocity) {
+  Simulation? createBallisticSimulation(
+      ScrollMetrics position, double velocity) {
     // Scenario 1:
     // If we're out of range and not headed back in range, defer to the parent
     // ballistics, which should put us back in range at the scrollable's boundary.
-    if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) || (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
+    if ((velocity <= 0.0 && position.pixels <= position.minScrollExtent) ||
+        (velocity >= 0.0 && position.pixels >= position.maxScrollExtent)) {
       return super.createBallisticSimulation(position, velocity);
     }
 
     // Create a test simulation to see where it would have ballistically fallen
     // naturally without settling onto items.
-    final Simulation? testFrictionSimulation = super.createBallisticSimulation(position, velocity);
+    final Simulation? testFrictionSimulation =
+        super.createBallisticSimulation(position, velocity);
 
     // Scenario 2:
     // If it was going to end up past the scroll extent, defer back to the
     // parent physics' ballistics again which should put us on the scrollable's
     // boundary.
-    if (testFrictionSimulation != null && (testFrictionSimulation.x(double.infinity) == position.minScrollExtent || testFrictionSimulation.x(double.infinity) == position.maxScrollExtent)) {
+    if (testFrictionSimulation != null &&
+        (testFrictionSimulation.x(double.infinity) ==
+                position.minScrollExtent ||
+            testFrictionSimulation.x(double.infinity) ==
+                position.maxScrollExtent)) {
       return super.createBallisticSimulation(position, velocity);
     }
 
@@ -74,7 +82,8 @@ class MagnetScrollPhysics extends ScrollPhysics {
     // Scenario 3:
     // If there's no velocity and we're already at where we intend to land,
     // do nothing.
-    if (velocity.abs() < tolerance.velocity && (settlingPixels - position.pixels).abs() < tolerance.distance) {
+    if (velocity.abs() < tolerance.velocity &&
+        (settlingPixels - position.pixels).abs() < tolerance.distance) {
       return null;
     }
 
@@ -113,7 +122,9 @@ class MagnetScrollPhysics extends ScrollPhysics {
     required double minScrollExtent,
     required double maxScrollExtent,
   }) =>
-      (_clipOffsetToScrollableRange(offset, minScrollExtent, maxScrollExtent) / itemSize).round();
+      (_clipOffsetToScrollableRange(offset, minScrollExtent, maxScrollExtent) /
+              itemSize)
+          .round();
 
   /// Clips the specified offset to the scrollable range.
   double _clipOffsetToScrollableRange(
@@ -155,7 +166,8 @@ class SilentScrollController extends ScrollController {
 
   /// Silently jumps to the specified position.
   void silentJumpTo(double pixels) {
-    assert(positions.isNotEmpty, 'ScrollController not attached to any scroll views.');
+    assert(positions.isNotEmpty,
+        'ScrollController not attached to any scroll views.');
     List.from(positions).forEach((position) => position.silentJumpTo(pixels));
   }
 }
