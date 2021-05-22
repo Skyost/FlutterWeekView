@@ -189,7 +189,8 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   void scrollToInitialTime() {
     super.scrollToInitialTime();
 
-    if (horizontalScrollController == null) {
+    if (horizontalScrollController == null ||
+        !horizontalScrollController!.hasClients) {
       return;
     }
 
@@ -371,7 +372,7 @@ class _AutoScrollDayBar extends StatefulWidget {
   /// Creates a new positioned day bar instance.
   _AutoScrollDayBar({
     required _WeekViewState state,
-  })   : weekView = state.widget,
+  })  : weekView = state.widget,
         dayViewWidth = state.dayViewWidth!,
         stateScrollController = state.horizontalScrollController!,
         dayBarStyleBuilder = state.widget.dayBarStyleBuilder;
