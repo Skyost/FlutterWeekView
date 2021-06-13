@@ -15,10 +15,10 @@ class DefaultBuilders {
   /// Formats a day in YYYY-MM-DD format, e.g., 2020-01-15.
   static String defaultDateFormatter(int year, int month, int day) =>
       year.toString() +
-      '-' +
-      Utils.addLeadingZero(month) +
-      '-' +
-      Utils.addLeadingZero(day);
+          '-' +
+          Utils.addLeadingZero(month) +
+          '-' +
+          Utils.addLeadingZero(day);
 
   /// Formats a hour in 24-hour HH:MM format, e.g., 15:00.
   static String defaultTimeFormatter(HourMinute time) =>
@@ -82,7 +82,7 @@ class DefaultBuilders {
 
   /// Builds the current time indicator builder.
   static Widget defaultCurrentTimeIndicatorBuilder(DayViewStyle dayViewStyle,
-      TopOffsetCalculator topOffsetCalculator, double hoursColumnWidth) {
+      TopOffsetCalculator topOffsetCalculator, double hoursColumnWidth, bool isRtl) {
     List<Widget> children = [
       if (dayViewStyle.currentTimeRuleHeight > 0 &&
           dayViewStyle.currentTimeRuleColor != null)
@@ -111,8 +111,8 @@ class DefaultBuilders {
 
     return Positioned(
       top: topOffsetCalculator(HourMinute.now()),
-      left: hoursColumnWidth,
-      right: 0,
+      left: isRtl ? 0 : hoursColumnWidth,
+      right: isRtl ? hoursColumnWidth : 0,
       child: Row(children: children),
     );
   }

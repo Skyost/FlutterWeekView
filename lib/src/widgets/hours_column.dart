@@ -46,13 +46,13 @@ class HoursColumn extends StatelessWidget {
   HoursColumn.fromHeadersWidgetState({
     required ZoomableHeadersWidgetState parent,
   }) : this(
-          minimumTime: parent.widget.minimumTime,
-          maximumTime: parent.widget.maximumTime,
-          topOffsetCalculator: parent.calculateTopOffset,
-          style: parent.widget.hoursColumnStyle,
-          onHoursColumnTappedDown: parent.widget.onHoursColumnTappedDown,
-          hoursColumnTimeBuilder: parent.widget.hoursColumnTimeBuilder,
-        );
+    minimumTime: parent.widget.minimumTime,
+    maximumTime: parent.widget.maximumTime,
+    topOffsetCalculator: parent.calculateTopOffset,
+    style: parent.widget.hoursColumnStyle,
+    onHoursColumnTappedDown: parent.widget.onHoursColumnTappedDown,
+    hoursColumnTimeBuilder: parent.widget.hoursColumnTimeBuilder,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -65,16 +65,16 @@ class HoursColumn extends StatelessWidget {
         children: _sideTimes
             .map(
               (time) => Positioned(
-                top: topOffsetCalculator(time) -
-                    ((style.textStyle.fontSize ?? 14) / 2),
-                left: 0,
-                right: 0,
-                child: Align(
-                  alignment: style.textAlignment,
-                  child: hoursColumnTimeBuilder(style, time),
-                ),
-              ),
-            )
+            top: topOffsetCalculator(time) -
+                ((style.textStyle.fontSize ?? 14) / 2),
+            left: 0,
+            right: 0,
+            child: Align(
+              alignment: style.textAlignment,
+              child: hoursColumnTimeBuilder(style, time),
+            ),
+          ),
+        )
             .toList(),
       ),
     );
@@ -86,7 +86,7 @@ class HoursColumn extends StatelessWidget {
     return GestureDetector(
       onTapDown: (details) {
         var hourRowHeight =
-            topOffsetCalculator(minimumTime.add(const HourMinute(hour: 1)));
+        topOffsetCalculator(minimumTime.add(const HourMinute(hour: 1)));
         double hourMinutesInHour = details.localPosition.dy / hourRowHeight;
 
         int hour = hourMinutesInHour.floor();

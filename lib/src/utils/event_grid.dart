@@ -68,8 +68,8 @@ class EventGrid {
       EventDrawProperties drawProperties, int column) {
     int colSpan = 1;
     for (int columnIndex = column + 1;
-        columnIndex < columns.length;
-        columnIndex++) {
+    columnIndex < columns.length;
+    columnIndex++) {
       List<EventDrawProperties> column = columns[columnIndex];
       for (EventDrawProperties other in column) {
         if (drawProperties.collidesWith(other)) {
@@ -103,8 +103,10 @@ class EventDrawProperties {
   /// The end time.
   DateTime? end;
 
+  final bool isRtl;
+
   /// Creates a new flutter week view event draw properties from the specified day view and the specified day view event.
-  EventDrawProperties(DayView dayView, FlutterWeekViewEvent event) {
+  EventDrawProperties(DayView dayView, FlutterWeekViewEvent event,  this.isRtl) {
     DateTime minimum = dayView.minimumTime.atDate(dayView.date);
     DateTime maximum = dayView.maximumTime.atDate(dayView.date);
 
@@ -132,15 +134,15 @@ class EventDrawProperties {
   /// Calculates the top and the height of the event rectangle.
   void calculateTopAndHeight(
       double Function(HourMinute time, {HourMinute minimumTime})
-          topOffsetCalculator) {
+      topOffsetCalculator) {
     if (!shouldDraw) {
       return;
     }
 
     top = topOffsetCalculator(HourMinute.fromDateTime(dateTime: start!));
     height = topOffsetCalculator(
-            HourMinute.fromDuration(duration: end!.difference(start!)),
-            minimumTime: HourMinute.MIN) +
+        HourMinute.fromDuration(duration: end!.difference(start!)),
+        minimumTime: HourMinute.MIN) +
         1;
   }
 
@@ -155,11 +157,12 @@ class EventDrawProperties {
 
   /// Creates the event widget.
   Widget createWidget(
-          BuildContext context, DayView dayView, FlutterWeekViewEvent event) =>
+      BuildContext context, DayView dayView, FlutterWeekViewEvent event) =>
       Positioned(
         top: top,
         height: height,
-        left: left,
+        left: isRtl ? null : left,
+        right: isRtl ? left : null,
         width: width,
         child: event.build(context, dayView, height!, width!),
       );
