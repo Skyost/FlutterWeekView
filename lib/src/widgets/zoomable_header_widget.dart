@@ -22,7 +22,7 @@ typedef DayBarTapCallback = Function(DateTime date);
 typedef CurrentTimeIndicatorBuilder = Widget? Function(
     DayViewStyle dayViewStyle,
     TopOffsetCalculator topOffsetCalculator,
-    double hoursColumnWidth);
+    double hoursColumnWidth, bool isRtl);
 
 /// Allows to build the time displayed on the side border.
 typedef HoursColumnTimeBuilder = Widget? Function(
@@ -30,7 +30,7 @@ typedef HoursColumnTimeBuilder = Widget? Function(
 
 /// A widget which is showing both headers and can be zoomed.
 abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
-    C extends ZoomController> extends StatefulWidget {
+C extends ZoomController> extends StatefulWidget {
   /// The widget style.
   final S style;
 
@@ -67,6 +67,8 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
   /// The current day view controller.
   final C controller;
 
+  /// Add Rtl support
+  final bool isRtl;
   /// Creates a new zoomable headers widget instance.
   const ZoomableHeadersWidget({
     required this.style,
@@ -80,7 +82,7 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
     this.onHoursColumnTappedDown,
     this.onDayBarTappedDown,
     required this.controller,
-    this.hoursColumnTimeBuilder,
+    this.hoursColumnTimeBuilder, required this.isRtl,
   });
 }
 
@@ -168,7 +170,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
       widget.minimumTime
           .atDate(widget.initialTime)
           .isBefore(widget.initialTime) &&
-      widget.maximumTime.atDate(widget.initialTime).isAfter(widget.initialTime);
+          widget.maximumTime.atDate(widget.initialTime).isAfter(widget.initialTime);
 
   /// Scrolls to the initial time.
   void scrollToInitialTime() {
@@ -186,7 +188,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
 
   /// Calculates the top offset of a given time.
   double calculateTopOffset(HourMinute time,
-          {HourMinute? minimumTime, double? hourRowHeight}) =>
+      {HourMinute? minimumTime, double? hourRowHeight}) =>
       DefaultBuilders.defaultTopOffsetCalculator(time,
           minimumTime: minimumTime ?? widget.minimumTime,
           hourRowHeight: hourRowHeight ?? this.hourRowHeight);
@@ -198,5 +200,5 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
   /// Calculates the hour row height.
   double _calculateHourRowHeight([ZoomController? controller]) =>
       currentDayViewStyle.hourRowHeight *
-      (controller ?? widget.controller).zoomFactor;
+          (controller ?? widget.controller).zoomFactor;
 }
