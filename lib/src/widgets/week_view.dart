@@ -344,7 +344,11 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
     }
 
     WidgetsBinding.instance?.addPostFrameCallback((_) {
-      double widgetWidth = (context.findRenderObject() as RenderBox).size.width;
+      final double? widgetWidth =
+          (context.findRenderObject() as RenderBox?)?.size.width;
+      if (widgetWidth == null) {
+        return;
+      }
       this.setState(() {
         dayViewWidth = widgetWidth - widget.hoursColumnStyle.width;
         if (andScrollToCurrentTime) {
