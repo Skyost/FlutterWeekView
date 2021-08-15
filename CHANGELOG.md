@@ -1,3 +1,8 @@
+## [1.2.0] - 2021-08-15
+
+* Added RTL support (thanks [nirbar89](https://github.com/nirbar89)).
+* Fixed various bugs (thanks [jayjah](https://github.com/jayjah)).
+
 ## [1.1.0] - 2021-03-05
 
 * Migrated to null safety.

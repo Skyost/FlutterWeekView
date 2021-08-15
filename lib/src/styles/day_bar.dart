@@ -40,16 +40,16 @@ class DayBarStyle {
     Decoration? decoration,
     Alignment? textAlignment,
   }) : this(
-    dateFormatter: dateFormatter,
-    textStyle: textStyle ??
-        TextStyle(
-          color: Utils.sameDay(date) ? Colors.blue[800] : Colors.black54,
-          fontWeight: FontWeight.bold,
-        ),
-    color: color,
-    decoration: decoration,
-    textAlignment: textAlignment,
-  );
+          dateFormatter: dateFormatter,
+          textStyle: textStyle ??
+              TextStyle(
+                color: Utils.sameDay(date) ? Colors.blue[800] : Colors.black54,
+                fontWeight: FontWeight.bold,
+              ),
+          color: color,
+          decoration: decoration,
+          textAlignment: textAlignment,
+        );
 
   /// Allows to copy the current style instance with your own properties.
   DayBarStyle copyWith({
