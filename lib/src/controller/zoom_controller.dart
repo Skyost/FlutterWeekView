@@ -31,7 +31,7 @@ abstract class ZoomController {
     double? maxZoom,
   })  : zoomCoefficient = math.max(0, zoomCoefficient),
         minZoom = math.max(0, minZoom ?? 0.4),
-        maxZoom = math.max(0, minZoom ?? 1.6) {
+        maxZoom = math.max(0, maxZoom ?? 1.6) {
     assert(this.minZoom <= this.maxZoom);
   }
 
