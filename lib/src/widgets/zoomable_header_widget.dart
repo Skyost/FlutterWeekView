@@ -122,6 +122,14 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
     oldWidget.controller.removeListener(this);
     widget.controller.addListener(this);
   }
+    
+  @override
+  void onZoomStart(ZoomController controller, ScaleStartDetails details) {    
+    /// store current scroll position (vertical) and pinch focal point position (vertical) for future use in onZoomFactorChanged()    
+    if (verticalScrollController != null) {
+      controller.contentOffset = (verticalScrollController!.offset + details.localFocalPoint.dy) / controller.zoomFactor;      
+    }
+  }
 
   @override
   void onZoomFactorChanged(
@@ -135,15 +143,9 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
     double maxPixels =
         calculateHeight(hourRowHeight) - widgetHeight + widget.style.headerSize;
 
-    if (verticalScrollController != null) {
-      if (hourRowHeight < this.hourRowHeight &&
-          verticalScrollController!.position.pixels > maxPixels) {
-        verticalScrollController!.jumpTo(maxPixels);
-      } else {
-        verticalScrollController!
-            .jumpTo(math.min(maxPixels, details.localFocalPoint.dy));
-      }
-    }
+    if (verticalScrollController != null) {      
+      verticalScrollController!.jumpTo(math.min(maxPixels, controller.contentOffset * controller.zoomFactor - details.localFocalPoint.dy));
+    } 
 
     setState(() {
       this.hourRowHeight = hourRowHeight;
