@@ -233,7 +233,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
 
     if (isZoomable) {
       mainWidget = GestureDetector(
-        onScaleStart: (_) => widget.controller.scaleStart(),
+        onScaleStart: widget.controller.scaleStart,
         onScaleUpdate: widget.controller.scaleUpdate,
         child: mainWidget,
       );

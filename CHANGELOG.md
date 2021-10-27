@@ -1,3 +1,7 @@
+## [1.2.1+1] - 2021-10-27
+
+* Fixed a compilation error.
+
 ## [1.2.1] - 2021-10-27
 
 * Now keeps pinch focal point when zoom-in/out (thanks [BiliBalaaaaaa](https://github.com/BiliBalaaaaaa)).
