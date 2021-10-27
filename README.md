@@ -170,4 +170,3 @@ You have a lot of options to contribute to this project ! You can :
 * [Fork it](https://github.com/Skyost/FlutterWeekView/fork) on Github.
 * [Submit](https://github.com/Skyost/FlutterWeekView/issues/new/choose) a feature request or a bug report.
 * [Donate](https://paypal.me/Skyost) to the developer.
-* [Watch a little ad](https://www.clipeee.com/creator/skyost) on Clipeee.
