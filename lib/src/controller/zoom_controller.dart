@@ -23,6 +23,10 @@ abstract class ZoomController {
 
   /// The current zoom factor.
   double _zoomFactor = 1;
+  
+  /// For maintain the position of the pinch focal point position (vertical)
+  @protected
+  double contentOffset = 0.0;
 
   /// Creates a zoom controller instance.
   ZoomController({
