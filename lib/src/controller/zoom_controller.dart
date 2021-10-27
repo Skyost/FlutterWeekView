@@ -23,6 +23,10 @@ abstract class ZoomController {
 
   /// The current zoom factor.
   double _zoomFactor = 1;
+  
+  /// For maintain the position of the pinch focal point position (vertical)
+  @protected
+  double contentOffset = 0.0;
 
   /// Creates a zoom controller instance.
   ZoomController({
@@ -57,7 +61,13 @@ abstract class ZoomController {
   }
 
   /// Should be called when the scale operation start.
-  void scaleStart() => previousZoomFactor = zoomFactor;
+  void scaleStart(ScaleStartDetails details) {
+    previousZoomFactor = zoomFactor;
+    
+    _listeners.forEach(
+            (listener) => listener.onZoomStart(this, details));
+    
+  }
 
   /// Should be called when the scale operation has an update.
   void scaleUpdate(ScaleUpdateDetails details) =>
@@ -96,6 +106,9 @@ abstract class ZoomController {
 
 /// A day view controller listener.
 mixin ZoomControllerListener {
+  /// Triggered when the day view zoom start
+  void onZoomStart(
+      covariant ZoomController controller, ScaleStartDetails details);
   /// Triggered when the day view zoom factor has changed.
   void onZoomFactorChanged(
       covariant ZoomController controller, ScaleUpdateDetails details);
