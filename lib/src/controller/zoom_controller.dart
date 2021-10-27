@@ -106,6 +106,9 @@ abstract class ZoomController {
 
 /// A day view controller listener.
 mixin ZoomControllerListener {
+  /// Triggered when the day view zoom start
+  void onZoomStart(
+      covariant ZoomController controller, ScaleStartDetails details);
   /// Triggered when the day view zoom factor has changed.
   void onZoomFactorChanged(
       covariant ZoomController controller, ScaleUpdateDetails details);
