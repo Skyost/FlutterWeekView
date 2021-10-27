@@ -57,7 +57,13 @@ abstract class ZoomController {
   }
 
   /// Should be called when the scale operation start.
-  void scaleStart() => previousZoomFactor = zoomFactor;
+  void scaleStart(ScaleStartDetails details) {
+    previousZoomFactor = zoomFactor;
+    
+    _listeners.forEach(
+            (listener) => listener.onZoomStart(this, details));
+    
+  }
 
   /// Should be called when the scale operation has an update.
   void scaleUpdate(ScaleUpdateDetails details) =>
