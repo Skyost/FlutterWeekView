@@ -54,6 +54,7 @@ class HoursColumn extends StatelessWidget {
           style: parent.widget.hoursColumnStyle,
           onHoursColumnTappedDown: parent.widget.onHoursColumnTappedDown,
           hoursColumnTimeBuilder: parent.widget.hoursColumnTimeBuilder,
+          hoursColumnBackgroundBuilder: parent.widget.hoursColumnBackgroundBuilder,
         );
 
   @override

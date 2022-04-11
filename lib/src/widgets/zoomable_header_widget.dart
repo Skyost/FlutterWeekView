@@ -62,6 +62,9 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
   /// Building method for building the time displayed on the side border.
   final HoursColumnTimeBuilder? hoursColumnTimeBuilder;
 
+  /// Building method for building background decoration below single time displayed on the side border.
+  final HoursColumnBackgroundBuilder? hoursColumnBackgroundBuilder;
+
   /// Triggered when the hours column has been tapped down.
   final HoursColumnTapCallback? onHoursColumnTappedDown;
 
@@ -88,6 +91,7 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
     this.onDayBarTappedDown,
     required this.controller,
     this.hoursColumnTimeBuilder,
+    this.hoursColumnBackgroundBuilder,
     required this.isRTL,
   });
 }
