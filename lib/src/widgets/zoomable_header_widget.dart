@@ -29,6 +29,9 @@ typedef CurrentTimeIndicatorBuilder = Widget? Function(
 typedef HoursColumnTimeBuilder = Widget? Function(
     HoursColumnStyle dayViewStyle, HourMinute time);
 
+/// Allows to build the background decoration below single time displayed on the side border.
+typedef HoursColumnBackgroundBuilder = Decoration? Function(HourMinute time);
+
 /// A widget which is showing both headers and can be zoomed.
 abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
     C extends ZoomController> extends StatefulWidget {

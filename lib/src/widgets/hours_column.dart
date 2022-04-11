@@ -27,6 +27,9 @@ class HoursColumn extends StatelessWidget {
   /// Building method for building the time displayed on the side border.
   final HoursColumnTimeBuilder hoursColumnTimeBuilder;
 
+  /// Building method for building background decoration below single time displayed on the side border.
+  final HoursColumnBackgroundBuilder? hoursColumnBackgroundBuilder;
+
   /// Creates a new hours column instance.
   HoursColumn({
     this.minimumTime = HourMinute.MIN,
@@ -35,11 +38,10 @@ class HoursColumn extends StatelessWidget {
     this.style = const HoursColumnStyle(),
     this.onHoursColumnTappedDown,
     HoursColumnTimeBuilder? hoursColumnTimeBuilder,
+    this.hoursColumnBackgroundBuilder,
   })  : assert(minimumTime < maximumTime),
-        topOffsetCalculator =
-            topOffsetCalculator ?? DefaultBuilders.defaultTopOffsetCalculator,
-        hoursColumnTimeBuilder = hoursColumnTimeBuilder ??
-            DefaultBuilders.defaultHoursColumnTimeBuilder,
+        topOffsetCalculator = topOffsetCalculator ?? DefaultBuilders.defaultTopOffsetCalculator,
+        hoursColumnTimeBuilder = hoursColumnTimeBuilder ?? DefaultBuilders.defaultHoursColumnTimeBuilder,
         _sideTimes = getSideTimes(minimumTime, maximumTime, style.interval);
 
   /// Creates a new hours column instance from a headers widget instance.
@@ -56,26 +58,50 @@ class HoursColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final singleHourSize = topOffsetCalculator(maximumTime) / (maximumTime.hour);
+    final Widget background;
+    if (hoursColumnBackgroundBuilder != null) {
+      background = SizedBox(
+        height: topOffsetCalculator(maximumTime),
+        width: style.width,
+        child: Padding(
+          padding: EdgeInsets.only(top: singleHourSize),
+          child: Column(
+            children: _sideTimes
+                .map(
+                  (time) => Container(
+                    decoration: hoursColumnBackgroundBuilder!(time),
+                    height: singleHourSize,
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      );
+    } else {
+      background = const SizedBox.shrink();
+    }
+
     Widget child = Container(
       height: topOffsetCalculator(maximumTime),
       width: style.width,
       color: style.decoration == null ? style.color : null,
       decoration: style.decoration,
       child: Stack(
-        children: _sideTimes
-            .map(
-              (time) => Positioned(
-                top: topOffsetCalculator(time) -
-                    ((style.textStyle.fontSize ?? 14) / 2),
-                left: 0,
-                right: 0,
-                child: Align(
-                  alignment: style.textAlignment,
-                  child: hoursColumnTimeBuilder(style, time),
-                ),
-              ),
-            )
-            .toList(),
+        children: <Widget>[background] +
+            _sideTimes
+                .map(
+                  (time) => Positioned(
+                    top: topOffsetCalculator(time) - ((style.textStyle.fontSize ?? 14) / 2),
+                    left: 0,
+                    right: 0,
+                    child: Align(
+                      alignment: style.textAlignment,
+                      child: hoursColumnTimeBuilder(style, time),
+                    ),
+                  ),
+                )
+                .toList(),
       ),
     );
 
@@ -85,28 +111,24 @@ class HoursColumn extends StatelessWidget {
 
     return GestureDetector(
       onTapDown: (details) {
-        var hourRowHeight =
-            topOffsetCalculator(minimumTime.add(const HourMinute(hour: 1)));
+        var hourRowHeight = topOffsetCalculator(minimumTime.add(const HourMinute(hour: 1)));
         double hourMinutesInHour = details.localPosition.dy / hourRowHeight;
 
         int hour = hourMinutesInHour.floor();
         int minute = ((hourMinutesInHour - hour) * 60).round();
-        onHoursColumnTappedDown!(
-            minimumTime.add(HourMinute(hour: hour, minute: minute)));
+        onHoursColumnTappedDown!(minimumTime.add(HourMinute(hour: hour, minute: minute)));
       },
       child: child,
     );
   }
 
   /// Creates the side times.
-  static List<HourMinute> getSideTimes(
-      HourMinute minimumTime, HourMinute maximumTime, Duration interval) {
+  static List<HourMinute> getSideTimes(HourMinute minimumTime, HourMinute maximumTime, Duration interval) {
     List<HourMinute> sideTimes = [];
     HourMinute currentHour = HourMinute(hour: minimumTime.hour + 1);
     while (currentHour < maximumTime) {
       sideTimes.add(currentHour);
-      currentHour =
-          currentHour.add(HourMinute.fromDuration(duration: interval));
+      currentHour = currentHour.add(HourMinute.fromDuration(duration: interval));
     }
     return sideTimes;
   }
