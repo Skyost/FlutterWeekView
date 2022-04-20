@@ -42,6 +42,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
     bool? userZoomable,
     CurrentTimeIndicatorBuilder? currentTimeIndicatorBuilder,
     HoursColumnTimeBuilder? hoursColumnTimeBuilder,
+    HoursColumnBackgroundBuilder? hoursColumnBackgroundBuilder,
     HoursColumnTapCallback? onHoursColumnTappedDown,
     DayBarTapCallback? onDayBarTappedDown,
   })  : events = events ?? [],
@@ -61,6 +62,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
           userZoomable: userZoomable ?? true,
           hoursColumnTimeBuilder: hoursColumnTimeBuilder ??
               DefaultBuilders.defaultHoursColumnTimeBuilder,
+          hoursColumnBackgroundBuilder: hoursColumnBackgroundBuilder,
           currentTimeIndicatorBuilder: currentTimeIndicatorBuilder ??
               DefaultBuilders.defaultCurrentTimeIndicatorBuilder,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
