@@ -143,7 +143,7 @@ class EventDrawProperties {
     top = topOffsetCalculator(HourMinute.fromDateTime(dateTime: start!));
     height = topOffsetCalculator(
             HourMinute.fromDuration(duration: end!.difference(start!)),
-            minimumTime: HourMinute.MIN) +
+            minimumTime: HourMinute.min) +
         1;
   }
 

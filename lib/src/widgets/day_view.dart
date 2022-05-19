@@ -54,8 +54,8 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
           controller: controller ?? DayViewController(),
           inScrollableWidget: inScrollableWidget ?? true,
           isRTL: isRTL ?? false,
-          minimumTime: minimumTime ?? HourMinute.MIN,
-          maximumTime: maximumTime ?? HourMinute.MAX,
+          minimumTime: minimumTime ?? HourMinute.min,
+          maximumTime: maximumTime ?? HourMinute.max,
           initialTime: initialTime?.atDate(date) ??
               (Utils.sameDay(date) ? HourMinute.now() : const HourMinute())
                   .atDate(date),
@@ -87,7 +87,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     super.initState();
     scheduleScrollToInitialTime();
     reset();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(createEventsDrawProperties);
       }

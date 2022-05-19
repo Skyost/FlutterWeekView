@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
-import 'package:flutter/rendering.dart';
 
 /// Allows to not show the glow effect in scrollable widgets.
 class NoGlowBehavior extends ScrollBehavior {
@@ -149,12 +148,12 @@ class SilentScrollController extends ScrollController {
         );
 
   @override
-  _SilentScrollPosition createScrollPosition(
+  SilentScrollPosition createScrollPosition(
     ScrollPhysics physics,
     ScrollContext context,
     ScrollPosition? oldPosition,
   ) {
-    return _SilentScrollPosition(
+    return SilentScrollPosition(
       physics: physics,
       context: context,
       initialPixels: initialScrollOffset,
@@ -168,14 +167,16 @@ class SilentScrollController extends ScrollController {
   void silentJumpTo(double pixels) {
     assert(positions.isNotEmpty,
         'ScrollController not attached to any scroll views.');
-    List.from(positions).forEach((position) => position.silentJumpTo(pixels));
+    for (SilentScrollPosition position in List.from(positions)) {
+      position.silentJumpTo(pixels);
+    }
   }
 }
 
 /// A scroll position that allows to use [silentJumpTo].
-class _SilentScrollPosition extends ScrollPositionWithSingleContext {
+class SilentScrollPosition extends ScrollPositionWithSingleContext {
   /// Creates a new scroll position instance.
-  _SilentScrollPosition({
+  SilentScrollPosition({
     required ScrollPhysics physics,
     required ScrollContext context,
     double initialPixels = 0.0,

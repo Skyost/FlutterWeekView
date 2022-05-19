@@ -25,7 +25,6 @@ abstract class ZoomController {
   double _zoomFactor = 1;
 
   /// For maintain the position of the pinch focal point position (vertical)
-  @protected
   double contentOffset = 0.0;
 
   /// Creates a zoom controller instance.
@@ -64,7 +63,9 @@ abstract class ZoomController {
   void scaleStart(ScaleStartDetails details) {
     previousZoomFactor = zoomFactor;
 
-    _listeners.forEach((listener) => listener.onZoomStart(this, details));
+    for (ZoomControllerListener listener in _listeners) {
+      listener.onZoomStart(this, details);
+    }
   }
 
   /// Should be called when the scale operation has an update.
@@ -89,8 +90,9 @@ abstract class ZoomController {
       _zoomFactor = zoomFactor;
       if (notify) {
         details ??= ScaleUpdateDetails(scale: scale);
-        _listeners.forEach(
-            (listener) => listener.onZoomFactorChanged(this, details!));
+        for (ZoomControllerListener listener in _listeners) {
+          listener.onZoomFactorChanged(this, details);
+        }
       }
     }
   }

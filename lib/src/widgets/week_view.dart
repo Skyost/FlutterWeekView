@@ -119,8 +119,8 @@ class WeekView
           controller: controller ?? WeekViewController(),
           inScrollableWidget: inScrollableWidget ?? true,
           isRTL: isRTL ?? false,
-          minimumTime: minimumTime ?? HourMinute.MIN,
-          maximumTime: maximumTime ?? HourMinute.MAX,
+          minimumTime: minimumTime ?? HourMinute.min,
+          maximumTime: maximumTime ?? HourMinute.max,
           initialTime: initialTime ?? DateTime.now(),
           userZoomable: userZoomable ?? true,
           currentTimeIndicatorBuilder: currentTimeIndicatorBuilder ??
@@ -349,7 +349,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
       return;
     }
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       final double? widgetWidth =
           (context.findRenderObject() as RenderBox?)?.size.width;
       if (widgetWidth == null) {
@@ -405,7 +405,7 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
     widget.stateScrollController.addListener(updateScrollPosition);
 
     WidgetsBinding.instance
-        ?.scheduleFrameCallback((_) => updateScrollPosition());
+        .scheduleFrameCallback((_) => updateScrollPosition());
   }
 
   @override

@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_week_view/flutter_week_view.dart';
 import 'package:flutter_week_view/src/controller/zoom_controller.dart';
 import 'package:flutter_week_view/src/styles/day_view.dart';
 import 'package:flutter_week_view/src/styles/hours_column.dart';
@@ -79,6 +78,7 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
 
   /// Creates a new zoomable headers widget instance.
   const ZoomableHeadersWidget({
+    Key? key,
     required this.style,
     required this.hoursColumnStyle,
     required this.inScrollableWidget,
@@ -93,7 +93,7 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
     this.hoursColumnTimeBuilder,
     this.hoursColumnBackgroundBuilder,
     required this.isRTL,
-  });
+  }) : super(key: key);
 }
 
 /// An abstract widget state that shows both headers and can be zoomed.

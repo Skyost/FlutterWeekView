@@ -22,20 +22,24 @@ class DayBar extends StatelessWidget {
 
   /// Creates a new day bar instance.
   DayBar({
+    Key? key,
     required DateTime date,
     required this.style,
     this.height,
     this.width,
     this.onDayBarTappedDown,
-  }) : date = date.yearMonthDay;
+  })  : date = date.yearMonthDay,
+        super(key: key);
 
   /// Creates a new day bar instance from a headers widget instance.
   DayBar.fromHeadersWidgetState({
+    Key? key,
     required ZoomableHeadersWidget parent,
     required DateTime date,
     required DayBarStyle style,
     double? width,
   }) : this(
+          key: key,
           date: date,
           style: style,
           height: parent.style.headerSize,

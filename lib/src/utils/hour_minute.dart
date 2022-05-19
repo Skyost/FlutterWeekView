@@ -6,13 +6,13 @@ import 'package:flutter_week_view/src/utils/utils.dart';
 /// This is not a duration but more of an instant in the current day.
 class HourMinute {
   /// "Zero" time.
-  static const HourMinute ZERO = HourMinute._internal(hour: 0, minute: 0);
+  static const HourMinute zero = HourMinute._internal(hour: 0, minute: 0);
 
   /// "Min" time.
-  static const HourMinute MIN = ZERO;
+  static const HourMinute min = zero;
 
   /// "Max" time.
-  static const HourMinute MAX = HourMinute._internal(hour: 24, minute: 0);
+  static const HourMinute max = HourMinute._internal(hour: 24, minute: 0);
 
   /// The current hour.
   final int hour;
@@ -71,12 +71,12 @@ class HourMinute {
   HourMinute subtract(HourMinute other) {
     int hour = this.hour - other.hour;
     if (hour < 0) {
-      return HourMinute.ZERO;
+      return HourMinute.zero;
     }
     int minute = this.minute - other.minute;
     while (minute < 0) {
       if (hour == 0) {
-        return HourMinute.ZERO;
+        return HourMinute.zero;
       }
       hour--;
       minute += 60;

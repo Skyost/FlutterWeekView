@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_week_view/flutter_week_view.dart';
 import 'package:flutter_week_view/src/event.dart';
 import 'package:flutter_week_view/src/styles/day_bar.dart';
 import 'package:flutter_week_view/src/styles/day_view.dart';
+import 'package:flutter_week_view/src/styles/hours_column.dart';
 import 'package:flutter_week_view/src/utils/hour_minute.dart';
 import 'package:flutter_week_view/src/utils/utils.dart';
 import 'package:flutter_week_view/src/widgets/day_view.dart';
@@ -14,19 +14,15 @@ import 'package:flutter_week_view/src/widgets/zoomable_header_widget.dart';
 class DefaultBuilders {
   /// Formats a day in YYYY-MM-DD format, e.g., 2020-01-15.
   static String defaultDateFormatter(int year, int month, int day) =>
-      year.toString() +
-      '-' +
-      Utils.addLeadingZero(month) +
-      '-' +
-      Utils.addLeadingZero(day);
+      '$year-${Utils.addLeadingZero(month)}-${Utils.addLeadingZero(day)}';
 
   /// Formats a hour in 24-hour HH:MM format, e.g., 15:00.
   static String defaultTimeFormatter(HourMinute time) =>
-      Utils.addLeadingZero(time.hour) + ':' + Utils.addLeadingZero(time.minute);
+      '${Utils.addLeadingZero(time.hour)}:${Utils.addLeadingZero(time.minute)}';
 
   /// Allows to calculate a top offset according to the specified hour row height.
   static double defaultTopOffsetCalculator(HourMinute time,
-      {HourMinute minimumTime = HourMinute.MIN, double hourRowHeight = 60}) {
+      {HourMinute minimumTime = HourMinute.min, double hourRowHeight = 60}) {
     HourMinute relative = time.subtract(minimumTime);
     return (relative.hour + (relative.minute / 60)) * hourRowHeight;
   }
@@ -40,13 +36,8 @@ class DefaultBuilders {
         style: const TextStyle(fontWeight: FontWeight.bold),
       ),
       TextSpan(
-        text: ' ' +
-            dayView.hoursColumnStyle
-                .timeFormatter(HourMinute.fromDateTime(dateTime: event.start)) +
-            ' - ' +
-            dayView.hoursColumnStyle
-                .timeFormatter(HourMinute.fromDateTime(dateTime: event.end)) +
-            '\n\n',
+        text:
+            ' ${dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.start))} - ${dayView.hoursColumnStyle.timeFormatter(HourMinute.fromDateTime(dateTime: event.end))}\n\n',
       ),
       TextSpan(
         text: event.description,
