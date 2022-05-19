@@ -178,7 +178,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
   void scheduleScrollToInitialTime() {
     if (shouldScrollToInitialTime) {
       WidgetsBinding.instance
-          ?.addPostFrameCallback((_) => scrollToInitialTime());
+          .addPostFrameCallback((_) => scrollToInitialTime());
     }
   }
 
@@ -191,7 +191,9 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
 
   /// Scrolls to the initial time.
   void scrollToInitialTime() {
-    if (mounted && verticalScrollController != null) {
+    if (mounted &&
+        verticalScrollController != null &&
+        verticalScrollController!.hasClients) {
       double topOffset = calculateTopOffset(
           HourMinute.fromDateTime(dateTime: widget.initialTime));
       verticalScrollController!.jumpTo(math.min(
