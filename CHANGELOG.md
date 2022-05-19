@@ -1,3 +1,7 @@
+## [1.2.2] - 2022-05-19
+
+* Fixed various warnings and errors.
+
 ## [1.2.1+1] - 2021-10-27
 
 * Fixed a compilation error.
