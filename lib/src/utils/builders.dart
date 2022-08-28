@@ -98,13 +98,18 @@ class DefaultBuilders {
         ),
     ];
 
+    final timeIndicatorHight = math.max(
+      dayViewStyle.currentTimeRuleHeight,
+      dayViewStyle.currentTimeCircleRadius * 2,
+    );
+
     if (dayViewStyle.currentTimeCirclePosition ==
         CurrentTimeCirclePosition.left) {
       children = children.reversed.toList();
     }
 
     return Positioned(
-      top: topOffsetCalculator(HourMinute.now()),
+      top: topOffsetCalculator(HourMinute.now()) - timeIndicatorHight / 2,
       left: isRtl ? 0 : hoursColumnWidth,
       right: isRtl ? hoursColumnWidth : 0,
       child: Row(children: children),
