@@ -147,8 +147,55 @@ class _DemoDayView extends StatelessWidget {
   }
 }
 
-/// The demo week view widget.
-class _DemoWeekView extends StatelessWidget {
+/// The demo week view widget. Also demonstrates adding an event upon tapping the calendar.
+class _DemoWeekView extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _DemoWeekViewState();
+}
+
+class _DemoWeekViewState extends State<_DemoWeekView> {
+  List<FlutterWeekViewEvent> events = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    DateTime now = DateTime.now();
+    DateTime date = DateTime(now.year, now.month, now.day);
+    events = [
+      FlutterWeekViewEvent(
+        title: 'An event 1',
+        description: 'A description 1',
+        start: date.subtract(const Duration(hours: 1)),
+        end: date.add(const Duration(hours: 18, minutes: 30)),
+      ),
+      FlutterWeekViewEvent(
+        title: 'An event 2',
+        description: 'A description 2',
+        start: date.add(const Duration(hours: 19)),
+        end: date.add(const Duration(hours: 22)),
+      ),
+      FlutterWeekViewEvent(
+        title: 'An event 3',
+        description: 'A description 3',
+        start: date.add(const Duration(hours: 23, minutes: 30)),
+        end: date.add(const Duration(hours: 25, minutes: 30)),
+      ),
+      FlutterWeekViewEvent(
+        title: 'An event 4',
+        description: 'A description 4',
+        start: date.add(const Duration(hours: 20)),
+        end: date.add(const Duration(hours: 21)),
+      ),
+      FlutterWeekViewEvent(
+        title: 'An event 5',
+        description: 'A description 5',
+        start: date.add(const Duration(hours: 20)),
+        end: date.add(const Duration(hours: 21)),
+      ),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     DateTime now = DateTime.now();
@@ -156,38 +203,18 @@ class _DemoWeekView extends StatelessWidget {
     return WeekView(
       initialTime: const HourMinute(hour: 7).atDate(DateTime.now()),
       dates: [date.subtract(const Duration(days: 1)), date, date.add(const Duration(days: 1))],
-      events: [
-        FlutterWeekViewEvent(
-          title: 'An event 1',
-          description: 'A description 1',
-          start: date.subtract(const Duration(hours: 1)),
-          end: date.add(const Duration(hours: 18, minutes: 30)),
-        ),
-        FlutterWeekViewEvent(
-          title: 'An event 2',
-          description: 'A description 2',
-          start: date.add(const Duration(hours: 19)),
-          end: date.add(const Duration(hours: 22)),
-        ),
-        FlutterWeekViewEvent(
-          title: 'An event 3',
-          description: 'A description 3',
-          start: date.add(const Duration(hours: 23, minutes: 30)),
-          end: date.add(const Duration(hours: 25, minutes: 30)),
-        ),
-        FlutterWeekViewEvent(
-          title: 'An event 4',
-          description: 'A description 4',
-          start: date.add(const Duration(hours: 20)),
-          end: date.add(const Duration(hours: 21)),
-        ),
-        FlutterWeekViewEvent(
-          title: 'An event 5',
-          description: 'A description 5',
-          start: date.add(const Duration(hours: 20)),
-          end: date.add(const Duration(hours: 21)),
-        ),
-      ],
+      events: events,
+      onBackgroundTappedDown: (DateTime dateTime) {
+        dateTime = roundTimeToFitGrid(dateTime);
+        setState(() {
+          events.add(FlutterWeekViewEvent(
+            title: 'New event',
+            description: 'A new event',
+            start: dateTime,
+            end: dateTime.add(const Duration(hours: 1)),
+          ));
+        });
+      },
     );
   }
 }

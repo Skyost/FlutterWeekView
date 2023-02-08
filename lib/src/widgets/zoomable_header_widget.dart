@@ -17,6 +17,11 @@ typedef HoursColumnTapCallback = Function(HourMinute time);
 /// Triggered when the day bar has been tapped down.
 typedef DayBarTapCallback = Function(DateTime date);
 
+/// Triggered when there's a click on the background (an empty region of the calendar). The returned
+/// value corresponds to the hour/minute where the user made the tap. For better user experience,
+/// you may want to round this value using [roundTimeToFitGrid].
+typedef BackgroundTapCallback = Function(DateTime date);
+
 /// Allows to build the current time indicator (rule and circle).
 typedef CurrentTimeIndicatorBuilder = Widget? Function(
     DayViewStyle dayViewStyle,
@@ -70,6 +75,11 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
   /// Triggered when the day bar has been tapped down.
   final DayBarTapCallback? onDayBarTappedDown;
 
+  /// Triggered when there's a click on the background (an empty region of the calendar). The returned
+  /// value corresponds to the hour/minute where the user made the tap. For better user experience,
+  /// you may want to round this value using [roundTimeToFitGrid].
+  final BackgroundTapCallback? onBackgroundTappedDown;
+
   /// The current day view controller.
   final C controller;
 
@@ -89,6 +99,7 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
     this.currentTimeIndicatorBuilder,
     this.onHoursColumnTappedDown,
     this.onDayBarTappedDown,
+    this.onBackgroundTappedDown,
     required this.controller,
     this.hoursColumnTimeBuilder,
     this.hoursColumnBackgroundBuilder,

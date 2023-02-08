@@ -63,6 +63,7 @@ class WeekView
     HoursColumnTimeBuilder? hoursColumnTimeBuilder,
     HoursColumnTapCallback? onHoursColumnTappedDown,
     DayBarTapCallback? onDayBarTappedDown,
+    BackgroundTapCallback? onBackgroundTappedDown,
     bool? isRTL,
   }) : this.builder(
           events: events,
@@ -84,6 +85,7 @@ class WeekView
           hoursColumnTimeBuilder: hoursColumnTimeBuilder,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
           onDayBarTappedDown: onDayBarTappedDown,
+          onBackgroundTappedDown: onBackgroundTappedDown,
         );
 
   /// Creates a new week view instance.
@@ -107,6 +109,7 @@ class WeekView
     HoursColumnTimeBuilder? hoursColumnTimeBuilder,
     HoursColumnTapCallback? onHoursColumnTappedDown,
     DayBarTapCallback? onDayBarTappedDown,
+    BackgroundTapCallback? onBackgroundTappedDown,
   })  : events = events ?? [],
         dayViewStyleBuilder =
             dayViewStyleBuilder ?? DefaultBuilders.defaultDayViewStyleBuilder,
@@ -129,6 +132,7 @@ class WeekView
               DefaultBuilders.defaultHoursColumnTimeBuilder,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
           onDayBarTappedDown: onDayBarTappedDown,
+          onBackgroundTappedDown: onBackgroundTappedDown,
         );
 
   @override
@@ -302,6 +306,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
         currentTimeIndicatorBuilder: widget.currentTimeIndicatorBuilder,
         inScrollableWidget: false,
         userZoomable: false,
+        onBackgroundTappedDown: widget.onBackgroundTappedDown,
       ),
     );
 

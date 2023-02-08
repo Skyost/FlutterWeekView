@@ -142,6 +142,7 @@ Here are the options that are available for both `FlutterDayView` and `FlutterWe
 * `userZoomable` Whether the user is able to (un)zoom the widget.
 * `currentTimeIndicatorBuilder` Allows you to change the default current time indicator (rule and circle).
 * `onHoursColumnTappedDown` Provides a tapped down callback for the hours column. Pretty useful if you want your users to add your own events at a specific time.
+* `onBackgroundTappedDown` Provides a similar callback as the above, but when the user clicks on the background (an empty region of the calendar).
 * `onDayBarTappedDown` Provides a tapped down callback for the day bar.
 
 ### Flutter day view

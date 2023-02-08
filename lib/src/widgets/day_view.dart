@@ -45,6 +45,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
     HoursColumnBackgroundBuilder? hoursColumnBackgroundBuilder,
     HoursColumnTapCallback? onHoursColumnTappedDown,
     DayBarTapCallback? onDayBarTappedDown,
+    BackgroundTapCallback? onBackgroundTappedDown,
   })  : events = events ?? [],
         date = date.yearMonthDay,
         dayBarStyle = dayBarStyle ?? DayBarStyle.fromDate(date: date),
@@ -67,6 +68,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
               DefaultBuilders.defaultCurrentTimeIndicatorBuilder,
           onHoursColumnTappedDown: onHoursColumnTappedDown,
           onDayBarTappedDown: onDayBarTappedDown,
+          onBackgroundTappedDown: onBackgroundTappedDown,
         );
 
   @override
@@ -159,9 +161,31 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
 
   /// Creates the main widget, with a hours column and an events column.
   Widget createMainWidget() {
-    List<Widget> children = eventsDrawProperties.entries
-        .map((entry) => entry.value.createWidget(context, widget, entry.key))
-        .toList();
+    List<Widget> children = [];
+
+    if (widget.onBackgroundTappedDown != null) {
+      children.add(Positioned.fill(
+        child: GestureDetector(
+          onTapUp: (details) {
+            var hourRowHeight =
+                calculateTopOffset(widget.minimumTime.add(const HourMinute(hour: 1)));
+            double hourMinutesInHour = details.localPosition.dy / hourRowHeight;
+
+            int hour = hourMinutesInHour.floor();
+            int minute = ((hourMinutesInHour - hour) * 60).round();
+            DateTime timeTapped = widget.date
+                .add(widget.minimumTime.asDuration)
+                .add(Duration(hours: hour, minutes: minute));
+            widget.onBackgroundTappedDown!(timeTapped);
+          },
+          child: Container(color: Colors.transparent),
+        ),
+      ));
+    }
+
+    children.addAll(eventsDrawProperties.entries
+        .map((entry) => entry.value.createWidget(context, widget, entry.key)));
+
     if (widget.hoursColumnStyle.width > 0) {
       children.add(Positioned(
         top: 0,
