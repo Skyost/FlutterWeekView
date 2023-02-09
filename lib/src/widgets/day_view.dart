@@ -7,7 +7,9 @@ import 'package:flutter_week_view/src/styles/day_bar.dart';
 import 'package:flutter_week_view/src/styles/day_view.dart';
 import 'package:flutter_week_view/src/styles/drag_and_drop.dart';
 import 'package:flutter_week_view/src/styles/hours_column.dart';
+import 'package:flutter_week_view/src/styles/resize_event.dart';
 import 'package:flutter_week_view/src/utils/builders.dart';
+import 'package:flutter_week_view/src/utils/callback_helpers.dart';
 import 'package:flutter_week_view/src/utils/event_grid.dart';
 import 'package:flutter_week_view/src/utils/hour_minute.dart';
 import 'package:flutter_week_view/src/utils/scroll.dart';
@@ -48,6 +50,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
     DayBarTapCallback? onDayBarTappedDown,
     BackgroundTapCallback? onBackgroundTappedDown,
     DragAndDropOptions? dragAndDropOptions,
+    ResizeEventOptions? resizeEventOptions,
   })  : events = events ?? [],
         date = date.yearMonthDay,
         dayBarStyle = dayBarStyle ?? DayBarStyle.fromDate(date: date),
@@ -72,6 +75,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
           onDayBarTappedDown: onDayBarTappedDown,
           onBackgroundTappedDown: onBackgroundTappedDown,
           dragAndDropOptions: dragAndDropOptions,
+          resizeEventOptions: resizeEventOptions,
         );
 
   @override
@@ -86,6 +90,16 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
 
   /// The flutter week view events.
   late List<FlutterWeekViewEvent> events;
+
+  /// These two variables control the resizing of events.
+  ///
+  /// Since we only receive the resize offset per update, we use this variable to
+  /// accumulate the full resize offset since the beginning of the resize action.
+  late double accumulatedResizeOffset;
+
+  /// Stores the original end time of the event being resized. This is so that
+  /// we can restore the original event before the callback.
+  late DateTime originalResizeEventEnd;
 
   @override
   void initState() {
@@ -209,8 +223,13 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       ));
     }
 
-    children.addAll(eventsDrawProperties.entries
-        .map((entry) => entry.value.createWidget(context, widget, entry.key)));
+    children.addAll(
+        eventsDrawProperties.entries.map((entry) => entry.value.createWidget(
+              context,
+              widget,
+              buildResizeGestureDetector(entry.key),
+              entry.key,
+            )));
 
     if (widget.hoursColumnStyle.width > 0) {
       children.add(Positioned(
@@ -249,6 +268,88 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       padding: EdgeInsets.only(top: widget.style.headerSize),
       child: mainWidget,
     );
+  }
+
+  /// Builds a transparent GestureDetector widget to handle event resizing.
+  Widget? buildResizeGestureDetector(FlutterWeekViewEvent event) {
+    if (widget.resizeEventOptions == null) {
+      return null;
+    }
+
+    return GestureDetector(
+      onVerticalDragStart: (_) {
+        accumulatedResizeOffset = 0;
+        originalResizeEventEnd = event.end;
+      },
+      onVerticalDragEnd: (_) {
+        // We restore the original event.end in order to pass the unchanged
+        // event in the callback.
+        DateTime newEventEnd = event.end;
+        event.end = originalResizeEventEnd;
+        setState(() {
+          reset();
+          createEventsDrawProperties();
+        });
+        widget.resizeEventOptions!.onEventResized(event, newEventEnd);
+      },
+      onVerticalDragUpdate: (details) =>
+          onEventResizeUpdate(event, details.primaryDelta ?? 0),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.resizeUpDown,
+        child: Container(color: Colors.transparent),
+      ),
+    );
+  }
+
+  /// Handles the updates of the event's resizing, by updating the UI to give
+  /// realtime feedback of the event's new duration.
+  void onEventResizeUpdate(FlutterWeekViewEvent event, double resizeOffset) {
+    accumulatedResizeOffset += resizeOffset;
+
+    // Compute the Duration equivalent to the accumulated offset.
+    double hourRowHeight =
+        calculateTopOffset(widget.minimumTime.add(const HourMinute(hour: 1)));
+    double hourMinutesInHour = accumulatedResizeOffset / hourRowHeight;
+    int hour = hourMinutesInHour.floor();
+    int minute = ((hourMinutesInHour - hour) * 60).round();
+    Duration delta = Duration(hours: hour, minutes: minute);
+
+    // To prevent a user from decreasing the size of an event indefinitely,
+    // we check if the new duration will be shorter than a minimum allowed
+    // event duration.
+    Duration newEventDuration =
+        originalResizeEventEnd.add(delta).difference(event.start);
+    Duration minimumDuration = widget.resizeEventOptions!.minimumEventDuration;
+
+    // We also handle the (rare) case where the event's duration was originally
+    // shorter than the allowed minimum duration. This is to avoid that, upon
+    // the beginning of resizing the short event, it already grows to be as
+    // long as the minimum duration.
+    Duration originalEventDuration =
+        originalResizeEventEnd.difference(event.start);
+    if (minimumDuration > originalEventDuration) {
+      minimumDuration = originalEventDuration;
+    }
+
+    // If the new duration is too short, we set the duration to be the minimum allowed.
+    if (newEventDuration < minimumDuration) {
+      event.end = event.start.add(minimumDuration);
+    } else {
+      // Otherwise, we compute the new event end normally.
+      DateTime newEventEnd = originalResizeEventEnd.add(delta);
+      Duration gridGranularity =
+          widget.resizeEventOptions!.snapToGridGranularity;
+      if (gridGranularity > Duration.zero) {
+        newEventEnd =
+            roundTimeToFitGrid(newEventEnd, gridGranularity: gridGranularity);
+      }
+      event.end = newEventEnd;
+    }
+
+    setState(() {
+      reset();
+      createEventsDrawProperties();
+    });
   }
 
   /// Creates the background widgets that should be added to a stack.

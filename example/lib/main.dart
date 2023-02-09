@@ -270,6 +270,14 @@ class _DynamicDayViewState extends State<_DynamicDayView> {
             });
           },
         ),
+        resizeEventOptions: ResizeEventOptions(
+          onEventResized: (FlutterWeekViewEvent event, DateTime newEndTime) {
+            event.end = newEndTime;
+            setState(() {
+              /* State set is the resized event's time. */
+            });
+          },
+        ),
       ),
     );
   }

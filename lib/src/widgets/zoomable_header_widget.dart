@@ -5,6 +5,7 @@ import 'package:flutter_week_view/src/controller/zoom_controller.dart';
 import 'package:flutter_week_view/src/styles/day_view.dart';
 import 'package:flutter_week_view/src/styles/drag_and_drop.dart';
 import 'package:flutter_week_view/src/styles/hours_column.dart';
+import 'package:flutter_week_view/src/styles/resize_event.dart';
 import 'package:flutter_week_view/src/styles/zoomable_header_widget.dart';
 import 'package:flutter_week_view/src/utils/builders.dart';
 import 'package:flutter_week_view/src/utils/hour_minute.dart';
@@ -85,6 +86,11 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
   /// is the default), drag-and-drop is disabled.
   final DragAndDropOptions? dragAndDropOptions;
 
+  /// Configures the behavior for resizing events. When resizing is enabled, users
+  /// can drag the end of events to increase/decrease their duration. If this is null
+  /// (which is the default), resizing is disabled.
+  final ResizeEventOptions? resizeEventOptions;
+
   /// The current day view controller.
   final C controller;
 
@@ -106,6 +112,7 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
     this.onDayBarTappedDown,
     this.onBackgroundTappedDown,
     this.dragAndDropOptions,
+    this.resizeEventOptions,
     required this.controller,
     this.hoursColumnTimeBuilder,
     this.hoursColumnBackgroundBuilder,

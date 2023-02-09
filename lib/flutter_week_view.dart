@@ -9,6 +9,7 @@ export 'package:flutter_week_view/src/styles/day_bar.dart';
 export 'package:flutter_week_view/src/styles/day_view.dart';
 export 'package:flutter_week_view/src/styles/drag_and_drop.dart';
 export 'package:flutter_week_view/src/styles/hours_column.dart';
+export 'package:flutter_week_view/src/styles/resize_event.dart';
 export 'package:flutter_week_view/src/styles/week_view.dart';
 export 'package:flutter_week_view/src/styles/zoomable_header_widget.dart';
 export 'package:flutter_week_view/src/utils/callback_helpers.dart';

@@ -158,8 +158,8 @@ class EventDrawProperties {
   }
 
   /// Creates the event widget.
-  Widget createWidget(
-      BuildContext context, DayView dayView, FlutterWeekViewEvent event) {
+  Widget createWidget(BuildContext context, DayView dayView,
+      Widget? resizeGestureDetector, FlutterWeekViewEvent event) {
     Widget child = event.build(context, dayView, height!, width!);
 
     // If drag-and-drop is allowed, we wrap the child in a Draggable widget.
@@ -177,6 +177,23 @@ class EventDrawProperties {
         ),
         childWhenDragging: Opacity(opacity: 0.5, child: child),
         child: child,
+      );
+    }
+
+    // If resizing is enabled, we create a Stack where the bottom is a
+    // transparent widget which handles the resizing.
+    if (resizeGestureDetector != null) {
+      child = Stack(
+        children: [
+          Positioned.fill(child: child),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 8,
+            child: resizeGestureDetector,
+          ),
+        ],
       );
     }
 

@@ -145,6 +145,7 @@ Here are the options that are available for both `DayView` and `WeekView` :
 * `onBackgroundTappedDown` Provides a similar callback as the above, but when the user clicks on the background (an empty region of the calendar).
 * `onDayBarTappedDown` Provides a tapped down callback for the day bar.
 * `dragAndDropOptions` Enables drag-and-drop of events.
+* `resizeEventOptions` Enables resizing events, by dragging the bottom of the event up/down.
 
 ### Flutter day view
 

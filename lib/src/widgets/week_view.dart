@@ -7,6 +7,7 @@ import 'package:flutter_week_view/src/styles/day_bar.dart';
 import 'package:flutter_week_view/src/styles/day_view.dart';
 import 'package:flutter_week_view/src/styles/drag_and_drop.dart';
 import 'package:flutter_week_view/src/styles/hours_column.dart';
+import 'package:flutter_week_view/src/styles/resize_event.dart';
 import 'package:flutter_week_view/src/styles/week_view.dart';
 import 'package:flutter_week_view/src/utils/builders.dart';
 import 'package:flutter_week_view/src/utils/hour_minute.dart';
@@ -66,6 +67,7 @@ class WeekView
     DayBarTapCallback? onDayBarTappedDown,
     BackgroundTapCallback? onBackgroundTappedDown,
     DragAndDropOptions? dragAndDropOptions,
+    ResizeEventOptions? resizeEventOptions,
     bool? isRTL,
   }) : this.builder(
           events: events,
@@ -89,6 +91,7 @@ class WeekView
           onDayBarTappedDown: onDayBarTappedDown,
           onBackgroundTappedDown: onBackgroundTappedDown,
           dragAndDropOptions: dragAndDropOptions,
+          resizeEventOptions: resizeEventOptions,
         );
 
   /// Creates a new week view instance.
@@ -114,6 +117,7 @@ class WeekView
     DayBarTapCallback? onDayBarTappedDown,
     BackgroundTapCallback? onBackgroundTappedDown,
     DragAndDropOptions? dragAndDropOptions,
+    ResizeEventOptions? resizeEventOptions,
   })  : events = events ?? [],
         dayViewStyleBuilder =
             dayViewStyleBuilder ?? DefaultBuilders.defaultDayViewStyleBuilder,
@@ -138,6 +142,7 @@ class WeekView
           onDayBarTappedDown: onDayBarTappedDown,
           onBackgroundTappedDown: onBackgroundTappedDown,
           dragAndDropOptions: dragAndDropOptions,
+          resizeEventOptions: resizeEventOptions,
         );
 
   @override
@@ -313,6 +318,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
         userZoomable: false,
         onBackgroundTappedDown: widget.onBackgroundTappedDown,
         dragAndDropOptions: widget.dragAndDropOptions,
+        resizeEventOptions: widget.resizeEventOptions,
       ),
     );
 
