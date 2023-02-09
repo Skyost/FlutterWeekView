@@ -5,6 +5,7 @@ import 'package:flutter_week_view/src/controller/day_view.dart';
 import 'package:flutter_week_view/src/event.dart';
 import 'package:flutter_week_view/src/styles/day_bar.dart';
 import 'package:flutter_week_view/src/styles/day_view.dart';
+import 'package:flutter_week_view/src/styles/drag_and_drop.dart';
 import 'package:flutter_week_view/src/styles/hours_column.dart';
 import 'package:flutter_week_view/src/utils/builders.dart';
 import 'package:flutter_week_view/src/utils/event_grid.dart';
@@ -46,6 +47,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
     HoursColumnTapCallback? onHoursColumnTappedDown,
     DayBarTapCallback? onDayBarTappedDown,
     BackgroundTapCallback? onBackgroundTappedDown,
+    DragAndDropOptions? dragAndDropOptions,
   })  : events = events ?? [],
         date = date.yearMonthDay,
         dayBarStyle = dayBarStyle ?? DayBarStyle.fromDate(date: date),
@@ -69,6 +71,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
           onHoursColumnTappedDown: onHoursColumnTappedDown,
           onDayBarTappedDown: onDayBarTappedDown,
           onBackgroundTappedDown: onBackgroundTappedDown,
+          dragAndDropOptions: dragAndDropOptions,
         );
 
   @override
@@ -110,7 +113,37 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
 
   @override
   Widget build(BuildContext context) {
-    Widget mainWidget = createMainWidget();
+    Widget mainWidget;
+
+    if (widget.dragAndDropOptions == null) {
+      mainWidget = createMainWidget();
+    } else {
+      mainWidget = DragTarget<FlutterWeekViewEvent>(
+        builder: (_, __, ___) => createMainWidget(),
+        onAcceptWithDetails: (details) {
+          // Drag details contains the global position of the drag event. First,
+          // we convert it to a local position on the widget.
+          RenderBox renderBox = context.findRenderObject() as RenderBox;
+          Offset localOffset = renderBox.globalToLocal(details.offset);
+
+          // After, we need to correct for scrolling. For example, if the widget
+          // is scrolled such that "5:00" is the first hour shown, a drag-and-drop
+          // at the first row of pixels still gives localOffset.dy = 0, so we
+          // add the scroll offset to get the proper value for "5:00". We also
+          // adjust for the header.
+          Offset correctedOffset = Offset(
+              localOffset.dx,
+              localOffset.dy +
+                  (verticalScrollController?.offset ?? 0) -
+                  widget.style.headerSize);
+
+          DateTime newStartTime = widget.date
+              .add(calculateOffsetHourMinute(correctedOffset).asDuration);
+          widget.dragAndDropOptions!.onEventDragged(details.data, newStartTime);
+        },
+      );
+    }
+
     if (widget.style.headerSize > 0 || widget.hoursColumnStyle.width > 0) {
       mainWidget = Stack(
         children: [
@@ -167,15 +200,8 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       children.add(Positioned.fill(
         child: GestureDetector(
           onTapUp: (details) {
-            var hourRowHeight =
-                calculateTopOffset(widget.minimumTime.add(const HourMinute(hour: 1)));
-            double hourMinutesInHour = details.localPosition.dy / hourRowHeight;
-
-            int hour = hourMinutesInHour.floor();
-            int minute = ((hourMinutesInHour - hour) * 60).round();
-            DateTime timeTapped = widget.date
-                .add(widget.minimumTime.asDuration)
-                .add(Duration(hours: hour, minutes: minute));
+            DateTime timeTapped = widget.date.add(
+                calculateOffsetHourMinute(details.localPosition).asDuration);
             widget.onBackgroundTappedDown!(timeTapped);
           },
           child: Container(color: Colors.transparent),

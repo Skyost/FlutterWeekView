@@ -18,10 +18,10 @@ class FlutterWeekViewEvent extends Comparable<FlutterWeekViewEvent> {
   final String description;
 
   /// The event start date & time.
-  final DateTime start;
+  DateTime start;
 
   /// The event end date & time.
-  final DateTime end;
+  DateTime end;
 
   /// The event widget background color.
   final Color? backgroundColor;
@@ -89,6 +89,13 @@ class FlutterWeekViewEvent extends Comparable<FlutterWeekViewEvent> {
         ),
       ),
     );
+  }
+
+  /// Shifts the start and end times, so that the event's duration is unaltered
+  /// and the event now starts in [newStartTime].
+  void shiftEventTo(DateTime newStartTime) {
+    end = end.add(newStartTime.difference(start));
+    start = newStartTime;
   }
 
   @override
