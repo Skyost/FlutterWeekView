@@ -253,7 +253,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
       );
     }
 
-    return Stack(
+    mainWidget = Stack(
       children: [
         mainWidget,
         Positioned(
@@ -269,6 +269,31 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
         ),
       ],
     );
+
+    if (widget.style.showHorizontalScrollbar) {
+      mainWidget = Scrollbar(
+        controller: horizontalScrollController,
+        thumbVisibility: true,
+        child: mainWidget,
+      );
+    }
+
+    return mainWidget;
+  }
+
+  ScrollPhysics? getScrollPhysics() {
+    if (!widget.inScrollableWidget) {
+      return const NeverScrollableScrollPhysics();
+    }
+
+    // When showing a scrollbar, it's better UX to not snap the scrollbar.
+    if (widget.style.showHorizontalScrollbar) {
+      return null;
+    }
+
+    // In the common case, we snap the scrolling to each day view.
+    return MagnetScrollPhysics(
+        itemSize: dayViewWidth! + widget.style.dayViewSeparatorWidth);
   }
 
   /// Creates the week view stack.
@@ -282,11 +307,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
                   right: widget.isRTL ? widget.hoursColumnStyle.width : 0),
               controller: horizontalScrollController,
               scrollDirection: Axis.horizontal,
-              physics: widget.inScrollableWidget
-                  ? MagnetScrollPhysics(
-                      itemSize:
-                          dayViewWidth! + widget.style.dayViewSeparatorWidth)
-                  : const NeverScrollableScrollPhysics(),
+              physics: getScrollPhysics(),
               itemCount: widget.dateCount,
               itemBuilder: (context, index) => createDayView(index),
             ),
