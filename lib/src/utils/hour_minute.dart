@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_week_view/src/utils/utils.dart';
 
 /// Simply represents a hour and a minute.
 /// This is not a duration but more of an instant in the current day.
@@ -33,7 +33,9 @@ class HourMinute {
     int minute = 0,
   }) : this._internal(
           hour: hour == null ? 0 : (hour < 0 ? 0 : (hour > 23 ? 23 : hour)),
-          minute: minute == null ? 0 : (minute < 0 ? 0 : (minute > 59 ? 59 : minute)),
+          minute: minute == null
+              ? 0
+              : (minute < 0 ? 0 : (minute > 59 ? 59 : minute)),
         );
 
   /// Creates a new hour minute time instance from a given date time object.
@@ -55,7 +57,7 @@ class HourMinute {
   }
 
   /// Creates a new hour minute time instance.
-  HourMinute.now() : this.fromDateTime(dateTime: DateTime.now());
+  HourMinute.now() : this.fromDateTime(dateTime: dateTimeGetter.now());
 
   /// Calculates the sum of this hour minute and another.
   HourMinute add(HourMinute other) {
@@ -70,7 +72,10 @@ class HourMinute {
 
   /// Calculates the difference between this hour minute and another.
   HourMinute subtract(HourMinute other) {
-    int hour = math.max(this.hour - other.hour, 0);
+    int hour = this.hour - other.hour;
+    if (hour < 0) {
+      return HourMinute.ZERO;
+    }
     int minute = this.minute - other.minute;
     while (minute < 0) {
       if (hour == 0) {
@@ -90,7 +95,8 @@ class HourMinute {
     if (other is! HourMinute) {
       return false;
     }
-    return identical(this, other) || (hour == other.hour && minute == other.minute);
+    return identical(this, other) ||
+        (hour == other.hour && minute == other.minute);
   }
 
   bool operator <(other) {
@@ -122,9 +128,16 @@ class HourMinute {
     return _calculateDifference(other) >= 0;
   }
 
+  /// Attaches this instant to a provided date.
+  DateTime atDate(DateTime date) => date.yearMonthDay.add(asDuration);
+
+  /// Converts this instance into a duration.
+  Duration get asDuration => Duration(hours: hour, minutes: minute);
+
   @override
   int get hashCode => hour.hashCode + minute.hashCode;
 
   /// Returns the difference in minutes between this and another hour minute time instance.
-  int _calculateDifference(HourMinute other) => (hour * 60 - other.hour * 60) + (minute - other.minute);
+  int _calculateDifference(HourMinute other) =>
+      (hour * 60 - other.hour * 60) + (minute - other.minute);
 }

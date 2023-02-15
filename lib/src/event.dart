@@ -1,11 +1,13 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_week_view/src/day_view.dart';
-import 'package:flutter_week_view/src/utils.dart';
+import 'package:flutter_week_view/src/utils/builders.dart';
+import 'package:flutter_week_view/src/utils/utils.dart';
+import 'package:flutter_week_view/src/widgets/day_view.dart';
 
 /// Builds an event text widget.
-typedef EventTextBuilder = Widget Function(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width);
+typedef EventTextBuilder = Widget Function(FlutterWeekViewEvent event,
+    BuildContext context, DayView dayView, double height, double width);
 
 /// Represents a flutter week view event.
 class FlutterWeekViewEvent extends Comparable<FlutterWeekViewEvent> {
@@ -59,15 +61,16 @@ class FlutterWeekViewEvent extends Comparable<FlutterWeekViewEvent> {
     this.onTap,
     this.onLongPress,
     this.eventTextBuilder,
-  })  : start = DateTime(start.year, start.month, start.day, start.hour, start.minute),
-        end = DateTime(end.year, end.month, end.day, end.hour, end.minute),
+  })  : start = start.yearMonthDayHourMinute,
+        end = end.yearMonthDayHourMinute,
         assert(title != null),
         assert(description != null),
         assert(start != null),
         assert(end != null);
 
   /// Builds the event widget.
-  Widget build(BuildContext context, DayView dayView, double height, double width) {
+  Widget build(
+      BuildContext context, DayView dayView, double height, double width) {
     height = height - (padding?.top ?? 0.0) - (padding?.bottom ?? 0.0);
     width = width - (padding?.left ?? 0.0) - (padding?.right ?? 0.0);
 
@@ -75,7 +78,10 @@ class FlutterWeekViewEvent extends Comparable<FlutterWeekViewEvent> {
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
-        decoration: decoration ?? (backgroundColor != null ? BoxDecoration(color: backgroundColor) : null),
+        decoration: decoration ??
+            (backgroundColor != null
+                ? BoxDecoration(color: backgroundColor)
+                : null),
         margin: margin,
         padding: padding,
         child: (eventTextBuilder ?? DefaultBuilders.defaultEventTextBuilder)(

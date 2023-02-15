@@ -137,7 +137,10 @@ class _DemoDayView extends StatelessWidget {
           end: date.add(const Duration(hours: 21)),
         ),
       ],
-      style: const DayViewStyle(currentTimeCircleColor: Colors.pink),
+      style: DayViewStyle.fromDate(
+        date: date,
+        currentTimeCircleColor: Colors.pink,
+      ),
     );
   }
 }
@@ -149,7 +152,7 @@ class _DemoWeekView extends StatelessWidget {
     DateTime now = DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day);
     return WeekView(
-      initialTime: const HourMinute(hour: 7),
+      initialTime: const HourMinute(hour: 7).atDate(DateTime.now()),
       dates: [date.subtract(const Duration(days: 1)), date, date.add(const Duration(days: 1))],
       events: [
         FlutterWeekViewEvent(
@@ -218,7 +221,7 @@ class _DynamicDayViewState extends State<_DynamicDayView> {
                 ));
               });
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.add,
               color: Colors.white,
             ),
