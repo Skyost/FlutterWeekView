@@ -412,7 +412,7 @@ class _AutoScrollDayBar extends StatefulWidget {
   final double dayViewWidth;
 
   /// The state's scroll controller.
-  final SilentScrollController stateScrollController;
+  final SilentScrollController? stateScrollController;
 
   /// Builds a day bar style according to the current date.
   final DayBarStyleBuilder dayBarStyleBuilder;
@@ -422,7 +422,7 @@ class _AutoScrollDayBar extends StatefulWidget {
     required _WeekViewState state,
   })  : weekView = state.widget,
         dayViewWidth = state.dayViewWidth!,
-        stateScrollController = state.horizontalScrollController!,
+        stateScrollController = state.horizontalScrollController,
         dayBarStyleBuilder = state.widget.dayBarStyleBuilder;
 
   @override
@@ -440,7 +440,7 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
 
     scrollController = SilentScrollController();
     scrollController.addListener(onScrolledHorizontally);
-    widget.stateScrollController.addListener(updateScrollPosition);
+    widget.stateScrollController?.addListener(updateScrollPosition);
 
     WidgetsBinding.instance
         .scheduleFrameCallback((_) => updateScrollPosition());
@@ -450,8 +450,8 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
   void didUpdateWidget(_AutoScrollDayBar oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    oldWidget.stateScrollController.removeListener(updateScrollPosition);
-    widget.stateScrollController.addListener(updateScrollPosition);
+    oldWidget.stateScrollController?.removeListener(updateScrollPosition);
+    widget.stateScrollController?.addListener(updateScrollPosition);
   }
 
   @override
@@ -477,7 +477,7 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
   @override
   void dispose() {
     scrollController.dispose();
-    widget.stateScrollController.removeListener(updateScrollPosition);
+    widget.stateScrollController?.removeListener(updateScrollPosition);
     super.dispose();
   }
 
@@ -498,8 +498,8 @@ class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
 
   /// Updates a scroll controller position based on another scroll controller.
   void updateScrollBasedOnAnother(
-      ScrollController base, SilentScrollController target) {
-    if (!mounted) {
+      ScrollController? base, SilentScrollController? target) {
+    if (!mounted || base == null || target == null) {
       return;
     }
 
