@@ -11,7 +11,7 @@ Flutter Week View is highly inspired by [Android Week View](https://github.com/t
 ## Getting Started
 
 Getting started with Flutter Week View is very straight forward.
-You have the choice between two widgets : `FlutterDayView` and `FlutterWeekView`.
+You have the choice between two widgets : `DayView` and `WeekView`.
 Use the first one to display a single day and use the second one to display
 multiple days. 
 
@@ -129,7 +129,7 @@ Result :
 
 ### Common options
 
-Here are the options that are available for both `FlutterDayView` and `FlutterWeekView` :
+Here are the options that are available for both `DayView` and `WeekView` :
 
 * `events` Events to display.
 * `style` Allows you to style your widget. A lot of different styles are available so don't hesitate to try them out !
@@ -142,24 +142,27 @@ Here are the options that are available for both `FlutterDayView` and `FlutterWe
 * `userZoomable` Whether the user is able to (un)zoom the widget.
 * `currentTimeIndicatorBuilder` Allows you to change the default current time indicator (rule and circle).
 * `onHoursColumnTappedDown` Provides a tapped down callback for the hours column. Pretty useful if you want your users to add your own events at a specific time.
+* `onBackgroundTappedDown` Provides a similar callback as the above, but when the user clicks on the background (an empty region of the calendar).
 * `onDayBarTappedDown` Provides a tapped down callback for the day bar.
+* `dragAndDropOptions` Enables drag-and-drop of events.
+* `resizeEventOptions` Enables resizing events, by dragging the bottom of the event up/down.
 
 ### Flutter day view
 
-Here are the specific options of `FlutterDayView` :
+Here are the specific options of `DayView` :
 
 * `date` The widget date.
 * `dayBarStyle` The day bar style.
 
 ### Flutter week view
 
-Here are the specific options of `FlutterWeekView` :
+Here are the specific options of `WeekView` :
 
 * `dates` The widget dates.
 * `dayViewStyleBuilder` The function that allows to build a Day View style according to the provided date.
 * `dayBarStyleBuilder` The function that allows to build a Day Bar style according to the provided date.
 
-Please note that you can create a `FlutterWeekView` instance using a builder.
+Please note that you can create a `WeekView` instance using a builder.
 All previous options are still available but you don't need to provide the `dates` list.
 However, you need to provide a `DateCreator` (and a date count if you can, if it's impossible for you to do it then `scrollToCurrentTime` will not scroll to the current date).
 

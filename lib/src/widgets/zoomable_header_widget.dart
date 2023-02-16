@@ -3,7 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/controller/zoom_controller.dart';
 import 'package:flutter_week_view/src/styles/day_view.dart';
+import 'package:flutter_week_view/src/styles/drag_and_drop.dart';
 import 'package:flutter_week_view/src/styles/hours_column.dart';
+import 'package:flutter_week_view/src/styles/resize_event.dart';
 import 'package:flutter_week_view/src/styles/zoomable_header_widget.dart';
 import 'package:flutter_week_view/src/utils/builders.dart';
 import 'package:flutter_week_view/src/utils/hour_minute.dart';
@@ -16,6 +18,11 @@ typedef HoursColumnTapCallback = Function(HourMinute time);
 
 /// Triggered when the day bar has been tapped down.
 typedef DayBarTapCallback = Function(DateTime date);
+
+/// Triggered when there's a click on the background (an empty region of the calendar). The returned
+/// value corresponds to the hour/minute where the user made the tap. For better user experience,
+/// you may want to round this value using [roundTimeToFitGrid].
+typedef BackgroundTapCallback = Function(DateTime date);
 
 /// Allows to build the current time indicator (rule and circle).
 typedef CurrentTimeIndicatorBuilder = Widget? Function(
@@ -70,6 +77,20 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
   /// Triggered when the day bar has been tapped down.
   final DayBarTapCallback? onDayBarTappedDown;
 
+  /// Triggered when there's a click on the background (an empty region of the calendar). The returned
+  /// value corresponds to the hour/minute where the user made the tap. For better user experience,
+  /// you may want to round this value using [roundTimeToFitGrid].
+  final BackgroundTapCallback? onBackgroundTappedDown;
+
+  /// Configures the behavior for drag-and-drop of events. If this is null (which
+  /// is the default), drag-and-drop is disabled.
+  final DragAndDropOptions? dragAndDropOptions;
+
+  /// Configures the behavior for resizing events. When resizing is enabled, users
+  /// can drag the end of events to increase/decrease their duration. If this is null
+  /// (which is the default), resizing is disabled.
+  final ResizeEventOptions? resizeEventOptions;
+
   /// The current day view controller.
   final C controller;
 
@@ -89,6 +110,9 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
     this.currentTimeIndicatorBuilder,
     this.onHoursColumnTappedDown,
     this.onDayBarTappedDown,
+    this.onBackgroundTappedDown,
+    this.dragAndDropOptions,
+    this.resizeEventOptions,
     required this.controller,
     this.hoursColumnTimeBuilder,
     this.hoursColumnBackgroundBuilder,
@@ -211,6 +235,23 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
       DefaultBuilders.defaultTopOffsetCalculator(time,
           minimumTime: minimumTime ?? widget.minimumTime,
           hourRowHeight: hourRowHeight ?? this.hourRowHeight);
+
+  /// Given a local position in the widget, calculates its corresponding
+  /// HourMinute.
+  HourMinute calculateOffsetHourMinute(Offset localOffset) {
+    double hourRowHeight =
+        calculateTopOffset(widget.minimumTime.add(const HourMinute(hour: 1)));
+    double hourMinutesInHour = localOffset.dy / hourRowHeight;
+
+    // Handle an edge case, since HourMinute doesn't support negative values.
+    if (hourMinutesInHour < 0) {
+      return widget.minimumTime;
+    }
+
+    int hour = hourMinutesInHour.floor();
+    int minute = ((hourMinutesInHour - hour) * 60).round();
+    return widget.minimumTime.add(HourMinute(hour: hour, minute: minute));
+  }
 
   /// Calculates the widget height.
   double calculateHeight([double? hourRowHeight]) =>

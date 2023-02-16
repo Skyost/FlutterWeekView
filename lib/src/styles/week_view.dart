@@ -18,12 +18,20 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
   /// Defaults to [Colors.black12].
   final Color dayViewSeparatorColor;
 
+  /// If true, render a horizontal scrollbar on the bottom of the widget. This
+  /// is useful for devices without a mechanism built-in for horizontal
+  /// scrolling, such as some Desktop computers.
+  ///
+  /// Defaults to false.
+  final bool showHorizontalScrollbar;
+
   /// Creates a new week view style instance.
   const WeekViewStyle({
     double? headerSize,
     this.dayViewWidth,
     double? dayViewSeparatorWidth,
     this.dayViewSeparatorColor = Colors.black12,
+    this.showHorizontalScrollbar = false,
   })  : dayViewSeparatorWidth =
             (dayViewSeparatorWidth ?? 0) < 0 ? 0 : (dayViewSeparatorWidth ?? 0),
         super(headerSize: headerSize);
@@ -34,6 +42,7 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
     double? dayViewWidth,
     double? dayViewSeparatorWidth,
     Color? dayViewSeparatorColor,
+    bool? showHorizontalScrollbar,
   }) =>
       WeekViewStyle(
         headerSize: headerSize ?? this.headerSize,
@@ -42,5 +51,7 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
             dayViewSeparatorWidth ?? this.dayViewSeparatorWidth,
         dayViewSeparatorColor:
             dayViewSeparatorColor ?? this.dayViewSeparatorColor,
+        showHorizontalScrollbar:
+            showHorizontalScrollbar ?? this.showHorizontalScrollbar,
       );
 }

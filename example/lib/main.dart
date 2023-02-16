@@ -233,6 +233,35 @@ class _DynamicDayViewState extends State<_DynamicDayView> {
       body: DayView(
         date: now,
         events: events,
+        onBackgroundTappedDown: (DateTime dateTime) {
+          dateTime = roundTimeToFitGrid(dateTime);
+          setState(() {
+            events.add(FlutterWeekViewEvent(
+              title: 'New event',
+              description: 'A new event',
+              start: dateTime,
+              end: dateTime.add(const Duration(hours: 1)),
+            ));
+          });
+        },
+        dragAndDropOptions: DragAndDropOptions(
+          onEventDragged: (FlutterWeekViewEvent event, DateTime newStartTime) {
+            DateTime roundedTime = roundTimeToFitGrid(newStartTime,
+                gridGranularity: const Duration(minutes: 15));
+            event.shiftEventTo(roundedTime);
+            setState(() {
+              /* State set is the shifted event's time. */
+            });
+          },
+        ),
+        resizeEventOptions: ResizeEventOptions(
+          onEventResized: (FlutterWeekViewEvent event, DateTime newEndTime) {
+            event.end = newEndTime;
+            setState(() {
+              /* State set is the resized event's time. */
+            });
+          },
+        ),
       ),
     );
   }

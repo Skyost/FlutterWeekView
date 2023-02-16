@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/event.dart';
+import 'package:flutter_week_view/src/styles/drag_and_drop.dart';
 import 'package:flutter_week_view/src/utils/hour_minute.dart';
 import 'package:flutter_week_view/src/widgets/day_view.dart';
 
@@ -157,14 +158,81 @@ class EventDrawProperties {
   }
 
   /// Creates the event widget.
-  Widget createWidget(
-          BuildContext context, DayView dayView, FlutterWeekViewEvent event) =>
-      Positioned(
-        top: top,
-        height: height,
-        left: isRTL ? null : left,
-        right: isRTL ? left : null,
-        width: width,
-        child: event.build(context, dayView, height!, width!),
+  Widget createWidget(BuildContext context, DayView dayView,
+      Widget? resizeGestureDetector, FlutterWeekViewEvent event) {
+    Widget child = event.build(context, dayView, height!, width!);
+
+    // If drag-and-drop is allowed, we wrap the child in a Draggable widget.
+    if (dayView.dragAndDropOptions != null) {
+      DragAndDropOptions options = dayView.dragAndDropOptions!;
+
+      child = _getDraggableOrLongPressDraggable(
+        isLongPress: options.startingGesture == DragStartingGesture.longPress,
+        data: event,
+        axis: options.allowOnlyVerticalDrag ? Axis.vertical : null,
+        feedback: SizedBox(
+          height: height!,
+          width: width!,
+          child: child,
+        ),
+        childWhenDragging: Opacity(opacity: 0.5, child: child),
+        child: child,
       );
+    }
+
+    // If resizing is enabled, we create a Stack where the bottom is a
+    // transparent widget which handles the resizing.
+    if (resizeGestureDetector != null) {
+      child = Stack(
+        children: [
+          Positioned.fill(child: child),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 8,
+            child: resizeGestureDetector,
+          ),
+        ],
+      );
+    }
+
+    return Positioned(
+      top: top,
+      height: height,
+      left: isRTL ? null : left,
+      right: isRTL ? left : null,
+      width: width,
+      child: child,
+    );
+  }
+
+  /// A helper method to allow passing the same parameters to either Draggable
+  /// or LongPressDraggable.
+  Widget _getDraggableOrLongPressDraggable({
+    required bool isLongPress,
+    required FlutterWeekViewEvent data,
+    required Axis? axis,
+    required Widget feedback,
+    required Widget childWhenDragging,
+    required Widget child,
+  }) {
+    if (isLongPress) {
+      return LongPressDraggable<FlutterWeekViewEvent>(
+        data: data,
+        axis: axis,
+        feedback: feedback,
+        childWhenDragging: childWhenDragging,
+        child: child,
+      );
+    }
+
+    return Draggable<FlutterWeekViewEvent>(
+      data: data,
+      axis: axis,
+      feedback: feedback,
+      childWhenDragging: childWhenDragging,
+      child: child,
+    );
+  }
 }
