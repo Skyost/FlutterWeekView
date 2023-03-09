@@ -25,22 +25,16 @@ typedef DayBarTapCallback = Function(DateTime date);
 typedef BackgroundTapCallback = Function(DateTime date);
 
 /// Allows to build the current time indicator (rule and circle).
-typedef CurrentTimeIndicatorBuilder = Widget? Function(
-    DayViewStyle dayViewStyle,
-    TopOffsetCalculator topOffsetCalculator,
-    double hoursColumnWidth,
-    bool isRtl);
+typedef CurrentTimeIndicatorBuilder = Widget? Function(DayViewStyle dayViewStyle, TopOffsetCalculator topOffsetCalculator, double hoursColumnWidth, bool isRtl);
 
 /// Allows to build the time displayed on the side border.
-typedef HoursColumnTimeBuilder = Widget? Function(
-    HoursColumnStyle dayViewStyle, HourMinute time);
+typedef HoursColumnTimeBuilder = Widget? Function(HoursColumnStyle dayViewStyle, HourMinute time);
 
 /// Allows to build the background decoration below single time displayed on the side border.
 typedef HoursColumnBackgroundBuilder = Decoration? Function(HourMinute time);
 
 /// A widget which is showing both headers and can be zoomed.
-abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
-    C extends ZoomController> extends StatefulWidget {
+abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C extends ZoomController> extends StatefulWidget {
   /// The widget style.
   final S style;
 
@@ -99,30 +93,29 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle,
 
   /// Creates a new zoomable headers widget instance.
   const ZoomableHeadersWidget({
-    Key? key,
+    super.key,
     required this.style,
     required this.hoursColumnStyle,
-    required this.inScrollableWidget,
-    required this.minimumTime,
-    required this.maximumTime,
+    this.inScrollableWidget = true,
+    this.minimumTime = HourMinute.min,
+    this.maximumTime = HourMinute.max,
     required this.initialTime,
-    required this.userZoomable,
-    this.currentTimeIndicatorBuilder,
+    this.userZoomable = true,
+    this.currentTimeIndicatorBuilder = DefaultBuilders.defaultCurrentTimeIndicatorBuilder,
     this.onHoursColumnTappedDown,
     this.onDayBarTappedDown,
     this.onBackgroundTappedDown,
     this.dragAndDropOptions,
     this.resizeEventOptions,
     required this.controller,
-    this.hoursColumnTimeBuilder,
+    this.hoursColumnTimeBuilder = DefaultBuilders.defaultHoursColumnTimeBuilder,
     this.hoursColumnBackgroundBuilder,
-    required this.isRTL,
-  }) : super(key: key);
+    this.isRTL = false,
+  });
 }
 
 /// An abstract widget state that shows both headers and can be zoomed.
-abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
-    extends State<W> with ZoomControllerListener {
+abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> extends State<W> with ZoomControllerListener {
   /// The current hour row height.
   late double hourRowHeight;
 
@@ -145,8 +138,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
     super.didUpdateWidget(oldWidget);
 
     if (widget.controller.zoomFactor != oldWidget.controller.zoomFactor) {
-      widget.controller
-          .changeZoomFactor(oldWidget.controller.zoomFactor, notify: false);
+      widget.controller.changeZoomFactor(oldWidget.controller.zoomFactor, notify: false);
     }
 
     hourRowHeight = _calculateHourRowHeight();
@@ -158,29 +150,22 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
   void onZoomStart(ZoomController controller, ScaleStartDetails details) {
     /// store current scroll position (vertical) and pinch focal point position (vertical) for future use in onZoomFactorChanged()
     if (verticalScrollController != null) {
-      controller.contentOffset =
-          (verticalScrollController!.offset + details.localFocalPoint.dy) /
-              controller.zoomFactor;
+      controller.contentOffset = (verticalScrollController!.offset + details.localFocalPoint.dy) / controller.zoomFactor;
     }
   }
 
   @override
-  void onZoomFactorChanged(
-      ZoomController controller, ScaleUpdateDetails details) {
+  void onZoomFactorChanged(ZoomController controller, ScaleUpdateDetails details) {
     if (!mounted) {
       return;
     }
 
     double hourRowHeight = _calculateHourRowHeight(controller);
     double widgetHeight = (context.findRenderObject() as RenderBox).size.height;
-    double maxPixels =
-        calculateHeight(hourRowHeight) - widgetHeight + widget.style.headerSize;
+    double maxPixels = calculateHeight(hourRowHeight) - widgetHeight + widget.style.headerSize;
 
     if (verticalScrollController != null) {
-      verticalScrollController!.jumpTo(math.min(
-          maxPixels,
-          controller.contentOffset * controller.zoomFactor -
-              details.localFocalPoint.dy));
+      verticalScrollController!.jumpTo(math.min(maxPixels, controller.contentOffset * controller.zoomFactor - details.localFocalPoint.dy));
     }
 
     setState(() {
@@ -201,46 +186,32 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
   /// Schedules a scroll to the default hour.
   void scheduleScrollToInitialTime() {
     if (shouldScrollToInitialTime) {
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => scrollToInitialTime());
+      WidgetsBinding.instance.addPostFrameCallback((_) => scrollToInitialTime());
     }
   }
 
   /// Checks whether the widget should scroll to current time.
-  bool get shouldScrollToInitialTime =>
-      widget.minimumTime
-          .atDate(widget.initialTime)
-          .isBefore(widget.initialTime) &&
-      widget.maximumTime.atDate(widget.initialTime).isAfter(widget.initialTime);
+  bool get shouldScrollToInitialTime => widget.minimumTime.atDate(widget.initialTime).isBefore(widget.initialTime) && widget.maximumTime.atDate(widget.initialTime).isAfter(widget.initialTime);
 
   /// Scrolls to the initial time.
   void scrollToInitialTime() {
-    if (mounted &&
-        verticalScrollController != null &&
-        verticalScrollController!.hasClients) {
-      double topOffset = calculateTopOffset(
-          HourMinute.fromDateTime(dateTime: widget.initialTime));
-      verticalScrollController!.jumpTo(math.min(
-          topOffset, verticalScrollController!.position.maxScrollExtent));
+    if (mounted && verticalScrollController != null && verticalScrollController!.hasClients) {
+      double topOffset = calculateTopOffset(HourMinute.fromDateTime(dateTime: widget.initialTime));
+      verticalScrollController!.jumpTo(math.min(topOffset, verticalScrollController!.position.maxScrollExtent));
     }
   }
 
   /// Returns whether this widget should be zoomable.
-  bool get isZoomable =>
-      widget.userZoomable && widget.controller.zoomCoefficient > 0;
+  bool get isZoomable => widget.userZoomable && widget.controller.zoomCoefficient > 0;
 
   /// Calculates the top offset of a given time.
-  double calculateTopOffset(HourMinute time,
-          {HourMinute? minimumTime, double? hourRowHeight}) =>
-      DefaultBuilders.defaultTopOffsetCalculator(time,
-          minimumTime: minimumTime ?? widget.minimumTime,
-          hourRowHeight: hourRowHeight ?? this.hourRowHeight);
+  double calculateTopOffset(HourMinute time, {HourMinute? minimumTime, double? hourRowHeight}) =>
+      DefaultBuilders.defaultTopOffsetCalculator(time, minimumTime: minimumTime ?? widget.minimumTime, hourRowHeight: hourRowHeight ?? this.hourRowHeight);
 
   /// Given a local position in the widget, calculates its corresponding
   /// HourMinute.
   HourMinute calculateOffsetHourMinute(Offset localOffset) {
-    double hourRowHeight =
-        calculateTopOffset(widget.minimumTime.add(const HourMinute(hour: 1)));
+    double hourRowHeight = calculateTopOffset(widget.minimumTime.add(const HourMinute(hour: 1)));
     double hourMinutesInHour = localOffset.dy / hourRowHeight;
 
     // Handle an edge case, since HourMinute doesn't support negative values.
@@ -254,11 +225,8 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget>
   }
 
   /// Calculates the widget height.
-  double calculateHeight([double? hourRowHeight]) =>
-      calculateTopOffset(widget.maximumTime, hourRowHeight: hourRowHeight);
+  double calculateHeight([double? hourRowHeight]) => calculateTopOffset(widget.maximumTime, hourRowHeight: hourRowHeight);
 
   /// Calculates the hour row height.
-  double _calculateHourRowHeight([ZoomController? controller]) =>
-      currentDayViewStyle.hourRowHeight *
-      (controller ?? widget.controller).zoomFactor;
+  double _calculateHourRowHeight([ZoomController? controller]) => currentDayViewStyle.hourRowHeight * (controller ?? widget.controller).zoomFactor;
 }

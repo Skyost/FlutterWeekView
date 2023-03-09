@@ -5,8 +5,7 @@ import 'package:flutter_week_view/src/event.dart';
 /// time corresponding to where the event was dropped. A common behavior in this
 /// callback is to shift the event's start and end dates (you may use
 /// [FlutterWeekViewEvent.shiftEventTo]) and then call setState to update the UI.
-typedef EventDragCallback = Function(
-    FlutterWeekViewEvent event, DateTime newStartTime);
+typedef EventDragCallback = Function(FlutterWeekViewEvent event, DateTime newStartTime);
 
 enum DragStartingGesture {
   /// Drag will start as soon as the user starts dragging an event. This is more

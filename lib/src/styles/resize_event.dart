@@ -5,8 +5,7 @@ import 'package:flutter_week_view/src/event.dart';
 /// time corresponding to where the event's end was dragged to. A common
 /// behavior in this callback is to update the event with the new end time
 /// and call setState to update the UI.
-typedef EventResizeCallback = Function(
-    FlutterWeekViewEvent event, DateTime newEndTime);
+typedef EventResizeCallback = Function(FlutterWeekViewEvent event, DateTime newEndTime);
 
 /// Configures the behavior for resizing events. When resizing is enabled, users
 /// can drag the end of events to increase/decrease their duration.

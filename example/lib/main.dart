@@ -55,7 +55,7 @@ class _FlutterWeekViewDemoAppBody extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 40),
               child: Text(
                 'Flutter Week View demo',
-                style: Theme.of(context).textTheme.headline4,
+                style: Theme.of(context).textTheme.headlineMedium,
                 textAlign: TextAlign.center,
               ),
             ),
@@ -78,8 +78,9 @@ class _FlutterWeekViewDemoAppBody extends StatelessWidget {
             ),
             GestureDetector(
               onTap: () async {
-                if (await launcher.canLaunch(github)) {
-                  await launcher.launch(github);
+                Uri uri = Uri.parse(github);
+                if (await launcher.canLaunchUrl(uri)) {
+                  await launcher.launchUrl(uri);
                 }
               },
               child: Text(

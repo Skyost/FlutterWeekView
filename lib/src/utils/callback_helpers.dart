@@ -3,9 +3,7 @@
 /// rounded to 16:00, or 16:30, or 17:00, and so on).
 ///
 /// For example, if the method receives 16:32 as input, it will return 16:30 as the rounded time.
-DateTime roundTimeToFitGrid(DateTime dateTime,
-    {Duration gridGranularity = const Duration(minutes: 30)}) {
-  int microseconds = (dateTime.microsecondsSinceEpoch / gridGranularity.inMicroseconds).round() *
-      gridGranularity.inMicroseconds;
+DateTime roundTimeToFitGrid(DateTime dateTime, {Duration gridGranularity = const Duration(minutes: 30)}) {
+  int microseconds = (dateTime.microsecondsSinceEpoch / gridGranularity.inMicroseconds).round() * gridGranularity.inMicroseconds;
   return DateTime.fromMicrosecondsSinceEpoch(microseconds);
 }

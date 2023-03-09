@@ -9,7 +9,7 @@
 ## [1.2.1] - 2021-10-27
 
 * Now keeps pinch focal point when zoom-in/out (thanks [BiliBalaaaaaa](https://github.com/BiliBalaaaaaa)).
-* `maxZoom` value is now assigned in contructor (thanks [BiliBalaaaaaa](https://github.com/BiliBalaaaaaa)).
+* `maxZoom` value is now assigned in constructor (thanks [BiliBalaaaaaa](https://github.com/BiliBalaaaaaa)).
 
 ## [1.2.0] - 2021-08-15
 

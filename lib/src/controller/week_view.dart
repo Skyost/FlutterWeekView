@@ -43,8 +43,7 @@ class WeekViewController extends ZoomController {
   }
 
   @override
-  void changeZoomFactor(double zoomFactor,
-      {bool notify = true, ScaleUpdateDetails? details}) {
+  void changeZoomFactor(double zoomFactor, {bool notify = true, ScaleUpdateDetails? details}) {
     super.changeZoomFactor(zoomFactor, notify: notify, details: details);
     for (DayViewController controller in _dayViewControllers.values) {
       controller.changeZoomFactor(zoomFactor, notify: notify, details: details);
@@ -61,7 +60,5 @@ class WeekViewController extends ZoomController {
   }
 
   /// Triggered when a day view controller is disposed.
-  void _onDayViewControllerDisposed(DayViewController dayViewController) =>
-      _dayViewControllers
-          .removeWhere((date, controller) => controller == dayViewController);
+  void _onDayViewControllerDisposed(DayViewController dayViewController) => _dayViewControllers.removeWhere((date, controller) => controller == dayViewController);
 }
