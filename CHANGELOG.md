@@ -1,3 +1,10 @@
+## [1.3.0] - 2023-03-09
+
+* Added the ability to render a horizontal scrollbar in week views (thanks [luistrivelatto](https://github.com/luistrivelatto)).
+* Added the ability to resize events (thanks [luistrivelatto](https://github.com/luistrivelatto)).
+* Added the ability to drag and drop events (thanks [luistrivelatto](https://github.com/luistrivelatto)).
+* Various other fixes and updates.
+
 ## [1.2.2] - 2022-05-19
 
 * Fixed various warnings and errors.
