@@ -114,9 +114,6 @@ class _DemoDayView extends StatelessWidget {
           description: 'A description 1',
           start: date.subtract(const Duration(hours: 1)),
           end: date.add(const Duration(hours: 18, minutes: 30)),
-          decoration: BoxDecoration(
-            color: Colors.pink,
-          ),
           onTap: () => print('Check this new effect!'),
         ),
         FlutterWeekViewEvent(
