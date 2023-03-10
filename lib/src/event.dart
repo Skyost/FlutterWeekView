@@ -70,22 +70,27 @@ class FlutterWeekViewEvent extends Comparable<FlutterWeekViewEvent> {
     height = height - (padding?.top ?? 0.0) - (padding?.bottom ?? 0.0);
     width = width - (padding?.left ?? 0.0) - (padding?.right ?? 0.0);
 
-    return GestureDetector(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      child: Container(
-        decoration: decoration ??
-            (backgroundColor != null
-                ? BoxDecoration(color: backgroundColor)
-                : null),
-        margin: margin,
-        padding: padding,
-        child: (eventTextBuilder ?? DefaultBuilders.defaultEventTextBuilder)(
-          this,
-          context,
-          dayView,
-          math.max(0.0, height),
-          math.max(0.0, width),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: Ink(
+          decoration: decoration ??
+              (backgroundColor != null
+                  ? BoxDecoration(color: backgroundColor)
+                  : null),
+          child: Container(
+            margin: margin,
+            padding: padding,
+            child: (eventTextBuilder ?? DefaultBuilders.defaultEventTextBuilder)(
+              this,
+              context,
+              dayView,
+              math.max(0.0, height),
+              math.max(0.0, width),
+            ),
+          ),
         ),
       ),
     );
