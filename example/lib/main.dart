@@ -11,21 +11,21 @@ void main() => runApp(_FlutterWeekViewDemoApp());
 class _FlutterWeekViewDemoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'Flutter Week View Demo',
-        initialRoute: '/',
-        routes: {
-          '/': (context) => inScaffold(body: _FlutterWeekViewDemoAppBody()),
-          '/day-view': (context) => inScaffold(
-                title: 'Demo day view',
-                body: _DemoDayView(),
-              ),
-          '/week-view': (context) => inScaffold(
-                title: 'Demo week view',
-                body: _DemoWeekView(),
-              ),
-          '/dynamic-day-view': (context) => _DynamicDayView(),
-        },
-      );
+    title: 'Flutter Week View Demo',
+    initialRoute: '/',
+    routes: {
+      '/': (context) => inScaffold(body: _FlutterWeekViewDemoAppBody()),
+      '/day-view': (context) => inScaffold(
+        title: 'Demo day view',
+        body: _DemoDayView(),
+      ),
+      '/week-view': (context) => inScaffold(
+        title: 'Demo week view',
+        body: _DemoWeekView(),
+      ),
+      '/dynamic-day-view': (context) => _DynamicDayView(),
+    },
+  );
 
   static Widget inScaffold({
     String title = 'Flutter Week View',
@@ -114,6 +114,7 @@ class _DemoDayView extends StatelessWidget {
           description: 'A description 1',
           start: date.subtract(const Duration(hours: 1)),
           end: date.add(const Duration(hours: 18, minutes: 30)),
+          onTap: () => print('Check this new effect!'),
         ),
         FlutterWeekViewEvent(
           title: 'An event 2',
