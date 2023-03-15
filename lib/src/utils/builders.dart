@@ -24,7 +24,7 @@ class DefaultBuilders {
     return (relative.hour + (relative.minute / 60)) * hourRowHeight;
   }
 
-  /// Builds an event text widget in order to put it in a week view.
+  /// Builds an event text widget in order to put it in an event widget.
   static Widget defaultEventTextBuilder(FlutterWeekViewEvent event, BuildContext context, DayView dayView, double height, double width) {
     List<TextSpan> text = [
       TextSpan(
