@@ -1,3 +1,11 @@
+## [1.4.0] - 2024-02-18
+
+* `FlutterWeekViewEvent` is now immutable.
+* Moved the render part of `FlutterWeekViewEvent` into `FlutterWeekViewEventWidget`.
+* Added an `eventWidgetBuilder` parameter.
+* Now using the `TimeOfDay` class from the Material library instead of our old `HourMinute`.
+* Updated SDK constraints.
+
 ## [1.3.0] - 2023-03-09
 
 * Added the ability to render a horizontal scrollbar in week views (thanks [luistrivelatto](https://github.com/luistrivelatto)).
@@ -63,7 +71,7 @@
 
 * Added a `Style` class for `DayView` and `WeekView`.
 * Replaced the `dayViewBuilder` by a `dayViewStyleBuilder` in `WeekView`.
-* Added a tap down list for hours column.
+* Added a tap down list for hour column.
 * Added the ability to restrict the current visible time.
 * Removed the background canvas painter. It was maybe a bit too complicated to use.
 * Various fixes and improvements.

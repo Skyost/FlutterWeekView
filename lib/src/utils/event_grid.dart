@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/event.dart';
 import 'package:flutter_week_view/src/styles/drag_and_drop.dart';
-import 'package:flutter_week_view/src/utils/hour_minute.dart';
-import 'package:flutter_week_view/src/widgets/day_view.dart';
+import 'package:flutter_week_view/src/utils/time_of_day.dart';
+import 'package:flutter_week_view/src/widgets/zoomable_header_widget.dart';
 
 /// An useful class that allows to position events in a grid.
 /// Thanks to https://stackoverflow.com/a/11323909/3608831.
@@ -14,12 +14,12 @@ class EventGrid {
   void add(EventDrawProperties drawProperties) => drawPropertiesList.add(drawProperties);
 
   /// Processes all display properties added to the grid.
-  void processEvents(double hoursColumnWidth, double eventsColumnWidth) {
+  void processEvents(double hourColumnWidth, double eventsColumnWidth) {
     List<List<EventDrawProperties>> columns = [];
     DateTime? lastEventEnding;
     for (EventDrawProperties drawProperties in drawPropertiesList) {
       if (lastEventEnding != null && drawProperties.start!.isAfter(lastEventEnding)) {
-        packEvents(columns, hoursColumnWidth, eventsColumnWidth);
+        packEvents(columns, hourColumnWidth, eventsColumnWidth);
         columns.clear();
         lastEventEnding = null;
       }
@@ -43,16 +43,16 @@ class EventGrid {
     }
 
     if (columns.isNotEmpty) {
-      packEvents(columns, hoursColumnWidth, eventsColumnWidth);
+      packEvents(columns, hourColumnWidth, eventsColumnWidth);
     }
   }
 
   /// Sets the left and right positions for each event in the connected group.
-  void packEvents(List<List<EventDrawProperties>> columns, double hoursColumnWidth, double eventsColumnWidth) {
+  void packEvents(List<List<EventDrawProperties>> columns, double hourColumnWidth, double eventsColumnWidth) {
     for (int columnIndex = 0; columnIndex < columns.length; columnIndex++) {
       List<EventDrawProperties> column = columns[columnIndex];
       for (EventDrawProperties drawProperties in column) {
-        drawProperties.left = hoursColumnWidth + (columnIndex / columns.length) * eventsColumnWidth;
+        drawProperties.left = hourColumnWidth + (columnIndex / columns.length) * eventsColumnWidth;
         int colSpan = calculateColSpan(columns, drawProperties, columnIndex);
         drawProperties.width = (eventsColumnWidth * colSpan) / (columns.length);
       }
@@ -97,12 +97,22 @@ class EventDrawProperties {
   DateTime? end;
 
   /// Whether the event should be aligned from right to left.
-  final bool isRTL;
+  final bool isRtl;
+
+  /// The event widget builder.
+  final EventWidgetBuilder builder;
 
   /// Creates a new flutter week view event draw properties from the specified day view and the specified day view event.
-  EventDrawProperties(DayView dayView, FlutterWeekViewEvent event, this.isRTL) {
-    DateTime minimum = dayView.minimumTime.atDate(dayView.date);
-    DateTime maximum = dayView.maximumTime.atDate(dayView.date);
+  EventDrawProperties({
+    required FlutterWeekViewEvent event,
+    required TimeOfDay minimumTime,
+    required TimeOfDay maximumTime,
+    required DateTime date,
+    required this.isRtl,
+    required this.builder,
+  }) {
+    DateTime minimum = minimumTime.atDate(date);
+    DateTime maximum = maximumTime.atDate(date);
 
     if (shouldDraw || (event.start.isBefore(minimum) && event.end.isBefore(minimum)) || (event.start.isAfter(maximum) && event.end.isAfter(maximum))) {
       return;
@@ -124,13 +134,13 @@ class EventDrawProperties {
   bool get shouldDraw => start != null && end != null;
 
   /// Calculates the top and the height of the event rectangle.
-  void calculateTopAndHeight(double Function(HourMinute time, {HourMinute minimumTime}) topOffsetCalculator) {
+  void calculateTopAndHeight(double Function(TimeOfDay time, {TimeOfDay minimumTime}) topOffsetCalculator) {
     if (!shouldDraw) {
       return;
     }
 
-    top = topOffsetCalculator(HourMinute.fromDateTime(dateTime: start!));
-    height = topOffsetCalculator(HourMinute.fromDuration(duration: end!.difference(start!)), minimumTime: HourMinute.min) + 1;
+    top = topOffsetCalculator(TimeOfDay.fromDateTime(start!));
+    height = topOffsetCalculator(TimeOfDayUtils.fromDuration(duration: end!.difference(start!)), minimumTime: TimeOfDayUtils.min) + 1;
   }
 
   /// Returns whether this draw properties overlaps another.
@@ -143,17 +153,15 @@ class EventDrawProperties {
   }
 
   /// Creates the event widget.
-  Widget createWidget(BuildContext context, DayView dayView, Widget? resizeGestureDetector, FlutterWeekViewEvent event) {
-    Widget child = event.build(context, dayView, height!, width!);
+  Widget createWidget(FlutterWeekViewEvent event, DragAndDropOptions? dragAndDropOptions, Widget? resizeGestureDetector) {
+    Widget child = builder(event, height!, width!);
 
     // If drag-and-drop is allowed, we wrap the child in a Draggable widget.
-    if (dayView.dragAndDropOptions != null) {
-      DragAndDropOptions options = dayView.dragAndDropOptions!;
-
+    if (dragAndDropOptions != null) {
       child = _getDraggableOrLongPressDraggable(
-        isLongPress: options.startingGesture == DragStartingGesture.longPress,
+        isLongPress: dragAndDropOptions.startingGesture == DragStartingGesture.longPress,
         data: event,
-        axis: options.allowOnlyVerticalDrag ? Axis.vertical : null,
+        axis: dragAndDropOptions.allowOnlyVerticalDrag ? Axis.vertical : null,
         feedback: SizedBox(
           height: height!,
           width: width!,
@@ -184,8 +192,8 @@ class EventDrawProperties {
     return Positioned(
       top: top,
       height: height,
-      left: isRTL ? null : left,
-      right: isRTL ? left : null,
+      left: isRtl ? null : left,
+      right: isRtl ? left : null,
       width: width,
       child: child,
     );

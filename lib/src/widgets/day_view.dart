@@ -9,11 +9,11 @@ import 'package:flutter_week_view/src/styles/hours_column.dart';
 import 'package:flutter_week_view/src/utils/builders.dart';
 import 'package:flutter_week_view/src/utils/callback_helpers.dart';
 import 'package:flutter_week_view/src/utils/event_grid.dart';
-import 'package:flutter_week_view/src/utils/hour_minute.dart';
 import 'package:flutter_week_view/src/utils/scroll.dart';
+import 'package:flutter_week_view/src/utils/time_of_day.dart';
 import 'package:flutter_week_view/src/utils/utils.dart';
 import 'package:flutter_week_view/src/widgets/day_bar.dart';
-import 'package:flutter_week_view/src/widgets/hours_column.dart';
+import 'package:flutter_week_view/src/widgets/hour_column.dart';
 import 'package:flutter_week_view/src/widgets/zoomable_header_widget.dart';
 
 /// A (scrollable) day view which is able to display events, zoom and un-zoom and more !
@@ -33,19 +33,20 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
     this.events = const [],
     required DateTime date,
     DayViewStyle? style,
-    super.hoursColumnStyle = const HoursColumnStyle(),
+    super.hourColumnStyle = const HourColumnStyle(),
     DayBarStyle? dayBarStyle,
     DayViewController? controller,
     super.inScrollableWidget,
-    super.isRTL,
+    super.isRtl,
     super.minimumTime,
     super.maximumTime,
-    HourMinute? initialTime,
+    TimeOfDay? initialTime,
     super.userZoomable,
     super.currentTimeIndicatorBuilder,
-    super.hoursColumnTimeBuilder,
-    super.hoursColumnBackgroundBuilder,
-    super.onHoursColumnTappedDown,
+    super.hourColumnTimeBuilder,
+    super.hourColumnBackgroundBuilder,
+    super.eventWidgetBuilder,
+    super.onHourColumnTappedDown,
     super.onDayBarTappedDown,
     super.onBackgroundTappedDown,
     super.dragAndDropOptions,
@@ -55,7 +56,7 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
         super(
           style: style ?? DayViewStyle.fromDate(date: date),
           controller: controller ?? DayViewController(),
-          initialTime: initialTime?.atDate(date) ?? (Utils.sameDay(date) ? HourMinute.now() : const HourMinute()).atDate(date),
+          initialTime: initialTime?.atDate(date) ?? (Utils.sameDay(date) ? TimeOfDay.now() : TimeOfDayUtils.zero).atDate(date),
         );
 
   @override
@@ -132,14 +133,14 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       );
     }
 
-    if (widget.style.headerSize > 0 || widget.hoursColumnStyle.width > 0) {
+    if (widget.style.headerSize > 0 || widget.hourColumnStyle.width > 0) {
       mainWidget = Stack(
         children: [
           mainWidget,
           Positioned(
             top: 0,
-            left: widget.isRTL ? 0 : widget.hoursColumnStyle.width,
-            right: widget.isRTL ? widget.hoursColumnStyle.width : 0,
+            left: widget.isRtl ? 0 : widget.hourColumnStyle.width,
+            right: widget.isRtl ? widget.hourColumnStyle.width : 0,
             child: DayBar.fromHeadersWidgetState(
               parent: widget,
               date: widget.date,
@@ -149,7 +150,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
           ),
           Container(
             height: widget.style.headerSize,
-            width: widget.hoursColumnStyle.width,
+            width: widget.hourColumnStyle.width,
             color: widget.dayBarStyle.color,
           ),
         ],
@@ -179,40 +180,47 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   @override
   DayViewStyle get currentDayViewStyle => widget.style;
 
-  /// Creates the main widget, with a hours column and an events column.
+  /// Creates the main widget, with a hour column and an events column.
   Widget createMainWidget() {
     List<Widget> children = [];
 
     if (widget.onBackgroundTappedDown != null) {
-      children.add(Positioned.fill(
-        child: GestureDetector(
-          onTapUp: (details) {
-            DateTime timeTapped = widget.date.add(calculateOffsetHourMinute(details.localPosition).asDuration);
-            widget.onBackgroundTappedDown!(timeTapped);
-          },
-          child: Container(color: Colors.transparent),
+      children.add(
+        Positioned.fill(
+          child: GestureDetector(
+            onTapUp: (details) {
+              DateTime timeTapped = widget.date.add(calculateOffsetHourMinute(details.localPosition).asDuration);
+              widget.onBackgroundTappedDown!(timeTapped);
+            },
+            child: Container(color: Colors.transparent),
+          ),
         ),
-      ));
+      );
     }
 
-    children.addAll(eventsDrawProperties.entries.map((entry) => entry.value.createWidget(
-          context,
-          widget,
-          buildResizeGestureDetector(entry.key),
+    children.addAll(
+      eventsDrawProperties.entries.map(
+        (entry) => entry.value.createWidget(
           entry.key,
-        )));
+          widget.dragAndDropOptions,
+          buildResizeGestureDetector(entry.key),
+        ),
+      ),
+    );
 
-    if (widget.hoursColumnStyle.width > 0) {
-      children.add(Positioned(
-        top: 0,
-        left: widget.isRTL ? null : 0,
-        child: HoursColumn.fromHeadersWidgetState(parent: this),
-      ));
+    if (widget.hourColumnStyle.width > 0) {
+      children.add(
+        Positioned(
+          top: 0,
+          left: widget.isRtl ? null : 0,
+          child: HourColumn.fromHeadersWidgetState(parent: this),
+        ),
+      );
     }
 
     if (Utils.sameDay(widget.date) && widget.minimumTime.atDate(widget.date).isBefore(DateTime.now()) && widget.maximumTime.atDate(widget.date).isAfter(DateTime.now())) {
       Widget? currentTimeIndicator =
-          (widget.currentTimeIndicatorBuilder ?? DefaultBuilders.defaultCurrentTimeIndicatorBuilder)(widget.style, calculateTopOffset, widget.hoursColumnStyle.width, widget.isRTL);
+          (widget.currentTimeIndicatorBuilder ?? DefaultBuilders.defaultCurrentTimeIndicatorBuilder)(widget.style, calculateTopOffset, widget.hourColumnStyle.width, widget.isRtl);
       if (currentTimeIndicator != null) {
         children.add(currentTimeIndicator);
       }
@@ -220,7 +228,12 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
 
     Widget mainWidget = SizedBox(
       height: calculateHeight(),
-      child: Stack(children: children..insert(0, createBackground())),
+      child: Stack(
+        children: [
+          createBackground(),
+          ...children,
+        ],
+      ),
     );
 
     if (verticalScrollController != null) {
@@ -253,11 +266,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
         // We restore the original event.end in order to pass the unchanged
         // event in the callback.
         DateTime newEventEnd = event.end;
-        event.end = originalResizeEventEnd;
-        setState(() {
-          reset();
-          createEventsDrawProperties();
-        });
+        setState(() => updateEvent(event, event.copyWith(end: originalResizeEventEnd)));
         widget.resizeEventOptions!.onEventResized(event, newEventEnd);
       },
       onVerticalDragUpdate: (details) => onEventResizeUpdate(event, details.primaryDelta ?? 0),
@@ -274,7 +283,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     accumulatedResizeOffset += resizeOffset;
 
     // Compute the Duration equivalent to the accumulated offset.
-    double hourRowHeight = calculateTopOffset(widget.minimumTime.add(const HourMinute(hour: 1)));
+    double hourRowHeight = calculateTopOffset(widget.minimumTime.add(const Duration(hours: 1)));
     double hourMinutesInHour = accumulatedResizeOffset / hourRowHeight;
     int hour = hourMinutesInHour.floor();
     int minute = ((hourMinutesInHour - hour) * 60).round();
@@ -296,8 +305,9 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     }
 
     // If the new duration is too short, we set the duration to be the minimum allowed.
+    FlutterWeekViewEvent updated;
     if (newEventDuration < minimumDuration) {
-      event.end = event.start.add(minimumDuration);
+      updated = event.copyWith(end: event.start.add(minimumDuration));
     } else {
       // Otherwise, we compute the new event end normally.
       DateTime newEventEnd = originalResizeEventEnd.add(delta);
@@ -305,13 +315,10 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
       if (gridGranularity > Duration.zero) {
         newEventEnd = roundTimeToFitGrid(newEventEnd, gridGranularity: gridGranularity);
       }
-      event.end = newEventEnd;
+      updated = event.copyWith(end: newEventEnd);
     }
 
-    setState(() {
-      reset();
-      createEventsDrawProperties();
-    });
+    setState(() => updateEvent(event, updated));
   }
 
   /// Creates the background widgets that should be added to a stack.
@@ -334,7 +341,21 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   void createEventsDrawProperties() {
     EventGrid eventsGrid = EventGrid();
     for (FlutterWeekViewEvent event in List.of(events)) {
-      EventDrawProperties drawProperties = eventsDrawProperties[event] ?? EventDrawProperties(widget, event, widget.isRTL);
+      EventDrawProperties drawProperties = eventsDrawProperties[event] ??
+          EventDrawProperties(
+            event: event,
+            minimumTime: widget.minimumTime,
+            maximumTime: widget.maximumTime,
+            date: widget.date,
+            isRtl: widget.isRtl,
+            builder: widget.eventWidgetBuilder ??
+                (event, height, width) => DefaultBuilders.defaultEventWidgetBuilder(
+                      event,
+                      height,
+                      width,
+                      timeFormatter: widget.hourColumnStyle.timeFormatter,
+                    ),
+          );
       if (!drawProperties.shouldDraw) {
         events.remove(event);
         continue;
@@ -349,8 +370,19 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     }
 
     if (eventsGrid.drawPropertiesList.isNotEmpty) {
-      double eventsColumnWidth = (context.findRenderObject() as RenderBox).size.width - widget.hoursColumnStyle.width;
-      eventsGrid.processEvents(widget.hoursColumnStyle.width, eventsColumnWidth);
+      double eventsColumnWidth = (context.findRenderObject() as RenderBox).size.width - widget.hourColumnStyle.width;
+      eventsGrid.processEvents(widget.hourColumnStyle.width, eventsColumnWidth);
     }
+  }
+
+  /// Updates [oldEvent] to [newEvent].
+  void updateEvent(FlutterWeekViewEvent oldEvent, FlutterWeekViewEvent newEvent) {
+    List<FlutterWeekViewEvent> events = List.of(this.events);
+    int index = events.indexOf(oldEvent);
+    if (index >= 0) {
+      events[index] = newEvent;
+    }
+    eventsDrawProperties.clear();
+    createEventsDrawProperties();
   }
 }

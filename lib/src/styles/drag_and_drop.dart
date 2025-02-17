@@ -7,6 +7,7 @@ import 'package:flutter_week_view/src/event.dart';
 /// [FlutterWeekViewEvent.shiftEventTo]) and then call setState to update the UI.
 typedef EventDragCallback = Function(FlutterWeekViewEvent event, DateTime newStartTime);
 
+/// Contains the drag starting gestures.
 enum DragStartingGesture {
   /// Drag will start as soon as the user starts dragging an event. This is more
   /// suited for desktop/web UX.
@@ -14,7 +15,7 @@ enum DragStartingGesture {
 
   /// Drag will start after a long press on the event. This is more suited for
   /// mobile UX.
-  longPress
+  longPress;
 }
 
 /// Configures the behavior of drag-and-drop of events.
@@ -34,6 +35,7 @@ class DragAndDropOptions {
   /// Which gesture the user should perform to start dragging an event.
   final DragStartingGesture startingGesture;
 
+  /// Creates a new drag and drop options instance.
   DragAndDropOptions({
     required this.onEventDragged,
     this.allowOnlyVerticalDrag = true,

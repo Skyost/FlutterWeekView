@@ -2,31 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/styles/zoomable_header_widget.dart';
 import 'package:flutter_week_view/src/utils/builders.dart';
 
-/// Allows to configure the hours column style.
-class HoursColumnStyle {
+/// Allows to configure the hour column style.
+class HourColumnStyle {
   /// The hour formatter. Defaults to 24-hour HH:MM, e.g., 15:00.
   final TimeFormatter timeFormatter;
 
-  /// The hours column text style. Defaults to light gray text.
+  /// The hour column text style. Defaults to light gray text.
   final TextStyle textStyle;
 
-  /// The hours column width. Defaults to 60.
+  /// The hour column width. Defaults to 60.
   final double width;
 
-  /// The hours column background color. Defaults to [Colors.white].
+  /// The hour column background color. Defaults to [Colors.white].
   final Color? color;
 
-  /// The hours column decoration. Defaults to null.
+  /// The hour column decoration. Defaults to null.
   final Decoration? decoration;
 
   /// The hours text alignment. Defaults to [Alignment.center].
   final Alignment textAlignment;
 
-  /// The interval between two durations displayed on the hours column. Defaults to [Duration(hours: 1)].
+  /// The interval between two durations displayed on the hour column. Defaults to [Duration(hours: 1)].
   final Duration interval;
 
   /// Creates a new hour column style instance.
-  const HoursColumnStyle({
+  const HourColumnStyle({
     TimeFormatter? timeFormatter,
     TextStyle? textStyle,
     double? width,
@@ -42,7 +42,7 @@ class HoursColumnStyle {
         interval = interval ?? const Duration(hours: 1);
 
   /// Allows to copy the current style instance with your own properties.
-  HoursColumnStyle copyWith({
+  HourColumnStyle copyWith({
     TimeFormatter? timeFormatter,
     TextStyle? textStyle,
     double? width,
@@ -51,7 +51,7 @@ class HoursColumnStyle {
     Alignment? textAlignment,
     Duration? interval,
   }) =>
-      HoursColumnStyle(
+      HourColumnStyle(
         timeFormatter: timeFormatter ?? this.timeFormatter,
         textStyle: textStyle ?? this.textStyle,
         width: width ?? this.width,

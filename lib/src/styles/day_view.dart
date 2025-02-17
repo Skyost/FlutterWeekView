@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/styles/zoomable_header_widget.dart';
-import 'package:flutter_week_view/src/utils/hour_minute.dart';
 import 'package:flutter_week_view/src/utils/utils.dart';
 import 'package:flutter_week_view/src/widgets/day_view.dart';
-import 'package:flutter_week_view/src/widgets/hours_column.dart';
+import 'package:flutter_week_view/src/widgets/hour_column.dart';
 import 'package:flutter_week_view/src/widgets/zoomable_header_widget.dart';
 
 /// Allows to style a day view.
@@ -19,7 +18,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
   final Color? backgroundColor;
 
   /// The rules color, i.e., the color of the background horizontal lines positioned along with
-  /// each hour shown in the hours column.
+  /// each hour shown in the hour column.
   ///
   /// Defaults to a semi-transparent gray.
   final Color? backgroundRulesColor;
@@ -36,7 +35,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
   final double currentTimeRuleHeight;
 
   /// The current time circle color. This is a small circle to be shown along with the horizontal
-  /// time rule in the hours column, typically colored the same as [currentTimeRuleColor].
+  /// time rule in the hour column, typically colored the same as [currentTimeRuleColor].
   ///
   /// If null, the circle is not drawn.
   final Color? currentTimeCircleColor;
@@ -53,7 +52,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
 
   /// Creates a new day view style instance.
   const DayViewStyle({
-    double? headerSize,
+    super.headerSize,
     double? hourRowHeight,
     Color? backgroundColor,
     this.backgroundRulesColor = const Color(0x1A000000),
@@ -66,8 +65,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
         backgroundColor = backgroundColor ?? const Color(0xFFF2F2F2),
         currentTimeRuleHeight = (currentTimeRuleHeight ?? 1) < 0 ? 0 : (currentTimeRuleHeight ?? 1),
         currentTimeCircleRadius = (currentTimeCircleRadius ?? 7.5) < 0 ? 0 : (currentTimeCircleRadius ?? 7.5),
-        currentTimeCirclePosition = currentTimeCirclePosition ?? CurrentTimeCirclePosition.right,
-        super(headerSize: headerSize);
+        currentTimeCirclePosition = currentTimeCirclePosition ?? CurrentTimeCirclePosition.right;
 
   /// Allows to automatically customize the day view background color according to the specified date.
   DayViewStyle.fromDate({
@@ -126,7 +124,7 @@ class DayViewStyle extends ZoomableHeaderWidgetStyle {
         maximumTime: dayView.maximumTime,
         topOffsetCalculator: topOffsetCalculator,
         dayViewStyle: this,
-        interval: dayView.hoursColumnStyle.interval,
+        interval: dayView.hourColumnStyle.interval,
       );
 }
 
@@ -142,10 +140,10 @@ enum CurrentTimeCirclePosition {
 /// The events column background painter.
 class _EventsColumnBackgroundPainter extends CustomPainter {
   /// The minimum time to display.
-  final HourMinute minimumTime;
+  final TimeOfDay minimumTime;
 
   /// The maximum time to display.
-  final HourMinute maximumTime;
+  final TimeOfDay maximumTime;
 
   /// The top offset calculator.
   final TopOffsetCalculator topOffsetCalculator;
@@ -172,8 +170,8 @@ class _EventsColumnBackgroundPainter extends CustomPainter {
     }
 
     if (dayViewStyle.backgroundRulesColor != null) {
-      final List<HourMinute> sideTimes = HoursColumn.getSideTimes(minimumTime, maximumTime, interval);
-      for (HourMinute time in sideTimes) {
+      final List<TimeOfDay> sideTimes = HourColumn.getSideTimes(minimumTime, maximumTime, interval);
+      for (TimeOfDay time in sideTimes) {
         double topOffset = topOffsetCalculator(time);
         canvas.drawLine(Offset(0, topOffset), Offset(size.width, topOffset), Paint()..color = dayViewStyle.backgroundRulesColor!);
       }

@@ -9,14 +9,10 @@ class WeekViewController extends ZoomController {
 
   /// Creates a new week view controller.
   WeekViewController({
-    double zoomCoefficient = 0.8,
-    double? minZoom,
-    double? maxZoom,
-  }) : super(
-          zoomCoefficient: zoomCoefficient,
-          minZoom: minZoom,
-          maxZoom: maxZoom,
-        );
+    super.zoomCoefficient,
+    super.minZoom,
+    super.maxZoom,
+  });
 
   /// Returns the day view controller associated with the specified date.
   DayViewController getDayViewController(DateTime date) {

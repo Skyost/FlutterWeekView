@@ -133,7 +133,7 @@ Here are the options that are available for both `DayView` and `WeekView` :
 
 * `events` Events to display.
 * `style` Allows you to style your widget. A lot of different styles are available so don't hesitate to try them out !
-* `hoursColumnStyle` Same, it allows you to style the hours column on the left.
+* `hourColumnStyle` Same, it allows you to style the hour column on the left.
 * `controller` Controllers allow you to manually change the zoom settings.
 * `inScrollableWidget` Whether to put the widget in a scrollable widget (disable if you want to manage the scroll by yourself).
 * `minimumTime` The minimum hour and minute to display in a day.
@@ -141,11 +141,12 @@ Here are the options that are available for both `DayView` and `WeekView` :
 * `initialTime` The initial hour and minute to put the widget on.
 * `userZoomable` Whether the user is able to (un)zoom the widget.
 * `currentTimeIndicatorBuilder` Allows you to change the default current time indicator (rule and circle).
-* `onHoursColumnTappedDown` Provides a tapped down callback for the hours column. Pretty useful if you want your users to add your own events at a specific time.
+* `onHourColumnTappedDown` Provides a tapped down callback for the hour column. Pretty useful if you want your users to add your own events at a specific time.
 * `onBackgroundTappedDown` Provides a similar callback as the above, but when the user clicks on the background (an empty region of the calendar).
 * `onDayBarTappedDown` Provides a tapped down callback for the day bar.
 * `dragAndDropOptions` Enables drag-and-drop of events.
 * `resizeEventOptions` Enables resizing events, by dragging the bottom of the event up/down.
+* `eventWidgetBuilder` The widget builder that customizes how events are rendered.
 
 ### Flutter day view
 

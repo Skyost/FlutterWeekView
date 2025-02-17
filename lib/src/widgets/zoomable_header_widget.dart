@@ -2,19 +2,20 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_week_view/src/controller/zoom_controller.dart';
+import 'package:flutter_week_view/src/event.dart';
 import 'package:flutter_week_view/src/styles/day_view.dart';
 import 'package:flutter_week_view/src/styles/drag_and_drop.dart';
 import 'package:flutter_week_view/src/styles/hours_column.dart';
 import 'package:flutter_week_view/src/styles/resize_event.dart';
 import 'package:flutter_week_view/src/styles/zoomable_header_widget.dart';
 import 'package:flutter_week_view/src/utils/builders.dart';
-import 'package:flutter_week_view/src/utils/hour_minute.dart';
+import 'package:flutter_week_view/src/utils/time_of_day.dart';
 
 /// Allows to calculate a top offset from a given hour.
-typedef TopOffsetCalculator = double Function(HourMinute time);
+typedef TopOffsetCalculator = double Function(TimeOfDay time);
 
-/// Triggered when the hours column has been tapped down.
-typedef HoursColumnTapCallback = Function(HourMinute time);
+/// Triggered when the hour column has been tapped down.
+typedef HourColumnTapCallback = Function(TimeOfDay time);
 
 /// Triggered when the day bar has been tapped down.
 typedef DayBarTapCallback = Function(DateTime date);
@@ -25,30 +26,33 @@ typedef DayBarTapCallback = Function(DateTime date);
 typedef BackgroundTapCallback = Function(DateTime date);
 
 /// Allows to build the current time indicator (rule and circle).
-typedef CurrentTimeIndicatorBuilder = Widget? Function(DayViewStyle dayViewStyle, TopOffsetCalculator topOffsetCalculator, double hoursColumnWidth, bool isRtl);
+typedef CurrentTimeIndicatorBuilder = Widget? Function(DayViewStyle dayViewStyle, TopOffsetCalculator topOffsetCalculator, double hourColumnWidth, bool isRtl);
 
 /// Allows to build the time displayed on the side border.
-typedef HoursColumnTimeBuilder = Widget? Function(HoursColumnStyle dayViewStyle, HourMinute time);
+typedef HourColumnTimeBuilder = Widget? Function(HourColumnStyle dayViewStyle, TimeOfDay time);
 
 /// Allows to build the background decoration below single time displayed on the side border.
-typedef HoursColumnBackgroundBuilder = Decoration? Function(HourMinute time);
+typedef HourColumnBackgroundBuilder = Decoration? Function(TimeOfDay time);
+
+/// Allows to build an event widget.
+typedef EventWidgetBuilder = Widget Function(FlutterWeekViewEvent event, double height, double width);
 
 /// A widget which is showing both headers and can be zoomed.
 abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C extends ZoomController> extends StatefulWidget {
   /// The widget style.
   final S style;
 
-  /// The hours column style.
-  final HoursColumnStyle hoursColumnStyle;
+  /// The hour column style.
+  final HourColumnStyle hourColumnStyle;
 
   /// Whether the widget should automatically be placed in a scrollable widget.
   final bool inScrollableWidget;
 
   /// The minimum time to display.
-  final HourMinute minimumTime;
+  final TimeOfDay minimumTime;
 
   /// The maximum time to display.
-  final HourMinute maximumTime;
+  final TimeOfDay maximumTime;
 
   /// The initial visible time. Defaults to the current hour of the day (if possible).
   final DateTime initialTime;
@@ -60,16 +64,19 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
   final CurrentTimeIndicatorBuilder? currentTimeIndicatorBuilder;
 
   /// Building method for building the time displayed on the side border.
-  final HoursColumnTimeBuilder? hoursColumnTimeBuilder;
+  final HourColumnTimeBuilder? hourColumnTimeBuilder;
 
   /// Building method for building background decoration below single time displayed on the side border.
-  final HoursColumnBackgroundBuilder? hoursColumnBackgroundBuilder;
+  final HourColumnBackgroundBuilder? hourColumnBackgroundBuilder;
 
-  /// Triggered when the hours column has been tapped down.
-  final HoursColumnTapCallback? onHoursColumnTappedDown;
+  /// Triggered when the hour column has been tapped down.
+  final HourColumnTapCallback? onHourColumnTappedDown;
 
   /// Triggered when the day bar has been tapped down.
   final DayBarTapCallback? onDayBarTappedDown;
+
+  /// The event widget builder.
+  final EventWidgetBuilder? eventWidgetBuilder;
 
   /// Triggered when there's a click on the background (an empty region of the calendar). The returned
   /// value corresponds to the hour/minute where the user made the tap. For better user experience,
@@ -89,28 +96,29 @@ abstract class ZoomableHeadersWidget<S extends ZoomableHeaderWidgetStyle, C exte
   final C controller;
 
   /// Whether the widget should be aligned from right to left.
-  final bool isRTL;
+  final bool isRtl;
 
   /// Creates a new zoomable headers widget instance.
   const ZoomableHeadersWidget({
     super.key,
     required this.style,
-    required this.hoursColumnStyle,
+    required this.hourColumnStyle,
     this.inScrollableWidget = true,
-    this.minimumTime = HourMinute.min,
-    this.maximumTime = HourMinute.max,
+    this.minimumTime = TimeOfDayUtils.min,
+    this.maximumTime = TimeOfDayUtils.max,
     required this.initialTime,
     this.userZoomable = true,
     this.currentTimeIndicatorBuilder = DefaultBuilders.defaultCurrentTimeIndicatorBuilder,
-    this.onHoursColumnTappedDown,
+    this.onHourColumnTappedDown,
     this.onDayBarTappedDown,
+    this.eventWidgetBuilder,
     this.onBackgroundTappedDown,
     this.dragAndDropOptions,
     this.resizeEventOptions,
     required this.controller,
-    this.hoursColumnTimeBuilder = DefaultBuilders.defaultHoursColumnTimeBuilder,
-    this.hoursColumnBackgroundBuilder,
-    this.isRTL = false,
+    this.hourColumnTimeBuilder = DefaultBuilders.defaultHourColumnTimeBuilder,
+    this.hourColumnBackgroundBuilder,
+    this.isRtl = false,
   });
 }
 
@@ -196,7 +204,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
   /// Scrolls to the initial time.
   void scrollToInitialTime() {
     if (mounted && verticalScrollController != null && verticalScrollController!.hasClients) {
-      double topOffset = calculateTopOffset(HourMinute.fromDateTime(dateTime: widget.initialTime));
+      double topOffset = calculateTopOffset(TimeOfDay.fromDateTime(widget.initialTime));
       verticalScrollController!.jumpTo(math.min(topOffset, verticalScrollController!.position.maxScrollExtent));
     }
   }
@@ -205,13 +213,13 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
   bool get isZoomable => widget.userZoomable && widget.controller.zoomCoefficient > 0;
 
   /// Calculates the top offset of a given time.
-  double calculateTopOffset(HourMinute time, {HourMinute? minimumTime, double? hourRowHeight}) =>
+  double calculateTopOffset(TimeOfDay time, {TimeOfDay? minimumTime, double? hourRowHeight}) =>
       DefaultBuilders.defaultTopOffsetCalculator(time, minimumTime: minimumTime ?? widget.minimumTime, hourRowHeight: hourRowHeight ?? this.hourRowHeight);
 
   /// Given a local position in the widget, calculates its corresponding
   /// HourMinute.
-  HourMinute calculateOffsetHourMinute(Offset localOffset) {
-    double hourRowHeight = calculateTopOffset(widget.minimumTime.add(const HourMinute(hour: 1)));
+  TimeOfDay calculateOffsetHourMinute(Offset localOffset) {
+    double hourRowHeight = calculateTopOffset(widget.minimumTime.add(const Duration(hours: 1)));
     double hourMinutesInHour = localOffset.dy / hourRowHeight;
 
     // Handle an edge case, since HourMinute doesn't support negative values.
@@ -221,7 +229,7 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
 
     int hour = hourMinutesInHour.floor();
     int minute = ((hourMinutesInHour - hour) * 60).round();
-    return widget.minimumTime.add(HourMinute(hour: hour, minute: minute));
+    return widget.minimumTime.add(Duration(hours: hour, minutes: minute));
   }
 
   /// Calculates the widget height.

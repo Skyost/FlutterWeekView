@@ -106,7 +106,7 @@ class _DemoDayView extends StatelessWidget {
     DateTime now = DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day);
     return DayView(
-      initialTime: const HourMinute(hour: 7),
+      initialTime: const TimeOfDay(hour: 7, minute: 0),
       date: now,
       events: [
         FlutterWeekViewEvent(
@@ -114,7 +114,6 @@ class _DemoDayView extends StatelessWidget {
           description: 'A description 1',
           start: date.subtract(const Duration(hours: 1)),
           end: date.add(const Duration(hours: 18, minutes: 30)),
-          onTap: () => 'Event 1 has been tapped !',
         ),
         FlutterWeekViewEvent(
           title: 'An event 2',
@@ -156,7 +155,7 @@ class _DemoWeekView extends StatelessWidget {
     DateTime now = DateTime.now();
     DateTime date = DateTime(now.year, now.month, now.day);
     return WeekView(
-      initialTime: const HourMinute(hour: 7).atDate(DateTime.now()),
+      initialTime: DateTime.now().copyWith(hour: 7, minute: 0),
       dates: [date.subtract(const Duration(days: 1)), date, date.add(const Duration(days: 1))],
       events: [
         FlutterWeekViewEvent(
@@ -249,21 +248,24 @@ class _DynamicDayViewState extends State<_DynamicDayView> {
         dragAndDropOptions: DragAndDropOptions(
           onEventDragged: (FlutterWeekViewEvent event, DateTime newStartTime) {
             DateTime roundedTime = roundTimeToFitGrid(newStartTime, gridGranularity: const Duration(minutes: 15));
-            event.shiftEventTo(roundedTime);
-            setState(() {
-              /* State set is the shifted event's time. */
-            });
+            setState(() => updateEvent(event, event.shiftEventTo(roundedTime)));
           },
         ),
         resizeEventOptions: ResizeEventOptions(
           onEventResized: (FlutterWeekViewEvent event, DateTime newEndTime) {
-            event.end = newEndTime;
-            setState(() {
-              /* State set is the resized event's time. */
-            });
+            setState(() => updateEvent(event, event.copyWith(end: newEndTime)));
           },
         ),
       ),
     );
+  }
+
+  /// Updates [oldEvent] to [newEvent].
+  void updateEvent(FlutterWeekViewEvent oldEvent, FlutterWeekViewEvent newEvent) {
+    List<FlutterWeekViewEvent> events = List.of(this.events);
+    int index = events.indexOf(oldEvent);
+    if (index >= 0) {
+      events[index] = newEvent;
+    }
   }
 }

@@ -7,15 +7,11 @@ class DayViewController extends ZoomController {
 
   /// Creates a new day view controller instance.
   DayViewController({
-    double zoomCoefficient = 0.8,
-    double? minZoom,
-    double? maxZoom,
+    super.zoomCoefficient,
+    super.minZoom,
+    super.maxZoom,
     this.onDisposed,
-  }) : super(
-          zoomCoefficient: zoomCoefficient,
-          minZoom: minZoom,
-          maxZoom: maxZoom,
-        );
+  });
 
   @override
   void dispose() {

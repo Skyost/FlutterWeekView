@@ -27,13 +27,12 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
 
   /// Creates a new week view style instance.
   const WeekViewStyle({
-    double? headerSize,
+    super.headerSize,
     this.dayViewWidth,
     double? dayViewSeparatorWidth,
     this.dayViewSeparatorColor = Colors.black12,
     this.showHorizontalScrollbar = false,
-  })  : dayViewSeparatorWidth = (dayViewSeparatorWidth ?? 0) < 0 ? 0 : (dayViewSeparatorWidth ?? 0),
-        super(headerSize: headerSize);
+  }) : dayViewSeparatorWidth = (dayViewSeparatorWidth ?? 0) < 0 ? 0 : (dayViewSeparatorWidth ?? 0);
 
   /// Allows to copy the current style instance with your own properties.
   WeekViewStyle copyWith({
