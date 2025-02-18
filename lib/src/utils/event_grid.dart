@@ -77,7 +77,7 @@ class EventGrid {
 }
 
 /// An utility class that allows to display the events in the events column.
-class EventDrawProperties<E extends FlutterWeekViewEventMixin<E>> {
+class EventDrawProperties<E extends FlutterWeekViewEventMixin> {
   /// The top position.
   double? top;
 

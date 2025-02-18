@@ -3,7 +3,7 @@ import 'package:flutter_week_view/src/styles/zoomable_header_widget.dart';
 import 'package:flutter_week_view/src/utils/utils.dart';
 
 /// Builds an event text widget.
-typedef EventTextBuilder<E extends FlutterWeekViewEventMixin<E>> = Widget Function(
+typedef EventTextBuilder<E extends FlutterWeekViewEventMixin> = Widget Function(
   E event,
   TimeFormatter timeFormatter,
   TextStyle textStyle,
@@ -12,7 +12,7 @@ typedef EventTextBuilder<E extends FlutterWeekViewEventMixin<E>> = Widget Functi
 );
 
 /// Represents a flutter week view event.
-mixin FlutterWeekViewEventMixin<T extends FlutterWeekViewEventMixin<T>> {
+mixin FlutterWeekViewEventMixin {
   /// The event title.
   String get title;
 
@@ -24,15 +24,10 @@ mixin FlutterWeekViewEventMixin<T extends FlutterWeekViewEventMixin<T>> {
 
   /// The event end date & time.
   DateTime get end;
+}
 
-  /// Shifts the start and end times, so that the event's duration is unaltered
-  /// and the event now starts in [newStartTime].
-  T shiftEventTo(DateTime newStartTime) {
-    DateTime end = this.end.add(newStartTime.difference(this.start));
-    DateTime start = newStartTime;
-    return copyWith(start: start, end: end);
-  }
-
+/// A copyable event.
+mixin CopyableEvent<T extends FlutterWeekViewEventMixin> on FlutterWeekViewEventMixin {
   /// Copies this instance with the given parameters.
   T copyWith({
     String? title,
@@ -42,8 +37,19 @@ mixin FlutterWeekViewEventMixin<T extends FlutterWeekViewEventMixin<T>> {
   });
 }
 
-/// A non-abstract flutter week view event.
-class FlutterWeekViewEvent with FlutterWeekViewEventMixin<FlutterWeekViewEvent> implements Comparable<FlutterWeekViewEvent> {
+/// A shiftable event.
+mixin ShiftableEvent<T extends FlutterWeekViewEventMixin> on CopyableEvent<T> {
+  /// Shifts the start and end times, so that the event's duration is unaltered
+  /// and the event now starts in [newStartTime].
+  T shiftEventTo(DateTime newStartTime) {
+    DateTime end = this.end.add(newStartTime.difference(this.start));
+    DateTime start = newStartTime;
+    return copyWith(start: start, end: end);
+  }
+}
+
+/// A typed flutter week view event.
+abstract class _TypedFlutterWeekViewEvent<T extends _TypedFlutterWeekViewEvent<T>> with FlutterWeekViewEventMixin, CopyableEvent<T>, ShiftableEvent<T> implements Comparable<T> {
   @override
   final String title;
 
@@ -57,13 +63,52 @@ class FlutterWeekViewEvent with FlutterWeekViewEventMixin<FlutterWeekViewEvent> 
   final DateTime end;
 
   /// Creates a new flutter week view event instance.
-  FlutterWeekViewEvent({
+  _TypedFlutterWeekViewEvent({
     required this.title,
     required this.description,
     required DateTime start,
     required DateTime end,
   })  : start = start.yearMonthDayHourMinute,
         end = end.yearMonthDayHourMinute;
+
+  @override
+  T copyWith({
+    String? title,
+    String? description,
+    DateTime? start,
+    DateTime? end,
+  });
+
+  @override
+  int compareTo(T other) {
+    int result = start.compareTo(other.start);
+    if (result != 0) {
+      return result;
+    }
+    return end.compareTo(other.end);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is! _TypedFlutterWeekViewEvent) {
+      return super == other;
+    }
+    return title == other.title && description == other.description && start.isAtSameMomentAs(other.start) && end.isAtSameMomentAs(other.end);
+  }
+
+  @override
+  int get hashCode => Object.hash(title, description, start, end);
+}
+
+/// A non-abstract flutter week view event.
+class FlutterWeekViewEvent extends _TypedFlutterWeekViewEvent<FlutterWeekViewEvent> {
+  /// Creates a new flutter week view event with value instance.
+  FlutterWeekViewEvent({
+    required super.title,
+    required super.description,
+    required super.start,
+    required super.end,
+  });
 
   @override
   FlutterWeekViewEvent copyWith({
@@ -78,30 +123,10 @@ class FlutterWeekViewEvent with FlutterWeekViewEventMixin<FlutterWeekViewEvent> 
         start: start ?? this.start,
         end: end ?? this.end,
       );
-
-  @override
-  int compareTo(FlutterWeekViewEvent other) {
-    int result = start.compareTo(other.start);
-    if (result != 0) {
-      return result;
-    }
-    return end.compareTo(other.end);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    if (other is! FlutterWeekViewEvent) {
-      return super == other;
-    }
-    return title == other.title && description == other.description && start.isAtSameMomentAs(other.start) && end.isAtSameMomentAs(other.end);
-  }
-
-  @override
-  int get hashCode => Object.hash(title, description, start, end);
 }
 
 /// A non-abstract flutter week view event that also holds a value.
-class FlutterWeekViewEventWithValue<T> extends FlutterWeekViewEvent {
+class FlutterWeekViewEventWithValue<T> extends _TypedFlutterWeekViewEvent<FlutterWeekViewEventWithValue<T>> {
   /// The value.
   final T value;
 
@@ -131,9 +156,9 @@ class FlutterWeekViewEventWithValue<T> extends FlutterWeekViewEvent {
       );
 
   @override
-  int compareTo(FlutterWeekViewEvent other) {
+  int compareTo(FlutterWeekViewEventWithValue<T> other) {
     int result = super.compareTo(other);
-    if (result == 0 && value is Comparable<T> && other is FlutterWeekViewEventWithValue<T>) {
+    if (result == 0 && value is Comparable<T>) {
       return (value as Comparable<T>).compareTo(other.value);
     }
     return result;

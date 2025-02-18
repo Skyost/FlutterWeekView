@@ -1,3 +1,7 @@
+## [1.4.2] - 2024-02-18
+
+* Added `CopyableEvent` and `ShiftableEvent`.
+
 ## [1.4.1] - 2024-02-18
 
 * Day views and week views can now use type parameters (to use custom events).

@@ -32,7 +32,7 @@ typedef DateCreator = DateTime Function(
 );
 
 /// A (scrollable) week view which is able to display events, zoom and un-zoom and more !
-class WeekView<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHeadersWidget<E, WeekViewStyle, WeekViewController> {
+class WeekView<E extends FlutterWeekViewEventMixin> extends ZoomableHeadersWidget<E, WeekViewStyle, WeekViewController> {
   /// The number of dates.
   final int dateCount;
 
@@ -111,7 +111,7 @@ class WeekView<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHeadersWi
 }
 
 /// The week view state.
-class _WeekViewState<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHeadersWidgetState<E, WeekViewStyle, WeekViewController, WeekView<E>> {
+class _WeekViewState<E extends FlutterWeekViewEventMixin> extends ZoomableHeadersWidgetState<WeekView<E>> {
   /// A day view width.
   double? dayViewWidth;
 

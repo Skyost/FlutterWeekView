@@ -53,14 +53,14 @@ typedef HourColumnBackgroundBuilder = Decoration? Function(
 );
 
 /// Allows to build an event widget.
-typedef EventWidgetBuilder<E extends FlutterWeekViewEventMixin<E>> = Widget Function(
+typedef EventWidgetBuilder<E extends FlutterWeekViewEventMixin> = Widget Function(
   E event,
   double height,
   double width,
 );
 
 /// A widget which is showing both headers and can be zoomed.
-abstract class ZoomableHeadersWidget<E extends FlutterWeekViewEventMixin<E>, S extends ZoomableHeaderWidgetStyle, C extends ZoomController> extends StatefulWidget {
+abstract class ZoomableHeadersWidget<E extends FlutterWeekViewEventMixin, S extends ZoomableHeaderWidgetStyle, C extends ZoomController> extends StatefulWidget {
   /// The widget style.
   final S style;
 
@@ -145,8 +145,7 @@ abstract class ZoomableHeadersWidget<E extends FlutterWeekViewEventMixin<E>, S e
 }
 
 /// An abstract widget state that shows both headers and can be zoomed.
-abstract class ZoomableHeadersWidgetState<E extends FlutterWeekViewEventMixin<E>, S extends ZoomableHeaderWidgetStyle, C extends ZoomController, W extends ZoomableHeadersWidget<E, S, C>>
-    extends State<W> with ZoomControllerListener {
+abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> extends State<W> with ZoomControllerListener {
   /// The current hour row height.
   late double hourRowHeight;
 

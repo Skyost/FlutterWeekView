@@ -17,7 +17,7 @@ import 'package:flutter_week_view/src/widgets/hour_column.dart';
 import 'package:flutter_week_view/src/widgets/zoomable_header_widget.dart';
 
 /// A (scrollable) day view which is able to display events, zoom and un-zoom and more !
-class DayView<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHeadersWidget<E, DayViewStyle, DayViewController> {
+class DayView<E extends FlutterWeekViewEventMixin> extends ZoomableHeadersWidget<E, DayViewStyle, DayViewController> {
   /// The events.
   final List<E> events;
 
@@ -64,7 +64,7 @@ class DayView<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHeadersWid
 }
 
 /// The day view state.
-class _DayViewState<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHeadersWidgetState<E, DayViewStyle, DayViewController, DayView<E>> {
+class _DayViewState<E extends FlutterWeekViewEventMixin> extends ZoomableHeadersWidgetState<DayView<E>> {
   /// Contains all events draw properties.
   final Map<E, EventDrawProperties<E>> eventsDrawProperties = HashMap();
 
@@ -263,13 +263,21 @@ class _DayViewState<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHead
         originalResizeEventEnd = event.end;
       },
       onVerticalDragEnd: (_) {
+        if (event is! CopyableEvent<E>) {
+          throw 'Your event (of type ${event.runtimeType}) must implement CopyableEvent<${E.runtimeType}}>.';
+        }
         // We restore the original event.end in order to pass the unchanged
         // event in the callback.
         DateTime newEventEnd = event.end;
         setState(() => updateEvent(event, event.copyWith(end: originalResizeEventEnd)));
         widget.resizeEventOptions!.onEventResized(event, newEventEnd);
       },
-      onVerticalDragUpdate: (details) => onEventResizeUpdate(event, details.primaryDelta ?? 0),
+      onVerticalDragUpdate: (details) {
+        if (event is! CopyableEvent<E>) {
+          throw 'Your event (of type ${event.runtimeType}) must implement CopyableEvent<${E.runtimeType}}>.';
+        }
+        onEventResizeUpdate(event, details.primaryDelta ?? 0);
+      },
       child: MouseRegion(
         cursor: SystemMouseCursors.resizeUpDown,
         child: Container(color: Colors.transparent),
@@ -307,7 +315,7 @@ class _DayViewState<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHead
     // If the new duration is too short, we set the duration to be the minimum allowed.
     E updated;
     if (newEventDuration < minimumDuration) {
-      updated = event.copyWith(end: event.start.add(minimumDuration));
+      updated = (event as CopyableEvent<E>).copyWith(end: event.start.add(minimumDuration));
     } else {
       // Otherwise, we compute the new event end normally.
       DateTime newEventEnd = originalResizeEventEnd.add(delta);
@@ -315,7 +323,7 @@ class _DayViewState<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHead
       if (gridGranularity > Duration.zero) {
         newEventEnd = roundTimeToFitGrid(newEventEnd, gridGranularity: gridGranularity);
       }
-      updated = event.copyWith(end: newEventEnd);
+      updated = (event as CopyableEvent<E>).copyWith(end: newEventEnd);
     }
 
     setState(() => updateEvent(event, updated));

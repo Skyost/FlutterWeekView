@@ -98,7 +98,7 @@ class DefaultBuilders {
       );
 
   /// Builds the time displayed on the side border.
-  static Widget defaultEventWidgetBuilder<E extends FlutterWeekViewEventMixin<E>>(
+  static Widget defaultEventWidgetBuilder<E extends FlutterWeekViewEventMixin>(
     E event,
     double height,
     double width, {
