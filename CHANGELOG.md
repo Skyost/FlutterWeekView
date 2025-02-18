@@ -1,3 +1,9 @@
+## [1.4.1] - 2024-02-18
+
+* Day views and week views can now use type parameters (to use custom events).
+* Added `FlutterWeekViewEventMixin` and `FlutterWeekViewEventWithValue`.
+* Updated SDK constraints.
+
 ## [1.4.0] - 2024-02-18
 
 * `FlutterWeekViewEvent` is now immutable.

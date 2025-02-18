@@ -77,7 +77,7 @@ class EventGrid {
 }
 
 /// An utility class that allows to display the events in the events column.
-class EventDrawProperties {
+class EventDrawProperties<E extends FlutterWeekViewEventMixin<E>> {
   /// The top position.
   double? top;
 
@@ -100,11 +100,11 @@ class EventDrawProperties {
   final bool isRtl;
 
   /// The event widget builder.
-  final EventWidgetBuilder builder;
+  final EventWidgetBuilder<E> builder;
 
   /// Creates a new flutter week view event draw properties from the specified day view and the specified day view event.
   EventDrawProperties({
-    required FlutterWeekViewEvent event,
+    required E event,
     required TimeOfDay minimumTime,
     required TimeOfDay maximumTime,
     required DateTime date,
@@ -153,7 +153,7 @@ class EventDrawProperties {
   }
 
   /// Creates the event widget.
-  Widget createWidget(FlutterWeekViewEvent event, DragAndDropOptions? dragAndDropOptions, Widget? resizeGestureDetector) {
+  Widget createWidget(E event, DragAndDropOptions? dragAndDropOptions, Widget? resizeGestureDetector) {
     Widget child = builder(event, height!, width!);
 
     // If drag-and-drop is allowed, we wrap the child in a Draggable widget.
@@ -203,14 +203,14 @@ class EventDrawProperties {
   /// or LongPressDraggable.
   Widget _getDraggableOrLongPressDraggable({
     required bool isLongPress,
-    required FlutterWeekViewEvent data,
+    required E data,
     required Axis? axis,
     required Widget feedback,
     required Widget childWhenDragging,
     required Widget child,
   }) {
     if (isLongPress) {
-      return LongPressDraggable<FlutterWeekViewEvent>(
+      return LongPressDraggable<E>(
         data: data,
         axis: axis,
         feedback: feedback,
@@ -219,7 +219,7 @@ class EventDrawProperties {
       );
     }
 
-    return Draggable<FlutterWeekViewEvent>(
+    return Draggable<E>(
       data: data,
       axis: axis,
       feedback: feedback,

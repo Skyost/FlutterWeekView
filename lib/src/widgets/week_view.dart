@@ -17,16 +17,22 @@ import 'package:flutter_week_view/src/widgets/zoomable_header_widget.dart';
 import 'day_view.dart';
 
 /// Builds a day view style according to the specified date.
-typedef DayViewStyleBuilder = DayViewStyle Function(DateTime date);
+typedef DayViewStyleBuilder = DayViewStyle Function(
+  DateTime date,
+);
 
 /// Builds a day bar style according to the specified date.
-typedef DayBarStyleBuilder = DayBarStyle Function(DateTime date);
+typedef DayBarStyleBuilder = DayBarStyle Function(
+  DateTime date,
+);
 
 /// Creates a date according to the specified index.
-typedef DateCreator = DateTime Function(int index);
+typedef DateCreator = DateTime Function(
+  int index,
+);
 
 /// A (scrollable) week view which is able to display events, zoom and un-zoom and more !
-class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> {
+class WeekView<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHeadersWidget<E, WeekViewStyle, WeekViewController> {
   /// The number of dates.
   final int dateCount;
 
@@ -34,7 +40,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
   final DateCreator dateCreator;
 
   /// The events.
-  final List<FlutterWeekViewEvent> events;
+  final List<E> events;
 
   /// The day view style builder.
   final DayViewStyleBuilder dayViewStyleBuilder;
@@ -68,10 +74,7 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
     super.resizeEventOptions,
   })  : dateCount = dates.length,
         dateCreator = ((index) => DefaultBuilders.defaultDateCreator(dates, index)),
-        super(
-          controller: controller ?? WeekViewController(),
-          initialTime: initialTime ?? DateTime.now(),
-        );
+        super(controller: controller ?? WeekViewController(), initialTime: initialTime ?? DateTime.now());
 
   /// Creates a new week view instance.
   WeekView.builder({
@@ -104,11 +107,11 @@ class WeekView extends ZoomableHeadersWidget<WeekViewStyle, WeekViewController> 
         );
 
   @override
-  State<StatefulWidget> createState() => _WeekViewState();
+  State<StatefulWidget> createState() => _WeekViewState<E>();
 }
 
 /// The week view state.
-class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
+class _WeekViewState<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHeadersWidgetState<E, WeekViewStyle, WeekViewController, WeekView<E>> {
   /// A day view width.
   double? dayViewWidth;
 
@@ -127,7 +130,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
   }
 
   @override
-  void didUpdateWidget(WeekView oldWidget) {
+  void didUpdateWidget(WeekView<E> oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     bool widthHasChanged = widget.style.dayViewWidth != oldWidget.style.dayViewWidth;
@@ -247,7 +250,10 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
           SizedBox(
             height: calculateHeight() + widget.style.headerSize,
             child: ListView.builder(
-              padding: EdgeInsets.only(left: widget.isRtl ? 0 : widget.hourColumnStyle.width, right: widget.isRtl ? widget.hourColumnStyle.width : 0),
+              padding: EdgeInsets.only(
+                left: widget.isRtl ? 0 : widget.hourColumnStyle.width,
+                right: widget.isRtl ? widget.hourColumnStyle.width : 0,
+              ),
               controller: horizontalScrollController,
               scrollDirection: Axis.horizontal,
               physics: getScrollPhysics(),
@@ -330,7 +336,7 @@ class _WeekViewState extends ZoomableHeadersWidgetState<WeekView> {
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final double? widgetWidth = (context.findRenderObject() as RenderBox?)?.size.width;
+      double? widgetWidth = (context.findRenderObject() as RenderBox?)?.size.width;
       if (widgetWidth == null) {
         return;
       }
@@ -359,9 +365,8 @@ class _AutoScrollDayBar extends StatefulWidget {
   final DayBarStyleBuilder dayBarStyleBuilder;
 
   /// Creates a new positioned day bar instance.
-  _AutoScrollDayBar({
-    required _WeekViewState state,
-  })  : weekView = state.widget,
+  _AutoScrollDayBar({required _WeekViewState state})
+      : weekView = state.widget,
         dayViewWidth = state.dayViewWidth!,
         stateScrollController = state.horizontalScrollController,
         dayBarStyleBuilder = state.widget.dayBarStyleBuilder;
@@ -373,13 +378,12 @@ class _AutoScrollDayBar extends StatefulWidget {
 /// The auto scroll day bar state.
 class _AutoScrollDayBarState extends State<_AutoScrollDayBar> {
   /// The day bar scroll controller.
-  late SilentScrollController scrollController;
+  late SilentScrollController scrollController = SilentScrollController();
 
   @override
   void initState() {
     super.initState();
 
-    scrollController = SilentScrollController();
     scrollController.addListener(onScrolledHorizontally);
     widget.stateScrollController?.addListener(updateScrollPosition);
 

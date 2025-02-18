@@ -7,9 +7,9 @@ import 'package:flutter_week_view/src/utils/builders.dart';
 import 'package:flutter_week_view/src/utils/utils.dart';
 
 /// Allows to draw a week view event.
-class FlutterWeekViewEventWidget extends StatelessWidget {
+class FlutterWeekViewEventWidget<E extends FlutterWeekViewEventMixin<E>> extends StatelessWidget {
   /// The flutter week view event.
-  final FlutterWeekViewEvent event;
+  final E event;
 
   /// The time formatter.
   final TimeFormatter? timeFormatter;
@@ -27,7 +27,7 @@ class FlutterWeekViewEventWidget extends StatelessWidget {
   final EdgeInsets? margin;
 
   /// The event text builder.
-  final EventTextBuilder? textBuilder;
+  final EventTextBuilder<E>? textBuilder;
 
   /// The widget height.
   final double? height;
@@ -81,8 +81,8 @@ class FlutterWeekViewEventWidget extends StatelessWidget {
   }
 
   /// Builds an event text widget in order to put it in an event widget.
-  static Widget defaultEventTextBuilder(
-    FlutterWeekViewEvent event,
+  static Widget defaultEventTextBuilder<E extends FlutterWeekViewEventMixin<E>>(
+    E event,
     TimeFormatter timeFormatter,
     TextStyle textStyle,
     double height,

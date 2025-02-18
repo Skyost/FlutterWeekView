@@ -17,9 +17,9 @@ import 'package:flutter_week_view/src/widgets/hour_column.dart';
 import 'package:flutter_week_view/src/widgets/zoomable_header_widget.dart';
 
 /// A (scrollable) day view which is able to display events, zoom and un-zoom and more !
-class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
+class DayView<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHeadersWidget<E, DayViewStyle, DayViewController> {
   /// The events.
-  final List<FlutterWeekViewEvent> events;
+  final List<E> events;
 
   /// The day view date.
   final DateTime date;
@@ -60,16 +60,16 @@ class DayView extends ZoomableHeadersWidget<DayViewStyle, DayViewController> {
         );
 
   @override
-  State<StatefulWidget> createState() => _DayViewState();
+  State<StatefulWidget> createState() => _DayViewState<E>();
 }
 
 /// The day view state.
-class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
+class _DayViewState<E extends FlutterWeekViewEventMixin<E>> extends ZoomableHeadersWidgetState<E, DayViewStyle, DayViewController, DayView<E>> {
   /// Contains all events draw properties.
-  final Map<FlutterWeekViewEvent, EventDrawProperties> eventsDrawProperties = HashMap();
+  final Map<E, EventDrawProperties<E>> eventsDrawProperties = HashMap();
 
   /// The flutter week view events.
-  late List<FlutterWeekViewEvent> events;
+  late List<E> events;
 
   /// These two variables control the resizing of events.
   ///
@@ -94,7 +94,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   }
 
   @override
-  void didUpdateWidget(DayView oldWidget) {
+  void didUpdateWidget(DayView<E> oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.date != widget.date) {
@@ -112,7 +112,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     if (widget.dragAndDropOptions == null) {
       mainWidget = createMainWidget();
     } else {
-      mainWidget = DragTarget<FlutterWeekViewEvent>(
+      mainWidget = DragTarget<E>(
         builder: (_, __, ___) => createMainWidget(),
         onAcceptWithDetails: (details) {
           // Drag details contains the global position of the drag event. First,
@@ -252,7 +252,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   }
 
   /// Builds a transparent GestureDetector widget to handle event resizing.
-  Widget? buildResizeGestureDetector(FlutterWeekViewEvent event) {
+  Widget? buildResizeGestureDetector(E event) {
     if (widget.resizeEventOptions == null) {
       return null;
     }
@@ -279,7 +279,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
 
   /// Handles the updates of the event's resizing, by updating the UI to give
   /// realtime feedback of the event's new duration.
-  void onEventResizeUpdate(FlutterWeekViewEvent event, double resizeOffset) {
+  void onEventResizeUpdate(E event, double resizeOffset) {
     accumulatedResizeOffset += resizeOffset;
 
     // Compute the Duration equivalent to the accumulated offset.
@@ -305,7 +305,7 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
     }
 
     // If the new duration is too short, we set the duration to be the minimum allowed.
-    FlutterWeekViewEvent updated;
+    E updated;
     if (newEventDuration < minimumDuration) {
       updated = event.copyWith(end: event.start.add(minimumDuration));
     } else {
@@ -340,16 +340,16 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   /// Creates the events draw properties and add them to the current list.
   void createEventsDrawProperties() {
     EventGrid eventsGrid = EventGrid();
-    for (FlutterWeekViewEvent event in List.of(events)) {
-      EventDrawProperties drawProperties = eventsDrawProperties[event] ??
-          EventDrawProperties(
+    for (E event in List.of(events)) {
+      EventDrawProperties<E> drawProperties = eventsDrawProperties[event] ??
+          EventDrawProperties<E>(
             event: event,
             minimumTime: widget.minimumTime,
             maximumTime: widget.maximumTime,
             date: widget.date,
             isRtl: widget.isRtl,
             builder: widget.eventWidgetBuilder ??
-                (event, height, width) => DefaultBuilders.defaultEventWidgetBuilder(
+                (event, height, width) => DefaultBuilders.defaultEventWidgetBuilder<E>(
                       event,
                       height,
                       width,
@@ -376,8 +376,8 @@ class _DayViewState extends ZoomableHeadersWidgetState<DayView> {
   }
 
   /// Updates [oldEvent] to [newEvent].
-  void updateEvent(FlutterWeekViewEvent oldEvent, FlutterWeekViewEvent newEvent) {
-    List<FlutterWeekViewEvent> events = List.of(this.events);
+  void updateEvent(E oldEvent, E newEvent) {
+    List<E> events = List.of(this.events);
     int index = events.indexOf(oldEvent);
     if (index >= 0) {
       events[index] = newEvent;

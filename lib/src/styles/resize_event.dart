@@ -5,13 +5,16 @@ import 'package:flutter_week_view/src/event.dart';
 /// time corresponding to where the event's end was dragged to. A common
 /// behavior in this callback is to update the event with the new end time
 /// and call setState to update the UI.
-typedef EventResizeCallback = Function(FlutterWeekViewEvent event, DateTime newEndTime);
+typedef EventResizeCallback<E extends FlutterWeekViewEventMixin<E>> = Function(
+  E event,
+  DateTime newEndTime,
+);
 
 /// Configures the behavior for resizing events. When resizing is enabled, users
 /// can drag the end of events to increase/decrease their duration.
-class ResizeEventOptions {
+class ResizeEventOptions<E extends FlutterWeekViewEventMixin<E>> {
   /// Triggered when the user performs a resize in an event.
-  final EventResizeCallback onEventResized;
+  final EventResizeCallback<E> onEventResized;
 
   /// When resizing, the event end is snapped to an imaginary grid, for better
   /// user experience. This variable controls the granularity of that grid,

@@ -217,7 +217,7 @@ class _DynamicDayViewState extends State<_DynamicDayView> {
               setState(() {
                 DateTime start = DateTime(now.year, now.month, now.day, Random().nextInt(24), Random().nextInt(60));
                 events.add(FlutterWeekViewEvent(
-                  title: 'Event ' + (events.length + 1).toString(),
+                  title: 'Event ${events.length + 1}',
                   start: start,
                   end: start.add(const Duration(hours: 1)),
                   description: 'A description.',

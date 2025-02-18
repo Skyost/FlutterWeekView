@@ -62,8 +62,8 @@ class HourColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final singleHourSize = topOffsetCalculator(maximumTime) / (maximumTime.hour);
-    final Widget background;
+    double singleHourSize = topOffsetCalculator(maximumTime) / (maximumTime.hour);
+    Widget background;
     if (hourColumnBackgroundBuilder != null) {
       background = SizedBox(
         height: topOffsetCalculator(maximumTime),

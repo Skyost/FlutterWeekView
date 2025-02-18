@@ -25,9 +25,9 @@ class MagnetScrollPhysics extends ScrollPhysics {
 
   /// Creates a new magnet scroll physics instance.
   const MagnetScrollPhysics({
-    ScrollPhysics? parent,
+    super.parent,
     required this.itemSize,
-  }) : super(parent: parent);
+  });
 
   @override
   MagnetScrollPhysics applyTo(ScrollPhysics? ancestor) {
@@ -67,6 +67,7 @@ class MagnetScrollPhysics extends ScrollPhysics {
     );
 
     final double settlingPixels = settlingItemIndex * itemSize;
+    final Tolerance tolerance = _tolerance;
 
     // Scenario 3:
     // If there's no velocity and we're already at where we intend to land,
@@ -104,6 +105,18 @@ class MagnetScrollPhysics extends ScrollPhysics {
     );
   }
 
+  /// Returns the tolerance.
+  Tolerance get _tolerance => toleranceFor(
+        FixedScrollMetrics(
+          minScrollExtent: null,
+          maxScrollExtent: null,
+          pixels: null,
+          viewportDimension: null,
+          axisDirection: AxisDirection.down,
+          devicePixelRatio: WidgetsBinding.instance.window.devicePixelRatio,
+        ),
+      );
+
   /// Returns the item index from the specified offset.
   int _getItemFromOffset({
     required double offset,
@@ -125,14 +138,10 @@ class MagnetScrollPhysics extends ScrollPhysics {
 class SilentScrollController extends ScrollController {
   /// Creates a new silent scroll controller instance.
   SilentScrollController({
-    double initialScrollOffset = 0.0,
-    bool keepScrollOffset = true,
-    String? debugLabel,
-  }) : super(
-          initialScrollOffset: initialScrollOffset,
-          keepScrollOffset: keepScrollOffset,
-          debugLabel: debugLabel,
-        );
+    super.initialScrollOffset,
+    super.keepScrollOffset,
+    super.debugLabel,
+  });
 
   @override
   SilentScrollPosition createScrollPosition(
@@ -163,20 +172,13 @@ class SilentScrollController extends ScrollController {
 class SilentScrollPosition extends ScrollPositionWithSingleContext {
   /// Creates a new scroll position instance.
   SilentScrollPosition({
-    required ScrollPhysics physics,
-    required ScrollContext context,
-    double initialPixels = 0.0,
-    bool keepScrollOffset = true,
-    ScrollPosition? oldPosition,
-    String? debugLabel,
-  }) : super(
-          physics: physics,
-          context: context,
-          initialPixels: initialPixels,
-          keepScrollOffset: keepScrollOffset,
-          oldPosition: oldPosition,
-          debugLabel: debugLabel,
-        );
+    required super.physics,
+    required super.context,
+    double super.initialPixels,
+    super.keepScrollOffset,
+    super.oldPosition,
+    super.debugLabel,
+  });
 
   /// Silently jumps to the specified position.
   void silentJumpTo(double value) {
