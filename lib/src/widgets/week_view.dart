@@ -95,6 +95,7 @@ class WeekView<E extends FlutterWeekViewEventMixin> extends ZoomableHeadersWidge
     super.userZoomable,
     super.currentTimeIndicatorBuilder,
     super.hourColumnTimeBuilder,
+    super.eventWidgetBuilder,
     super.onHourColumnTappedDown,
     super.onDayBarTappedDown,
     super.onBackgroundTappedDown,
@@ -274,7 +275,7 @@ class _WeekViewState<E extends FlutterWeekViewEventMixin> extends ZoomableHeader
     Widget dayView = Container(
       padding: EdgeInsets.only(top: widget.style.headerSize),
       width: dayViewWidth,
-      child: DayView(
+      child: DayView<E>(
         isRtl: widget.isRtl,
         date: date,
         events: widget.events,
@@ -286,6 +287,7 @@ class _WeekViewState<E extends FlutterWeekViewEventMixin> extends ZoomableHeader
         currentTimeIndicatorBuilder: widget.currentTimeIndicatorBuilder,
         inScrollableWidget: false,
         userZoomable: false,
+        eventWidgetBuilder: widget.eventWidgetBuilder,
         onBackgroundTappedDown: widget.onBackgroundTappedDown,
         dragAndDropOptions: widget.dragAndDropOptions,
         resizeEventOptions: widget.resizeEventOptions,

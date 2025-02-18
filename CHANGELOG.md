@@ -1,3 +1,7 @@
+## [1.4.3] - 2024-02-18
+
+* Fixed a problem with `eventWidgetBuilder` in week views.
+
 ## [1.4.2] - 2024-02-18
 
 * Added `CopyableEvent` and `ShiftableEvent`.
