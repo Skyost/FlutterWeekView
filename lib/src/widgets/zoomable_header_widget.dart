@@ -12,52 +12,30 @@ import 'package:flutter_week_view/src/utils/builders.dart';
 import 'package:flutter_week_view/src/utils/time_of_day.dart';
 
 /// Allows to calculate a top offset from a given hour.
-typedef TopOffsetCalculator = double Function(
-  TimeOfDay time,
-);
+typedef TopOffsetCalculator = double Function(TimeOfDay time);
 
 /// Triggered when the hour column has been tapped down.
-typedef HourColumnTapCallback = Function(
-  TimeOfDay time,
-);
+typedef HourColumnTapCallback = Function(TimeOfDay time);
 
 /// Triggered when the day bar has been tapped down.
-typedef DayBarTapCallback = Function(
-  DateTime date,
-);
+typedef DayBarTapCallback = Function(DateTime date);
 
 /// Triggered when there's a click on the background (an empty region of the calendar). The returned
 /// value corresponds to the hour/minute where the user made the tap. For better user experience,
 /// you may want to round this value using [roundTimeToFitGrid].
-typedef BackgroundTapCallback = Function(
-  DateTime date,
-);
+typedef BackgroundTapCallback = Function(DateTime date);
 
 /// Allows to build the current time indicator (rule and circle).
-typedef CurrentTimeIndicatorBuilder = Widget? Function(
-  DayViewStyle dayViewStyle,
-  TopOffsetCalculator topOffsetCalculator,
-  double hourColumnWidth,
-  bool isRtl,
-);
+typedef CurrentTimeIndicatorBuilder = Widget? Function(DayViewStyle dayViewStyle, TopOffsetCalculator topOffsetCalculator, double hourColumnWidth, bool isRtl);
 
 /// Allows to build the time displayed on the side border.
-typedef HourColumnTimeBuilder = Widget? Function(
-  HourColumnStyle dayViewStyle,
-  TimeOfDay time,
-);
+typedef HourColumnTimeBuilder = Widget? Function(HourColumnStyle dayViewStyle, TimeOfDay time);
 
 /// Allows to build the background decoration below single time displayed on the side border.
-typedef HourColumnBackgroundBuilder = Decoration? Function(
-  TimeOfDay time,
-);
+typedef HourColumnBackgroundBuilder = Decoration? Function(TimeOfDay time);
 
 /// Allows to build an event widget.
-typedef EventWidgetBuilder<E extends FlutterWeekViewEventMixin> = Widget Function(
-  E event,
-  double height,
-  double width,
-);
+typedef EventWidgetBuilder<E extends FlutterWeekViewEventMixin> = Widget Function(E event, double height, double width);
 
 /// A widget which is showing both headers and can be zoomed.
 abstract class ZoomableHeadersWidget<E extends FlutterWeekViewEventMixin, S extends ZoomableHeaderWidgetStyle, C extends ZoomController> extends StatefulWidget {
@@ -239,12 +217,11 @@ abstract class ZoomableHeadersWidgetState<W extends ZoomableHeadersWidget> exten
     TimeOfDay time, {
     TimeOfDay? minimumTime,
     double? hourRowHeight,
-  }) =>
-      DefaultBuilders.defaultTopOffsetCalculator(
-        time,
-        minimumTime: minimumTime ?? widget.minimumTime,
-        hourRowHeight: hourRowHeight ?? this.hourRowHeight,
-      );
+  }) => DefaultBuilders.defaultTopOffsetCalculator(
+    time,
+    minimumTime: minimumTime ?? widget.minimumTime,
+    hourRowHeight: hourRowHeight ?? this.hourRowHeight,
+  );
 
   /// Given a local position in the widget, calculates its corresponding
   /// HourMinute.

@@ -5,10 +5,11 @@ import 'package:flutter_week_view/src/event.dart';
 /// time corresponding to where the event was dropped. A common behavior in this
 /// callback is to shift the event's start and end dates (you may use
 /// [FlutterWeekViewEvent.shiftEventTo]) and then call setState to update the UI.
-typedef EventDragCallback<E extends FlutterWeekViewEventMixin> = Function(
-  E event,
-  DateTime newStartTime,
-);
+typedef EventDragCallback<E extends FlutterWeekViewEventMixin> =
+    Function(
+      E event,
+      DateTime newStartTime,
+    );
 
 /// Contains the drag starting gestures.
 enum DragStartingGesture {
@@ -18,7 +19,7 @@ enum DragStartingGesture {
 
   /// Drag will start after a long press on the event. This is more suited for
   /// mobile UX.
-  longPress;
+  longPress,
 }
 
 /// Configures the behavior of drag-and-drop of events.

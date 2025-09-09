@@ -18,14 +18,12 @@ class DefaultBuilders {
     int year,
     int month,
     int day,
-  ) =>
-      '$year-${Utils.addLeadingZero(month)}-${Utils.addLeadingZero(day)}';
+  ) => '$year-${Utils.addLeadingZero(month)}-${Utils.addLeadingZero(day)}';
 
   /// Formats a hour in 24-hour HH:MM format, e.g., 15:00.
   static String defaultTimeFormatter(
     TimeOfDay time,
-  ) =>
-      '${Utils.addLeadingZero(time.hour)}:${Utils.addLeadingZero(time.minute)}';
+  ) => '${Utils.addLeadingZero(time.hour)}:${Utils.addLeadingZero(time.minute)}';
 
   /// Allows to calculate a top offset according to the specified hour row height.
   static double defaultTopOffsetCalculator(
@@ -41,8 +39,7 @@ class DefaultBuilders {
   static DateTime defaultDateCreator(
     List<DateTime> dates,
     int index,
-  ) =>
-      dates[index];
+  ) => dates[index];
 
   /// Builds the current time indicator builder.
   static Widget defaultCurrentTimeIndicatorBuilder(
@@ -91,11 +88,10 @@ class DefaultBuilders {
   static Widget defaultHourColumnTimeBuilder(
     HourColumnStyle hourColumnStyle,
     TimeOfDay time,
-  ) =>
-      Text(
-        hourColumnStyle.timeFormatter(time),
-        style: hourColumnStyle.textStyle,
-      );
+  ) => Text(
+    hourColumnStyle.timeFormatter(time),
+    style: hourColumnStyle.textStyle,
+  );
 
   /// Builds the time displayed on the side border.
   static Widget defaultEventWidgetBuilder<E extends FlutterWeekViewEventMixin>(
@@ -103,27 +99,24 @@ class DefaultBuilders {
     double height,
     double width, {
     TimeFormatter? timeFormatter,
-  }) =>
-      FlutterWeekViewEventWidget<E>(
-        event: event,
-        height: height,
-        width: width,
-        timeFormatter: timeFormatter,
-      );
+  }) => FlutterWeekViewEventWidget<E>(
+    event: event,
+    height: height,
+    width: width,
+    timeFormatter: timeFormatter,
+  );
 
   /// The default day view style builder.
   static DayViewStyle defaultDayViewStyleBuilder(
     DateTime date,
-  ) =>
-      DayViewStyle.fromDate(
-        date: date,
-      );
+  ) => DayViewStyle.fromDate(
+    date: date,
+  );
 
   /// The default day view style builder.
   static DayBarStyle defaultDayBarStyleBuilder(
     DateTime date,
-  ) =>
-      DayBarStyle.fromDate(
-        date: date,
-      );
+  ) => DayBarStyle.fromDate(
+    date: date,
+  );
 }

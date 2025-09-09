@@ -34,12 +34,12 @@ class HourColumnStyle {
     this.decoration,
     Alignment? textAlignment,
     Duration? interval,
-  })  : timeFormatter = timeFormatter ?? DefaultBuilders.defaultTimeFormatter,
-        textStyle = textStyle ?? const TextStyle(color: Colors.black54),
-        width = (width ?? 60) < 0 ? 0 : (width ?? 60),
-        color = color ?? Colors.white,
-        textAlignment = textAlignment ?? Alignment.center,
-        interval = interval ?? const Duration(hours: 1);
+  }) : timeFormatter = timeFormatter ?? DefaultBuilders.defaultTimeFormatter,
+       textStyle = textStyle ?? const TextStyle(color: Colors.black54),
+       width = (width ?? 60) < 0 ? 0 : (width ?? 60),
+       color = color ?? Colors.white,
+       textAlignment = textAlignment ?? Alignment.center,
+       interval = interval ?? const Duration(hours: 1);
 
   /// Allows to copy the current style instance with your own properties.
   HourColumnStyle copyWith({
@@ -50,14 +50,13 @@ class HourColumnStyle {
     Decoration? decoration,
     Alignment? textAlignment,
     Duration? interval,
-  }) =>
-      HourColumnStyle(
-        timeFormatter: timeFormatter ?? this.timeFormatter,
-        textStyle: textStyle ?? this.textStyle,
-        width: width ?? this.width,
-        color: color ?? this.color,
-        decoration: decoration ?? this.decoration,
-        textAlignment: textAlignment ?? this.textAlignment,
-        interval: interval ?? this.interval,
-      );
+  }) => HourColumnStyle(
+    timeFormatter: timeFormatter ?? this.timeFormatter,
+    textStyle: textStyle ?? this.textStyle,
+    width: width ?? this.width,
+    color: color ?? this.color,
+    decoration: decoration ?? this.decoration,
+    textAlignment: textAlignment ?? this.textAlignment,
+    interval: interval ?? this.interval,
+  );
 }

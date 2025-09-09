@@ -2,9 +2,17 @@ include: package:flutter_lints/flutter.yaml
 
 linter:
   rules:
-    - prefer_const_constructors
-    - prefer_single_quotes
+    prefer_single_quotes: true
+    unnecessary_lambdas: true
+    avoid_renaming_method_parameters: false
+    prefer_const_constructors: true
 
 analyzer:
-  errors:
-    omit_local_variable_types: ignore
+  plugins:
+    - custom_lint
+  exclude:
+    - '**.g.dart'
+
+formatter:
+  trailing_commas: preserve
+  page_width: 200

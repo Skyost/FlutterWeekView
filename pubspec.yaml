@@ -1,20 +1,16 @@
 name: flutter_week_view
 description: Displays a highly customizable week view (or day view) which is able to display events, to be scrolled, to be zoomed-in & out and a lot more !
-version: 1.4.3
+version: 1.4.4
 homepage: https://github.com/Skyost/FlutterWeekView
 
 environment:
-  sdk: '>=3.6.0 <4.0.0'
+  sdk: '>=3.8.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
 dev_dependencies:
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-
-flutter:
-  # This is needed for golden_toolkit's loading of fonts for testings to work.
-  uses-material-design: true

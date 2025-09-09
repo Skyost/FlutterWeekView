@@ -38,27 +38,27 @@ class DayBar extends StatelessWidget {
     required DayBarStyle style,
     double? width,
   }) : this(
-          key: key,
-          date: date,
-          style: style,
-          height: parent.style.headerSize,
-          width: width,
-          onDayBarTappedDown: parent.onDayBarTappedDown,
-        );
+         key: key,
+         date: date,
+         style: style,
+         height: parent.style.headerSize,
+         width: width,
+         onDayBarTappedDown: parent.onDayBarTappedDown,
+       );
 
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTapDown: (details) => (onDayBarTappedDown ?? (date) {})(date),
-        child: Container(
-          height: height,
-          width: width,
-          color: style.decoration == null ? style.color : null,
-          decoration: style.decoration,
-          alignment: style.textAlignment,
-          child: Text(
-            style.dateFormatter(date.year, date.month, date.day),
-            style: style.textStyle,
-          ),
-        ),
-      );
+    onTapDown: (details) => (onDayBarTappedDown ?? (date) {})(date),
+    child: Container(
+      height: height,
+      width: width,
+      color: style.decoration == null ? style.color : null,
+      decoration: style.decoration,
+      alignment: style.textAlignment,
+      child: Text(
+        style.dateFormatter(date.year, date.month, date.day),
+        style: style.textStyle,
+      ),
+    ),
+  );
 }

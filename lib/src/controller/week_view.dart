@@ -17,14 +17,15 @@ class WeekViewController extends ZoomController {
   /// Returns the day view controller associated with the specified date.
   DayViewController getDayViewController(DateTime date) {
     if (!_dayViewControllers.containsKey(date)) {
-      _dayViewControllers[date] = DayViewController(
-        zoomCoefficient: zoomCoefficient,
-        minZoom: minZoom,
-        maxZoom: maxZoom,
-        onDisposed: _onDayViewControllerDisposed,
-      )
-        ..previousZoomFactor = previousZoomFactor
-        ..zoomFactor = zoomFactor;
+      _dayViewControllers[date] =
+          DayViewController(
+              zoomCoefficient: zoomCoefficient,
+              minZoom: minZoom,
+              maxZoom: maxZoom,
+              onDisposed: _onDayViewControllerDisposed,
+            )
+            ..previousZoomFactor = previousZoomFactor
+            ..zoomFactor = zoomFactor;
     }
 
     return _dayViewControllers[date]!;

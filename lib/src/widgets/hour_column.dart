@@ -40,25 +40,25 @@ class HourColumn extends StatelessWidget {
     this.onHourColumnTappedDown,
     HourColumnTimeBuilder? hourColumnTimeBuilder,
     this.hourColumnBackgroundBuilder,
-  })  : assert(minimumTime.isBefore(maximumTime)),
-        topOffsetCalculator = topOffsetCalculator ?? DefaultBuilders.defaultTopOffsetCalculator,
-        hourColumnTimeBuilder = hourColumnTimeBuilder ?? DefaultBuilders.defaultHourColumnTimeBuilder,
-        _sideTimes = getSideTimes(minimumTime, maximumTime, style.interval);
+  }) : assert(minimumTime.isBefore(maximumTime)),
+       topOffsetCalculator = topOffsetCalculator ?? DefaultBuilders.defaultTopOffsetCalculator,
+       hourColumnTimeBuilder = hourColumnTimeBuilder ?? DefaultBuilders.defaultHourColumnTimeBuilder,
+       _sideTimes = getSideTimes(minimumTime, maximumTime, style.interval);
 
   /// Creates a new h, super(key: key)ours column instance from a headers widget instance.
   HourColumn.fromHeadersWidgetState({
     Key? key,
     required ZoomableHeadersWidgetState parent,
   }) : this(
-          key: key,
-          minimumTime: parent.widget.minimumTime,
-          maximumTime: parent.widget.maximumTime,
-          topOffsetCalculator: parent.calculateTopOffset,
-          style: parent.widget.hourColumnStyle,
-          onHourColumnTappedDown: parent.widget.onHourColumnTappedDown,
-          hourColumnTimeBuilder: parent.widget.hourColumnTimeBuilder,
-          hourColumnBackgroundBuilder: parent.widget.hourColumnBackgroundBuilder,
-        );
+         key: key,
+         minimumTime: parent.widget.minimumTime,
+         maximumTime: parent.widget.maximumTime,
+         topOffsetCalculator: parent.calculateTopOffset,
+         style: parent.widget.hourColumnStyle,
+         onHourColumnTappedDown: parent.widget.onHourColumnTappedDown,
+         hourColumnTimeBuilder: parent.widget.hourColumnTimeBuilder,
+         hourColumnBackgroundBuilder: parent.widget.hourColumnBackgroundBuilder,
+       );
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +92,8 @@ class HourColumn extends StatelessWidget {
       color: style.decoration == null ? style.color : null,
       decoration: style.decoration,
       child: Stack(
-        children: <Widget>[background] +
+        children:
+            <Widget>[background] +
             _sideTimes
                 .map(
                   (time) => Positioned(

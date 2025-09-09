@@ -11,11 +11,10 @@ class NoGlowBehavior extends ScrollBehavior {
   /// Applies this behavior to a scrollable widget.
   static Widget noGlow({
     required Widget child,
-  }) =>
-      ScrollConfiguration(
-        behavior: NoGlowBehavior(),
-        child: child,
-      );
+  }) => ScrollConfiguration(
+    behavior: NoGlowBehavior(),
+    child: child,
+  );
 }
 
 /// A scroll physics that always lands on specific points.
@@ -107,31 +106,29 @@ class MagnetScrollPhysics extends ScrollPhysics {
 
   /// Returns the tolerance.
   Tolerance get _tolerance => toleranceFor(
-        FixedScrollMetrics(
-          minScrollExtent: null,
-          maxScrollExtent: null,
-          pixels: null,
-          viewportDimension: null,
-          axisDirection: AxisDirection.down,
-          devicePixelRatio: WidgetsBinding.instance.window.devicePixelRatio,
-        ),
-      );
+    FixedScrollMetrics(
+      minScrollExtent: null,
+      maxScrollExtent: null,
+      pixels: null,
+      viewportDimension: null,
+      axisDirection: AxisDirection.down,
+      devicePixelRatio: WidgetsBinding.instance.window.devicePixelRatio,
+    ),
+  );
 
   /// Returns the item index from the specified offset.
   int _getItemFromOffset({
     required double offset,
     required double minScrollExtent,
     required double maxScrollExtent,
-  }) =>
-      (_clipOffsetToScrollableRange(offset, minScrollExtent, maxScrollExtent) / itemSize).round();
+  }) => (_clipOffsetToScrollableRange(offset, minScrollExtent, maxScrollExtent) / itemSize).round();
 
   /// Clips the specified offset to the scrollable range.
   double _clipOffsetToScrollableRange(
     double offset,
     double minScrollExtent,
     double maxScrollExtent,
-  ) =>
-      math.min(math.max(offset, minScrollExtent), maxScrollExtent);
+  ) => math.min(math.max(offset, minScrollExtent), maxScrollExtent);
 }
 
 /// A scroll controller that allows to use the [silentJumpTo] method.

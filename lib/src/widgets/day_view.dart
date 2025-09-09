@@ -51,13 +51,13 @@ class DayView<E extends FlutterWeekViewEventMixin> extends ZoomableHeadersWidget
     super.onBackgroundTappedDown,
     super.dragAndDropOptions,
     super.resizeEventOptions,
-  })  : date = date.yearMonthDay,
-        dayBarStyle = dayBarStyle ?? DayBarStyle.fromDate(date: date),
-        super(
-          style: style ?? DayViewStyle.fromDate(date: date),
-          controller: controller ?? DayViewController(),
-          initialTime: initialTime?.atDate(date) ?? (Utils.sameDay(date) ? TimeOfDay.now() : TimeOfDayUtils.zero).atDate(date),
-        );
+  }) : date = date.yearMonthDay,
+       dayBarStyle = dayBarStyle ?? DayBarStyle.fromDate(date: date),
+       super(
+         style: style ?? DayViewStyle.fromDate(date: date),
+         controller: controller ?? DayViewController(),
+         initialTime: initialTime?.atDate(date) ?? (Utils.sameDay(date) ? TimeOfDay.now() : TimeOfDayUtils.zero).atDate(date),
+       );
 
   @override
   State<StatefulWidget> createState() => _DayViewState<E>();
@@ -113,7 +113,7 @@ class _DayViewState<E extends FlutterWeekViewEventMixin> extends ZoomableHeaders
       mainWidget = createMainWidget();
     } else {
       mainWidget = DragTarget<E>(
-        builder: (_, __, ___) => createMainWidget(),
+        builder: (_, _, _) => createMainWidget(),
         onAcceptWithDetails: (details) {
           // Drag details contains the global position of the drag event. First,
           // we convert it to a local position on the widget.
@@ -219,8 +219,12 @@ class _DayViewState<E extends FlutterWeekViewEventMixin> extends ZoomableHeaders
     }
 
     if (Utils.sameDay(widget.date) && widget.minimumTime.atDate(widget.date).isBefore(DateTime.now()) && widget.maximumTime.atDate(widget.date).isAfter(DateTime.now())) {
-      Widget? currentTimeIndicator =
-          (widget.currentTimeIndicatorBuilder ?? DefaultBuilders.defaultCurrentTimeIndicatorBuilder)(widget.style, calculateTopOffset, widget.hourColumnStyle.width, widget.isRtl);
+      Widget? currentTimeIndicator = (widget.currentTimeIndicatorBuilder ?? DefaultBuilders.defaultCurrentTimeIndicatorBuilder)(
+        widget.style,
+        calculateTopOffset,
+        widget.hourColumnStyle.width,
+        widget.isRtl,
+      );
       if (currentTimeIndicator != null) {
         children.add(currentTimeIndicator);
       }
@@ -331,13 +335,13 @@ class _DayViewState<E extends FlutterWeekViewEventMixin> extends ZoomableHeaders
 
   /// Creates the background widgets that should be added to a stack.
   Widget createBackground() => Positioned.fill(
-        child: CustomPaint(
-          painter: widget.style.createBackgroundPainter(
-            dayView: widget,
-            topOffsetCalculator: calculateTopOffset,
-          ),
-        ),
-      );
+    child: CustomPaint(
+      painter: widget.style.createBackgroundPainter(
+        dayView: widget,
+        topOffsetCalculator: calculateTopOffset,
+      ),
+    ),
+  );
 
   /// Resets the events positioning.
   void reset() {
@@ -349,20 +353,22 @@ class _DayViewState<E extends FlutterWeekViewEventMixin> extends ZoomableHeaders
   void createEventsDrawProperties() {
     EventGrid eventsGrid = EventGrid();
     for (E event in List.of(events)) {
-      EventDrawProperties<E> drawProperties = eventsDrawProperties[event] ??
+      EventDrawProperties<E> drawProperties =
+          eventsDrawProperties[event] ??
           EventDrawProperties<E>(
             event: event,
             minimumTime: widget.minimumTime,
             maximumTime: widget.maximumTime,
             date: widget.date,
             isRtl: widget.isRtl,
-            builder: widget.eventWidgetBuilder ??
+            builder:
+                widget.eventWidgetBuilder ??
                 (event, height, width) => DefaultBuilders.defaultEventWidgetBuilder<E>(
-                      event,
-                      height,
-                      width,
-                      timeFormatter: widget.hourColumnStyle.timeFormatter,
-                    ),
+                  event,
+                  height,
+                  width,
+                  timeFormatter: widget.hourColumnStyle.timeFormatter,
+                ),
           );
       if (!drawProperties.shouldDraw) {
         events.remove(event);

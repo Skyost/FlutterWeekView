@@ -1,3 +1,7 @@
+## [1.4.4] - 2025-09-09
+
+* Updated dependencies and SDK version.
+
 ## [1.4.3] - 2024-02-18
 
 * Fixed a problem with `eventWidgetBuilder` in week views.

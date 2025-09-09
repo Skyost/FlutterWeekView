@@ -41,12 +41,11 @@ class WeekViewStyle extends ZoomableHeaderWidgetStyle {
     double? dayViewSeparatorWidth,
     Color? dayViewSeparatorColor,
     bool? showHorizontalScrollbar,
-  }) =>
-      WeekViewStyle(
-        headerSize: headerSize ?? this.headerSize,
-        dayViewWidth: dayViewWidth ?? this.dayViewWidth,
-        dayViewSeparatorWidth: dayViewSeparatorWidth ?? this.dayViewSeparatorWidth,
-        dayViewSeparatorColor: dayViewSeparatorColor ?? this.dayViewSeparatorColor,
-        showHorizontalScrollbar: showHorizontalScrollbar ?? this.showHorizontalScrollbar,
-      );
+  }) => WeekViewStyle(
+    headerSize: headerSize ?? this.headerSize,
+    dayViewWidth: dayViewWidth ?? this.dayViewWidth,
+    dayViewSeparatorWidth: dayViewSeparatorWidth ?? this.dayViewSeparatorWidth,
+    dayViewSeparatorColor: dayViewSeparatorColor ?? this.dayViewSeparatorColor,
+    showHorizontalScrollbar: showHorizontalScrollbar ?? this.showHorizontalScrollbar,
+  );
 }

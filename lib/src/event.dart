@@ -3,13 +3,14 @@ import 'package:flutter_week_view/src/styles/zoomable_header_widget.dart';
 import 'package:flutter_week_view/src/utils/utils.dart';
 
 /// Builds an event text widget.
-typedef EventTextBuilder<E extends FlutterWeekViewEventMixin> = Widget Function(
-  E event,
-  TimeFormatter timeFormatter,
-  TextStyle textStyle,
-  double height,
-  double width,
-);
+typedef EventTextBuilder<E extends FlutterWeekViewEventMixin> =
+    Widget Function(
+      E event,
+      TimeFormatter timeFormatter,
+      TextStyle textStyle,
+      double height,
+      double width,
+    );
 
 /// Represents a flutter week view event.
 mixin FlutterWeekViewEventMixin {
@@ -68,8 +69,8 @@ abstract class _TypedFlutterWeekViewEvent<T extends _TypedFlutterWeekViewEvent<T
     required this.description,
     required DateTime start,
     required DateTime end,
-  })  : start = start.yearMonthDayHourMinute,
-        end = end.yearMonthDayHourMinute;
+  }) : start = start.yearMonthDayHourMinute,
+       end = end.yearMonthDayHourMinute;
 
   @override
   T copyWith({
@@ -116,13 +117,12 @@ class FlutterWeekViewEvent extends _TypedFlutterWeekViewEvent<FlutterWeekViewEve
     String? description,
     DateTime? start,
     DateTime? end,
-  }) =>
-      FlutterWeekViewEvent(
-        title: title ?? this.title,
-        description: description ?? this.description,
-        start: start ?? this.start,
-        end: end ?? this.end,
-      );
+  }) => FlutterWeekViewEvent(
+    title: title ?? this.title,
+    description: description ?? this.description,
+    start: start ?? this.start,
+    end: end ?? this.end,
+  );
 }
 
 /// A non-abstract flutter week view event that also holds a value.
@@ -146,14 +146,13 @@ class FlutterWeekViewEventWithValue<T> extends _TypedFlutterWeekViewEvent<Flutte
     DateTime? start,
     DateTime? end,
     T? value,
-  }) =>
-      FlutterWeekViewEventWithValue(
-        title: title ?? this.title,
-        description: description ?? this.description,
-        start: start ?? this.start,
-        end: end ?? this.end,
-        value: value ?? this.value,
-      );
+  }) => FlutterWeekViewEventWithValue(
+    title: title ?? this.title,
+    description: description ?? this.description,
+    start: start ?? this.start,
+    end: end ?? this.end,
+    value: value ?? this.value,
+  );
 
   @override
   int compareTo(FlutterWeekViewEventWithValue<T> other) {

@@ -27,9 +27,9 @@ class DayBarStyle {
     Color? color,
     this.decoration,
     Alignment? textAlignment,
-  })  : dateFormatter = dateFormatter ?? DefaultBuilders.defaultDateFormatter,
-        color = color ?? const Color(0xFFEBEBEB),
-        textAlignment = textAlignment ?? Alignment.center;
+  }) : dateFormatter = dateFormatter ?? DefaultBuilders.defaultDateFormatter,
+       color = color ?? const Color(0xFFEBEBEB),
+       textAlignment = textAlignment ?? Alignment.center;
 
   /// Creates a new day bar style according to the specified date.
   DayBarStyle.fromDate({
@@ -40,16 +40,17 @@ class DayBarStyle {
     Decoration? decoration,
     Alignment? textAlignment,
   }) : this(
-          dateFormatter: dateFormatter,
-          textStyle: textStyle ??
-              TextStyle(
-                color: Utils.sameDay(date) ? Colors.blue[800] : Colors.black54,
-                fontWeight: FontWeight.bold,
-              ),
-          color: color,
-          decoration: decoration,
-          textAlignment: textAlignment,
-        );
+         dateFormatter: dateFormatter,
+         textStyle:
+             textStyle ??
+             TextStyle(
+               color: Utils.sameDay(date) ? Colors.blue[800] : Colors.black54,
+               fontWeight: FontWeight.bold,
+             ),
+         color: color,
+         decoration: decoration,
+         textAlignment: textAlignment,
+       );
 
   /// Allows to copy the current style instance with your own properties.
   DayBarStyle copyWith({
@@ -58,12 +59,11 @@ class DayBarStyle {
     Color? color,
     Decoration? decoration,
     Alignment? textAlignment,
-  }) =>
-      DayBarStyle(
-        dateFormatter: dateFormatter ?? this.dateFormatter,
-        textStyle: textStyle ?? this.textStyle,
-        color: color ?? this.color,
-        decoration: decoration ?? this.decoration,
-        textAlignment: textAlignment ?? this.textAlignment,
-      );
+  }) => DayBarStyle(
+    dateFormatter: dateFormatter ?? this.dateFormatter,
+    textStyle: textStyle ?? this.textStyle,
+    color: color ?? this.color,
+    decoration: decoration ?? this.decoration,
+    textAlignment: textAlignment ?? this.textAlignment,
+  );
 }
