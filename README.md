@@ -17,7 +17,7 @@ multiple days.
 
 ## Example
 
-If you want a <q>real project</q> example, you can check [this one](https://github.com/Skyost/FlutterWeekView/tree/master/example) on Github.
+If you want a <q>real project</q> example, you can check [this one](https://github.com/Skyost/FlutterWeekView/tree/main/example) on Github.
 
 ### Day View
 
@@ -72,7 +72,7 @@ return DayView(
 
 Result :
 
-<img src="https://github.com/Skyost/FlutterWeekView/raw/master/screenshots/day_view.png" height="500">
+<img src="https://github.com/Skyost/FlutterWeekView/raw/main/screenshots/day_view.png" height="500">
 
 ### Week view
 
@@ -123,7 +123,7 @@ return WeekView(
 
 Result :
 
-<img src="https://github.com/Skyost/FlutterWeekView/raw/master/screenshots/week_view.gif" height="500">
+<img src="https://github.com/Skyost/FlutterWeekView/raw/main/screenshots/week_view.gif" height="500">
 
 ## Options
 
