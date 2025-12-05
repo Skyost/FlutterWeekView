@@ -262,7 +262,6 @@ class _DynamicDayViewState extends State<_DynamicDayView> {
 
   /// Updates [oldEvent] to [newEvent].
   void updateEvent(FlutterWeekViewEvent oldEvent, FlutterWeekViewEvent newEvent) {
-    List<FlutterWeekViewEvent> events = List.of(this.events);
     int index = events.indexOf(oldEvent);
     if (index >= 0) {
       events[index] = newEvent;
