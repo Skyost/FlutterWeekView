@@ -1,3 +1,7 @@
+## [1.4.5] - 2025-12-17
+
+* Fixed a problem with resizing.
+
 ## [1.4.4] - 2025-09-09
 
 * Updated dependencies and SDK version.
