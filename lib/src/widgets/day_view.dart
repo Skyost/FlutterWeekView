@@ -273,8 +273,8 @@ class _DayViewState<E extends FlutterWeekViewEventMixin> extends ZoomableHeaders
         // We restore the original event.end in order to pass the unchanged
         // event in the callback.
         DateTime newEventEnd = event.end;
-        setState(() => updateEvent(event, event.copyWith(end: originalResizeEventEnd)));
-        widget.resizeEventOptions!.onEventResized(event, newEventEnd);
+        setState(() => updateEvent(event, event.copyWith(end: newEventEnd)));
+        widget.resizeEventOptions!.onEventResized(event.copyWith(end: originalResizeEventEnd), newEventEnd);
       },
       onVerticalDragUpdate: (details) {
         if (event is! CopyableEvent<E>) {
@@ -391,7 +391,6 @@ class _DayViewState<E extends FlutterWeekViewEventMixin> extends ZoomableHeaders
 
   /// Updates [oldEvent] to [newEvent].
   void updateEvent(E oldEvent, E newEvent) {
-    List<E> events = List.of(this.events);
     int index = events.indexOf(oldEvent);
     if (index >= 0) {
       events[index] = newEvent;
